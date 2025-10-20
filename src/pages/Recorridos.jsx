@@ -16,8 +16,7 @@ const Recorridos = () => {
   
   const [formData, setFormData] = useState({
     fecha: new Date().toISOString().split('T')[0],
-    hora_inicio: '',
-    hora_fin: '',
+    hora_inicio: new Date().toTimeString().slice(0, 5),
     vehiculo_id: '',
     tipo_recorrido: 'llevar',
     costo: '',
@@ -120,7 +119,6 @@ const Recorridos = () => {
       const data = {
         fecha: formData.fecha,
         hora_inicio: formData.hora_inicio,
-        hora_fin: formData.hora_fin || null,
         vehiculo_id: formData.vehiculo_id,
         tipo_recorrido: formData.tipo_recorrido,
         costo: formData.costo ? parseFloat(formData.costo) : null,
@@ -133,8 +131,7 @@ const Recorridos = () => {
         showAlert('Recorrido creado exitosamente', 'success');
         setFormData({
           fecha: new Date().toISOString().split('T')[0],
-          hora_inicio: '',
-          hora_fin: '',
+          hora_inicio: new Date().toTimeString().slice(0, 5),
           vehiculo_id: '',
           tipo_recorrido: 'llevar',
           costo: '',
@@ -184,23 +181,13 @@ const Recorridos = () => {
             </div>
 
             <div className="input-group">
-              <label>Hora de Inicio *</label>
+              <label>Hora *</label>
               <input
                 type="time"
                 name="hora_inicio"
                 value={formData.hora_inicio}
                 onChange={handleChange}
                 required
-              />
-            </div>
-
-            <div className="input-group">
-              <label>Hora de Fin</label>
-              <input
-                type="time"
-                name="hora_fin"
-                value={formData.hora_fin}
-                onChange={handleChange}
               />
             </div>
 
