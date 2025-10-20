@@ -16,7 +16,6 @@ const Recorridos = () => {
   const [ninosSeleccionados, setNinosSeleccionados] = useState([]);
   const [editando, setEditando] = useState(false);
   const [recorridoId, setRecorridoId] = useState(null);
-
   const [formData, setFormData] = useState({
     fecha: new Date().toISOString().split('T')[0],
     hora_inicio: new Date().toTimeString().slice(0, 5),
@@ -74,27 +73,22 @@ const Recorridos = () => {
   const agregarNino = (e) => {
     const ninoId = e.target.value;
     if (!ninoId) return;
-
     const nino = ninos.find((n) => n.id === ninoId);
     if (!nino) return;
-
     const yaExiste = ninosSeleccionados.find((n) => n.nino_id === ninoId);
     if (yaExiste) {
       showAlert('Este niño ya está agregado', 'error');
       return;
     }
-
     setNinosSeleccionados([
       ...ninosSeleccionados,
       {
         nino_id: ninoId,
         nombre: nino.nombre,
         apellidos: nino.apellidos,
-        hora_recogida: formData.hora_inicio, // Se pone automáticamente la hora del recorrido
         notas: '',
       },
     ]);
-
     e.target.value = '';
   };
 
@@ -103,20 +97,18 @@ const Recorridos = () => {
     setNinosSeleccionados(nuevosNinos);
   };
 
-  const actualizarHoraNino = (index, hora) => {
+  const actualizarNotaNino = (index, nota) => {
     const nuevosNinos = [...ninosSeleccionados];
-    nuevosNinos[index].hora_recogida = hora;
+    nuevosNinos[index].notas = nota;
     setNinosSeleccionados(nuevosNinos);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!formData.fecha || !formData.hora_inicio || !formData.vehiculo_id) {
       showAlert('Fecha, hora de inicio y vehículo son requeridos', 'error');
       return;
     }
-
     try {
       const data = {
         fecha: formData.fecha,
@@ -126,7 +118,6 @@ const Recorridos = () => {
         notas: formData.notas || null,
         ninos: ninosSeleccionados,
       };
-
       if (editando) {
         // Actualizar recorrido existente
         const response = await updateRecorrido(recorridoId, data);
@@ -172,7 +163,6 @@ const Recorridos = () => {
       tipo_recorrido: recorrido.tipo_recorrido,
       notas: recorrido.notas || '',
     });
-
     // Cargar los niños del recorrido
     if (recorrido.ninos && recorrido.ninos.length > 0) {
       setNinosSeleccionados(
@@ -180,19 +170,16 @@ const Recorridos = () => {
           nino_id: nino.nino_id,
           nombre: nino.nombre,
           apellidos: nino.apellidos,
-          hora_recogida: nino.hora_recogida || '',
           notas: nino.notas || '',
         }))
       );
     }
-
     // Scroll al formulario
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm('¿Estás seguro de eliminar este recorrido?')) return;
-
     try {
       const response = await deleteRecorrido(id);
       if (response.data.success) {
@@ -209,7 +196,6 @@ const Recorridos = () => {
       <div className="page-header">
         <h2>📍 Gestión de Recorridos</h2>
       </div>
-
       <div className="form-card">
         <h3>{editando ? 'Editar Recorrido' : 'Crear Nuevo Recorrido'}</h3>
         <form onSubmit={handleSubmit}>
@@ -224,7 +210,6 @@ const Recorridos = () => {
                 required
               />
             </div>
-
             <div className="input-group">
               <label>Hora *</label>
               <input
@@ -235,7 +220,6 @@ const Recorridos = () => {
                 required
               />
             </div>
-
             <div className="input-group">
               <label>Vehículo *</label>
               <select
@@ -252,7 +236,6 @@ const Recorridos = () => {
                 ))}
               </select>
             </div>
-
             <div className="input-group">
               <label>Tipo de Recorrido *</label>
               <select
@@ -266,7 +249,6 @@ const Recorridos = () => {
                 <option value="ambos">Ambos</option>
               </select>
             </div>
-
             <div className="input-group full-width">
               <label>Notas</label>
               <input
@@ -278,7 +260,6 @@ const Recorridos = () => {
               />
             </div>
           </div>
-
           <div className="ninos-section">
             <h4>Niños en el Recorrido</h4>
             <div className="input-group">
@@ -292,7 +273,6 @@ const Recorridos = () => {
                 ))}
               </select>
             </div>
-
             <div className="ninos-list">
               {ninosSeleccionados.length === 0 ? (
                 <p className="empty-message">No hay niños agregados</p>
@@ -302,12 +282,7 @@ const Recorridos = () => {
                     <span className="nino-name">
                       {nino.nombre} {nino.apellidos}
                     </span>
-                    <input
-                      type="time"
-                      value={nino.hora_recogida}
-                      onChange={(e) => actualizarHoraNino(index, e.target.value)}
-                      placeholder="Hora"
-                    />
+                    
                     <button
                       type="button"
                       className="btn-remove"
@@ -320,7 +295,6 @@ const Recorridos = () => {
               )}
             </div>
           </div>
-
           <div className="form-actions">
             <button type="submit" className="btn btn-primary">
               {editando ? '💾 Actualizar Recorrido' : '✅ Crear Recorrido'}
@@ -336,7 +310,6 @@ const Recorridos = () => {
           </div>
         </form>
       </div>
-
       <div className="cards-grid">
         {recorridos.map((recorrido) => (
           <div key={recorrido.id} className="card recorrido-card">
@@ -358,7 +331,7 @@ const Recorridos = () => {
                 {recorrido.ninos.map((nino, idx) => (
                   <div key={idx} className="nino-detail">
                     • {nino.nombre} {nino.apellidos}
-                    {nino.hora_recogida && ` (${nino.hora_recogida})`}
+                    {nino.notas && ` (${nino.notas})`}
                   </div>
                 ))}
               </div>
@@ -385,7 +358,6 @@ const Recorridos = () => {
           </div>
         ))}
       </div>
-
       {recorridos.length === 0 && (
         <div className="empty-state">
           <p>No hay recorridos registrados</p>

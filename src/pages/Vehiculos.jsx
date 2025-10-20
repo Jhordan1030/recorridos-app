@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { getVehiculos, createVehiculo, deleteVehiculo } from '../services/api';
+import { getVehiculos, createVehiculo, deleteVehiculo, updateVehiculo } from '../services/api';
 
 const Vehiculos = () => {
   const { showAlert, vehiculos, setVehiculos } = useApp();
@@ -11,6 +11,8 @@ const Vehiculos = () => {
     capacidad: '',
     costo_por_recorrido: '',
   });
+  const [editMode, setEditMode] = useState(false);
+  const [editId, setEditId] = useState(null);
 
   useEffect(() => {
     loadVehiculos();
@@ -36,41 +38,58 @@ const Vehiculos = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!formData.descripcion) {
       showAlert('Descripción es requerida', 'error');
       return;
     }
 
-    try {
-      const data = {
-        tipo: formData.tipo,
-        descripcion: formData.descripcion,
-        placa: formData.placa || null,
-        capacidad: formData.capacidad ? parseInt(formData.capacidad) : null,
-        costo_por_recorrido: formData.costo_por_recorrido ? parseFloat(formData.costo_por_recorrido) : 0,
-      };
+    const data = {
+      tipo: formData.tipo,
+      descripcion: formData.descripcion,
+      placa: formData.placa || null,
+      capacidad: formData.capacidad ? parseInt(formData.capacidad) : null,
+      costo_por_recorrido: formData.costo_por_recorrido ? parseFloat(formData.costo_por_recorrido) : 0,
+    };
 
-      const response = await createVehiculo(data);
-      if (response.data.success) {
-        showAlert('Vehículo creado exitosamente', 'success');
-        setFormData({
-          tipo: 'propio',
-          descripcion: '',
-          placa: '',
-          capacidad: '',
-          costo_por_recorrido: '',
-        });
-        loadVehiculos();
+    try {
+      if (editMode) {
+        // Actualizar vehículo existente
+        const response = await updateVehiculo(editId, data);
+        if (response.data.success) {
+          showAlert('Vehículo actualizado exitosamente', 'success');
+          setEditMode(false);
+          setEditId(null);
+          setFormData({
+            tipo: 'propio',
+            descripcion: '',
+            placa: '',
+            capacidad: '',
+            costo_por_recorrido: '',
+          });
+          loadVehiculos();
+        }
+      } else {
+        // Crear nuevo vehículo
+        const response = await createVehiculo(data);
+        if (response.data.success) {
+          showAlert('Vehículo creado exitosamente', 'success');
+          setFormData({
+            tipo: 'propio',
+            descripcion: '',
+            placa: '',
+            capacidad: '',
+            costo_por_recorrido: '',
+          });
+          loadVehiculos();
+        }
       }
     } catch (error) {
-      showAlert('Error al crear vehículo: ' + error.message, 'error');
+      showAlert(`Error al ${editMode ? 'actualizar' : 'crear'} vehículo: ` + error.message, 'error');
     }
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm('¿Estás seguro de desactivar este vehículo?')) return;
-
     try {
       const response = await deleteVehiculo(id);
       if (response.data.success) {
@@ -82,14 +101,37 @@ const Vehiculos = () => {
     }
   };
 
+  const handleEdit = (vehiculo) => {
+    setEditMode(true);
+    setEditId(vehiculo.id);
+    setFormData({
+      tipo: vehiculo.tipo,
+      descripcion: vehiculo.descripcion,
+      placa: vehiculo.placa || '',
+      capacidad: vehiculo.capacidad || '',
+      costo_por_recorrido: vehiculo.costo_por_recorrido || '',
+    });
+  };
+
+  const cancelEdit = () => {
+    setEditMode(false);
+    setEditId(null);
+    setFormData({
+      tipo: 'propio',
+      descripcion: '',
+      placa: '',
+      capacidad: '',
+      costo_por_recorrido: '',
+    });
+  };
+
   return (
     <div className="page">
       <div className="page-header">
         <h2>🚗 Gestión de Vehículos</h2>
       </div>
-
       <div className="form-card">
-        <h3>Agregar Nuevo Vehículo</h3>
+        <h3>{editMode ? 'Editar Vehículo' : 'Agregar Nuevo Vehículo'}</h3>
         <form onSubmit={handleSubmit}>
           <div className="form-grid">
             <div className="input-group">
@@ -101,7 +143,6 @@ const Vehiculos = () => {
                 <option value="taxi">Taxi</option>
               </select>
             </div>
-
             <div className="input-group">
               <label>Descripción *</label>
               <input
@@ -113,7 +154,6 @@ const Vehiculos = () => {
                 required
               />
             </div>
-
             <div className="input-group">
               <label>Placa</label>
               <input
@@ -124,7 +164,6 @@ const Vehiculos = () => {
                 placeholder="Ej: ABC-1234"
               />
             </div>
-
             <div className="input-group">
               <label>Capacidad</label>
               <input
@@ -135,7 +174,6 @@ const Vehiculos = () => {
                 placeholder="Ej: 5"
               />
             </div>
-
             <div className="input-group">
               <label>Costo por Recorrido ($) *</label>
               <input
@@ -149,18 +187,22 @@ const Vehiculos = () => {
               />
             </div>
           </div>
-
           <div className="form-actions">
             <button type="submit" className="btn btn-primary">
-              ➕ Agregar Vehículo
+              {editMode ? '✅ Actualizar Vehículo' : '➕ Agregar Vehículo'}
             </button>
-            <button type="button" className="btn btn-secondary" onClick={loadVehiculos}>
-              🔄 Actualizar Lista
-            </button>
+            {editMode ? (
+              <button type="button" className="btn btn-secondary" onClick={cancelEdit}>
+                ❌ Cancelar
+              </button>
+            ) : (
+              <button type="button" className="btn btn-secondary" onClick={loadVehiculos}>
+                🔄 Actualizar Lista
+              </button>
+            )}
           </div>
         </form>
       </div>
-
       <div className="cards-grid">
         {vehiculos.map((vehiculo) => (
           <div key={vehiculo.id} className="card">
@@ -171,6 +213,12 @@ const Vehiculos = () => {
             <p className="cost"><strong>💰 Costo:</strong> ${vehiculo.costo_por_recorrido || '0.00'}</p>
             <div className="card-actions">
               <button
+                className="btn btn-edit btn-small"
+                onClick={() => handleEdit(vehiculo)}
+              >
+                ✏️ Editar
+              </button>
+              <button
                 className="btn btn-danger btn-small"
                 onClick={() => handleDelete(vehiculo.id)}
               >
@@ -180,7 +228,6 @@ const Vehiculos = () => {
           </div>
         ))}
       </div>
-
       {vehiculos.length === 0 && (
         <div className="empty-state">
           <p>No hay vehículos registrados</p>
