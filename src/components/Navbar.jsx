@@ -1,25 +1,36 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const Navbar = () => {
+  const location = useLocation();
+
+  const isActive = (path) => {
+    return location.pathname === path ? 'active' : '';
+  };
+
   return (
     <nav className="navbar">
       <div className="nav-container">
-        <div className="nav-logo">
-          <Link to="/">🚌 App Recorridos</Link>
-        </div>
+        <h1 className="nav-logo">🚌 App Recorridos</h1>
         <ul className="nav-menu">
           <li>
-            <Link to="/">Dashboard</Link>
+            <Link to="/" className={isActive('/')}>
+              📊 Dashboard
+            </Link>
           </li>
           <li>
-            <Link to="/recorridos">Recorridos</Link>
+            <Link to="/recorridos" className={isActive('/recorridos')}>
+              📍 Recorridos
+            </Link>
           </li>
           <li>
-            <Link to="/ninos">Niños</Link>
+            <Link to="/ninos" className={isActive('/ninos')}>
+              👦 Niños
+            </Link>
           </li>
           <li>
-            <Link to="/vehiculos">Vehículos</Link>
+            <Link to="/vehiculos" className={isActive('/vehiculos')}>
+              🚗 Vehículos
+            </Link>
           </li>
         </ul>
       </div>

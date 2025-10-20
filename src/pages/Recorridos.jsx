@@ -4,6 +4,7 @@ import {
   getRecorridos,
   createRecorrido,
   deleteRecorrido,
+  updateRecorrido,
   getNinos,
   getVehiculos,
 } from '../services/api';
@@ -13,13 +14,14 @@ const Recorridos = () => {
   const [ninos, setNinos] = useState([]);
   const [vehiculos, setVehiculos] = useState([]);
   const [ninosSeleccionados, setNinosSeleccionados] = useState([]);
-  
+  const [editando, setEditando] = useState(false);
+  const [recorridoId, setRecorridoId] = useState(null);
+
   const [formData, setFormData] = useState({
     fecha: new Date().toISOString().split('T')[0],
     hora_inicio: new Date().toTimeString().slice(0, 5),
     vehiculo_id: '',
     tipo_recorrido: 'llevar',
-    costo: '',
     notas: '',
   });
 
@@ -88,7 +90,7 @@ const Recorridos = () => {
         nino_id: ninoId,
         nombre: nino.nombre,
         apellidos: nino.apellidos,
-        hora_recogida: '',
+        hora_recogida: formData.hora_inicio, // Se pone automáticamente la hora del recorrido
         notas: '',
       },
     ]);
@@ -121,28 +123,71 @@ const Recorridos = () => {
         hora_inicio: formData.hora_inicio,
         vehiculo_id: formData.vehiculo_id,
         tipo_recorrido: formData.tipo_recorrido,
-        costo: formData.costo ? parseFloat(formData.costo) : null,
         notas: formData.notas || null,
         ninos: ninosSeleccionados,
       };
 
-      const response = await createRecorrido(data);
-      if (response.data.success) {
-        showAlert('Recorrido creado exitosamente', 'success');
-        setFormData({
-          fecha: new Date().toISOString().split('T')[0],
-          hora_inicio: new Date().toTimeString().slice(0, 5),
-          vehiculo_id: '',
-          tipo_recorrido: 'llevar',
-          costo: '',
-          notas: '',
-        });
-        setNinosSeleccionados([]);
-        loadRecorridos();
+      if (editando) {
+        // Actualizar recorrido existente
+        const response = await updateRecorrido(recorridoId, data);
+        if (response.data.success) {
+          showAlert('Recorrido actualizado exitosamente', 'success');
+          resetForm();
+          loadRecorridos();
+        }
+      } else {
+        // Crear nuevo recorrido
+        const response = await createRecorrido(data);
+        if (response.data.success) {
+          showAlert('Recorrido creado exitosamente', 'success');
+          resetForm();
+          loadRecorridos();
+        }
       }
     } catch (error) {
-      showAlert('Error al crear recorrido: ' + error.message, 'error');
+      showAlert('Error al guardar recorrido: ' + error.message, 'error');
     }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      fecha: new Date().toISOString().split('T')[0],
+      hora_inicio: new Date().toTimeString().slice(0, 5),
+      vehiculo_id: '',
+      tipo_recorrido: 'llevar',
+      notas: '',
+    });
+    setNinosSeleccionados([]);
+    setEditando(false);
+    setRecorridoId(null);
+  };
+
+  const handleEdit = (recorrido) => {
+    setEditando(true);
+    setRecorridoId(recorrido.id);
+    setFormData({
+      fecha: recorrido.fecha,
+      hora_inicio: recorrido.hora_inicio,
+      vehiculo_id: recorrido.vehiculo_id,
+      tipo_recorrido: recorrido.tipo_recorrido,
+      notas: recorrido.notas || '',
+    });
+
+    // Cargar los niños del recorrido
+    if (recorrido.ninos && recorrido.ninos.length > 0) {
+      setNinosSeleccionados(
+        recorrido.ninos.map((nino) => ({
+          nino_id: nino.nino_id,
+          nombre: nino.nombre,
+          apellidos: nino.apellidos,
+          hora_recogida: nino.hora_recogida || '',
+          notas: nino.notas || '',
+        }))
+      );
+    }
+
+    // Scroll al formulario
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDelete = async (id) => {
@@ -166,7 +211,7 @@ const Recorridos = () => {
       </div>
 
       <div className="form-card">
-        <h3>Crear Nuevo Recorrido</h3>
+        <h3>{editando ? 'Editar Recorrido' : 'Crear Nuevo Recorrido'}</h3>
         <form onSubmit={handleSubmit}>
           <div className="form-grid">
             <div className="input-group">
@@ -220,18 +265,6 @@ const Recorridos = () => {
                 <option value="traer">Traer</option>
                 <option value="ambos">Ambos</option>
               </select>
-            </div>
-
-            <div className="input-group">
-              <label>Costo ($) - Opcional</label>
-              <input
-                type="number"
-                step="0.01"
-                name="costo"
-                value={formData.costo}
-                onChange={handleChange}
-                placeholder="Se calcula automáticamente"
-              />
             </div>
 
             <div className="input-group full-width">
@@ -290,8 +323,13 @@ const Recorridos = () => {
 
           <div className="form-actions">
             <button type="submit" className="btn btn-primary">
-              ✅ Crear Recorrido
+              {editando ? '💾 Actualizar Recorrido' : '✅ Crear Recorrido'}
             </button>
+            {editando && (
+              <button type="button" className="btn btn-secondary" onClick={resetForm}>
+                ❌ Cancelar
+              </button>
+            )}
             <button type="button" className="btn btn-secondary" onClick={loadRecorridos}>
               🔄 Actualizar Lista
             </button>
@@ -303,7 +341,7 @@ const Recorridos = () => {
         {recorridos.map((recorrido) => (
           <div key={recorrido.id} className="card recorrido-card">
             <h4>
-              📅 {recorrido.fecha} - {recorrido.hora_inicio}
+              📅 {recorrido.fecha.split('T')[0]} - {recorrido.hora_inicio}
             </h4>
             <p>
               <strong>🚗</strong> {recorrido.vehiculo_descripcion || 'Sin vehículo'}
@@ -331,6 +369,12 @@ const Recorridos = () => {
               </p>
             )}
             <div className="card-actions">
+              <button
+                className="btn btn-primary btn-small"
+                onClick={() => handleEdit(recorrido)}
+              >
+                ✏️ Editar
+              </button>
               <button
                 className="btn btn-danger btn-small"
                 onClick={() => handleDelete(recorrido.id)}
