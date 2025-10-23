@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { getRecorridos } from '../services/api';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const Dashboard = () => {
   const { showAlert } = useApp();
@@ -15,19 +17,132 @@ const Dashboard = () => {
     "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
   ];
 
+  // Función para exportar a PDF
+  const exportarPDF = () => {
+    try {
+      const doc = new jsPDF();
+      
+      // Título
+      doc.setFontSize(20);
+      doc.setTextColor(102, 126, 234);
+      doc.text('Reporte de Recorridos', doc.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
+      
+      // Subtítulo con mes y año
+      doc.setFontSize(14);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`${nombresMeses[mesActual - 1]} ${añoActual}`, doc.internal.pageSize.getWidth() / 2, 30, { align: 'center' });
+      
+      // Línea separadora
+      doc.setDrawColor(102, 126, 234);
+      doc.setLineWidth(0.5);
+      doc.line(20, 35, 190, 35);
+      
+      // Estadísticas generales
+      const totalDias = Object.keys(recorridosMensuales).length;
+      const totalRecorridos = Object.values(recorridosMensuales).reduce(
+        (total, recorridos) => total + recorridos.length, 
+        0
+      );
+      
+      doc.setFontSize(11);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`Total de días con recorridos: ${totalDias}`, 20, 45);
+      doc.text(`Total de recorridos: ${totalRecorridos}`, 20, 52);
+      
+      // Preparar datos para la tabla
+      const datosTabla = [];
+      
+      Object.keys(recorridosMensuales)
+        .filter(dia => !isNaN(parseInt(dia)))
+        .sort((a, b) => parseInt(a) - parseInt(b))
+        .forEach(dia => {
+          recorridosMensuales[dia].forEach((recorrido, idx) => {
+            datosTabla.push([
+              idx === 0 ? `${dia} ${nombresMeses[mesActual - 1]}` : '',
+              recorrido.hora_inicio || 'N/A',
+              recorrido.tipo_recorrido || 'N/A',
+              recorrido.vehiculo_descripcion || 'N/A',
+              `$${recorrido.costo || '0.00'}`,
+              recorrido.ninos?.length || 0,
+              recorrido.notas || '-'
+            ]);
+          });
+        });
+      
+      // Crear la tabla usando autoTable como función
+      autoTable(doc, {
+        startY: 60,
+        head: [['Fecha', 'Hora', 'Tipo', 'Vehículo', 'Costo', 'Niños', 'Notas']],
+        body: datosTabla,
+        theme: 'striped',
+        headStyles: {
+          fillColor: [102, 126, 234],
+          textColor: [255, 255, 255],
+          fontStyle: 'bold',
+          halign: 'center'
+        },
+        columnStyles: {
+          0: { cellWidth: 30 },
+          1: { cellWidth: 20, halign: 'center' },
+          2: { cellWidth: 25, halign: 'center' },
+          3: { cellWidth: 35 },
+          4: { cellWidth: 20, halign: 'right' },
+          5: { cellWidth: 15, halign: 'center' },
+          6: { cellWidth: 45 }
+        },
+        styles: {
+          fontSize: 9,
+          cellPadding: 3
+        },
+        alternateRowStyles: {
+          fillColor: [245, 245, 245]
+        }
+      });
+      
+      // Footer con fecha de generación
+      const fechaGeneracion = new Date().toLocaleDateString('es-EC', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      
+      const pageCount = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(128, 128, 128);
+        doc.text(
+          `Generado el: ${fechaGeneracion}`,
+          doc.internal.pageSize.getWidth() / 2,
+          doc.internal.pageSize.height - 10,
+          { align: 'center' }
+        );
+        doc.text(
+          `Página ${i} de ${pageCount}`,
+          190,
+          doc.internal.pageSize.height - 10,
+          { align: 'right' }
+        );
+      }
+      
+      // Guardar el PDF
+      doc.save(`Recorridos_${nombresMeses[mesActual - 1]}_${añoActual}.pdf`);
+      showAlert('PDF generado exitosamente', 'success');
+    } catch (error) {
+      console.error('Error al generar PDF:', error);
+      showAlert('Error al generar el PDF: ' + error.message, 'error');
+    }
+  };
+
   // Función para procesar y agrupar recorridos por día
   const procesarRecorridos = (data) => {
-    console.log('Procesando datos:', data);
     const recorridosAgrupados = {};
 
     if (Array.isArray(data)) {
       data.forEach(recorrido => {
-        console.log('Procesando recorrido:', recorrido);
-        
         if (recorrido.fecha) {
-          console.log(`Procesando recorrido con fecha: ${recorrido.fecha}`);
-          
-          // Intentar diferentes formatos de fecha
           let fechaProcesada = null;
           
           // Formato YYYY-MM-DD
@@ -65,9 +180,6 @@ const Dashboard = () => {
           }
           
           if (fechaProcesada) {
-            console.log(`Fecha procesada: ${recorrido.fecha} -> año=${fechaProcesada.año}, mes=${fechaProcesada.mes}, dia=${fechaProcesada.dia}`);
-            console.log(`Comparando: mes=${fechaProcesada.mes} vs mesActual=${mesActual}, año=${fechaProcesada.año} vs añoActual=${añoActual}`);
-            
             // Filtramos por el mes y año seleccionado
             if (fechaProcesada.mes === mesActual && fechaProcesada.año === añoActual && 
                 !isNaN(fechaProcesada.dia) && fechaProcesada.dia > 0 && fechaProcesada.dia <= 31) {
@@ -75,15 +187,8 @@ const Dashboard = () => {
                 recorridosAgrupados[fechaProcesada.dia] = [];
               }
               recorridosAgrupados[fechaProcesada.dia].push(recorrido);
-              console.log(`✅ Agregado recorrido al día ${fechaProcesada.dia}`);
-            } else {
-              console.log(`❌ Recorrido descartado: fecha=${recorrido.fecha}, mes=${fechaProcesada.mes}, año=${fechaProcesada.año}, dia=${fechaProcesada.dia}`);
             }
-          } else {
-            console.log(`❌ No se pudo procesar la fecha: ${recorrido.fecha}`);
           }
-        } else {
-          console.log(`❌ Recorrido sin fecha:`, recorrido);
         }
       });
     }
@@ -97,7 +202,6 @@ const Dashboard = () => {
       }
     });
 
-    console.log('Recorridos agrupados finales:', recorridosLimpios);
     setRecorridosMensuales(recorridosLimpios);
     setLoading(false);
   };
@@ -107,77 +211,19 @@ const Dashboard = () => {
     setLoading(true);
     try {
       const response = await getRecorridos();
-      console.log('=== RESPUESTA COMPLETA DE LA API ===');
-      console.log('Status:', response.status);
-      console.log('Data completa:', response.data);
-      console.log('Tipo de data:', typeof response.data);
-      console.log('Es array:', Array.isArray(response.data));
       
       let data = [];
       
-      // Manejar diferentes estructuras de respuesta
       if (response.data) {
-        console.log('Estructura de response.data:', Object.keys(response.data));
-        
         if (response.data.success && response.data.data) {
-          console.log('Usando response.data.data');
           data = response.data.data;
         } else if (Array.isArray(response.data)) {
-          console.log('Usando response.data directamente (es array)');
           data = response.data;
         } else if (response.data.recorridos) {
-          console.log('Usando response.data.recorridos');
           data = response.data.recorridos;
-        } else {
-          console.log('Estructura no reconocida, explorando...');
-          // Intentar encontrar datos en cualquier propiedad
-          Object.keys(response.data).forEach(key => {
-            console.log(`Propiedad ${key}:`, response.data[key]);
-            if (Array.isArray(response.data[key]) && response.data[key].length > 0) {
-              console.log(`Encontrado array en ${key} con ${response.data[key].length} elementos`);
-              data = response.data[key];
-            }
-          });
         }
       }
       
-      console.log('Datos extraídos:', data);
-      console.log('Cantidad de datos:', data.length);
-      
-      // Si no hay datos reales, crear datos de prueba
-      if (!data || data.length === 0) {
-        console.log('No hay datos reales, creando datos de prueba');
-        const hoy = new Date();
-        const diaActual = hoy.getDate();
-        const mesActualNum = hoy.getMonth() + 1;
-        const añoActualNum = hoy.getFullYear();
-        
-        data = [
-          {
-            id: 1,
-            fecha: `${añoActualNum}-${mesActualNum.toString().padStart(2, '0')}-${diaActual.toString().padStart(2, '0')}`,
-            nombre: 'Recorrido Matutino',
-            hora_inicio: '07:00',
-            hora_fin: '08:30'
-          },
-          {
-            id: 2,
-            fecha: `${añoActualNum}-${mesActualNum.toString().padStart(2, '0')}-${(diaActual + 1).toString().padStart(2, '0')}`,
-            nombre: 'Recorrido Vespertino',
-            hora_inicio: '15:00',
-            hora_fin: '16:30'
-          },
-          {
-            id: 3,
-            fecha: `${añoActualNum}-${mesActualNum.toString().padStart(2, '0')}-${(diaActual + 2).toString().padStart(2, '0')}`,
-            nombre: 'Recorrido Especial',
-            hora_inicio: '10:00',
-            hora_fin: '11:30'
-          }
-        ];
-      }
-      
-      console.log('Datos finales a procesar:', data);
       procesarRecorridos(data);
     } catch (error) {
       console.error('Error al cargar recorridos:', error);
@@ -190,34 +236,28 @@ const Dashboard = () => {
   useEffect(() => {
     loadRecorridosData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mesActual, añoActual]); // Recargar si cambia el mes/año seleccionado
+  }, [mesActual, añoActual]);
 
   // Generar la matriz del calendario para el mes/año actual
   const generarCalendario = () => {
-    const primerDia = new Date(añoActual, mesActual - 1, 1).getDay(); // 0=Dom, 1=Lun...
-    const diasEnElMes = new Date(añoActual, mesActual, 0).getDate(); // Último día del mes
+    const primerDia = new Date(añoActual, mesActual - 1, 1).getDay();
+    const diasEnElMes = new Date(añoActual, mesActual, 0).getDate();
     const matriz = [];
     let dia = 1;
 
-    // Rellenar las celdas vacías al inicio (padding)
-    let fila = Array(primerDia === 0 ? 6 : primerDia - 1).fill(null); // Ajuste para que la semana empiece en Lunes
+    let fila = Array(primerDia === 0 ? 6 : primerDia - 1).fill(null);
 
-    // Llenar los días del mes
     while (dia <= diasEnElMes) {
       if (fila.length === 7) {
         matriz.push(fila);
         fila = [];
       }
 
-      // 1. Determinar el estado del día
       const tieneRecorridos = recorridosMensuales[dia] && recorridosMensuales[dia].length > 0;
       const esHoy = (dia === new Date().getDate() && 
                     mesActual === (new Date().getMonth() + 1) && 
                     añoActual === new Date().getFullYear());
 
-      console.log(`Día ${dia}: tieneRecorridos=${tieneRecorridos}, esHoy=${esHoy}, recorridos=${recorridosMensuales[dia]?.length || 0}`);
-
-      // 2. Crear el objeto del día
       fila.push({
         numero: dia,
         tieneRecorridos: tieneRecorridos,
@@ -228,7 +268,6 @@ const Dashboard = () => {
       dia++;
     }
 
-    // Rellenar las celdas vacías al final
     while (fila.length < 7) {
       fila.push(null);
     }
@@ -263,9 +302,16 @@ const Dashboard = () => {
       </div>
 
       <div className="calendar-controls">
-          <button onClick={() => cambiarMes(-1)} className="btn btn-secondary">{'< Mes Anterior'}</button>
-          <h3>{nombresMeses[mesActual - 1]} {añoActual}</h3>
-          <button onClick={() => cambiarMes(1)} className="btn btn-secondary">{'Siguiente Mes >'}</button>
+        <button onClick={() => cambiarMes(-1)} className="btn btn-secondary">{'< Mes Anterior'}</button>
+        <h3>{nombresMeses[mesActual - 1]} {añoActual}</h3>
+        <button onClick={() => cambiarMes(1)} className="btn btn-secondary">{'Siguiente Mes >'}</button>
+        <button 
+          onClick={exportarPDF} 
+          className="btn btn-primary"
+          disabled={Object.keys(recorridosMensuales).length === 0}
+        >
+          📄 Exportar PDF
+        </button>
       </div>
 
       {loading ? (
@@ -277,8 +323,8 @@ const Dashboard = () => {
           <div className="dashboard-summary">
             <h4>Resumen del Mes:</h4>
             <div className="legend">
-                <span className="recorrido-si-leyenda">Día con Recorrido</span>
-                <span className="recorrido-no-leyenda">Día sin Recorrido</span>
+              <span className="recorrido-si-leyenda">Día con Recorrido</span>
+              <span className="recorrido-no-leyenda">Día sin Recorrido</span>
             </div>
           </div>
 
@@ -304,55 +350,55 @@ const Dashboard = () => {
           <div className="recorridos-detail">
             <h4>📊 Resumen de Recorridos del Mes</h4>
             {Object.keys(recorridosMensuales).length === 0 ? (
-                <div className="empty-state">
-                  <p>📅 No hay recorridos registrados para este mes.</p>
-                  <p>Los recorridos aparecerán aquí una vez que se creen en la sección de Recorridos.</p>
-                </div>
+              <div className="empty-state">
+                <p>📅 No hay recorridos registrados para este mes.</p>
+                <p>Los recorridos aparecerán aquí una vez que se creen en la sección de Recorridos.</p>
+              </div>
             ) : (
-                <div className="recorridos-summary">
-                  <div className="summary-header">
-                    <div className="summary-stat">
-                      <span className="stat-number">{Object.keys(recorridosMensuales).length}</span>
-                      <span className="stat-label">Días con Recorridos</span>
-                    </div>
-                    <div className="summary-stat">
-                      <span className="stat-number">
-                        {Object.values(recorridosMensuales).reduce((total, recorridos) => total + recorridos.length, 0)}
-                      </span>
-                      <span className="stat-label">Total de Recorridos</span>
-                    </div>
+              <div className="recorridos-summary">
+                <div className="summary-header">
+                  <div className="summary-stat">
+                    <span className="stat-number">{Object.keys(recorridosMensuales).length}</span>
+                    <span className="stat-label">Días con Recorridos</span>
                   </div>
-                  
-                  <div className="recorridos-timeline">
-                    <h5>🗓️ Cronología del Mes</h5>
-                    <div className="timeline-grid">
-                      {Object.keys(recorridosMensuales)
-                        .filter(dia => !isNaN(parseInt(dia)))
-                        .sort((a, b) => parseInt(a) - parseInt(b))
-                        .map(dia => (
-                          <div key={dia} className="timeline-item">
-                            <div className="timeline-date">
-                              <span className="dia-numero">{dia}</span>
-                              <span className="dia-mes">{nombresMeses[mesActual - 1].substring(0, 3)}</span>
+                  <div className="summary-stat">
+                    <span className="stat-number">
+                      {Object.values(recorridosMensuales).reduce((total, recorridos) => total + recorridos.length, 0)}
+                    </span>
+                    <span className="stat-label">Total de Recorridos</span>
+                  </div>
+                </div>
+                
+                <div className="recorridos-timeline">
+                  <h5>🗓️ Cronología del Mes</h5>
+                  <div className="timeline-grid">
+                    {Object.keys(recorridosMensuales)
+                      .filter(dia => !isNaN(parseInt(dia)))
+                      .sort((a, b) => parseInt(a) - parseInt(b))
+                      .map(dia => (
+                        <div key={dia} className="timeline-item">
+                          <div className="timeline-date">
+                            <span className="dia-numero">{dia}</span>
+                            <span className="dia-mes">{nombresMeses[mesActual - 1].substring(0, 3)}</span>
+                          </div>
+                          <div className="timeline-content">
+                            <div className="recorrido-count">
+                              {recorridosMensuales[dia].length} recorrido{recorridosMensuales[dia].length > 1 ? 's' : ''}
                             </div>
-                            <div className="timeline-content">
-                              <div className="recorrido-count">
-                                {recorridosMensuales[dia].length} recorrido{recorridosMensuales[dia].length > 1 ? 's' : ''}
-                              </div>
-                              <div className="recorrido-details">
-                                {recorridosMensuales[dia].map((recorrido, idx) => (
-                                  <div key={idx} className="recorrido-mini">
-                                    <span className="recorrido-hora">{recorrido.hora_inicio}</span>
-                                    <span className="recorrido-tipo">{recorrido.tipo_recorrido || 'Recorrido'}</span>
-                                  </div>
-                                ))}
-                              </div>
+                            <div className="recorrido-details">
+                              {recorridosMensuales[dia].map((recorrido, idx) => (
+                                <div key={idx} className="recorrido-mini">
+                                  <span className="recorrido-hora">{recorrido.hora_inicio}</span>
+                                  <span className="recorrido-tipo">{recorrido.tipo_recorrido || 'Recorrido'}</span>
+                                </div>
+                              ))}
                             </div>
                           </div>
-                        ))}
-                    </div>
+                        </div>
+                      ))}
                   </div>
                 </div>
+              </div>
             )}
           </div>
         </>
