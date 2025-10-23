@@ -858,3 +858,12 @@ body {
     justify-content: center;
   }
 }
+.recorrido-vehiculo {
+  color: #2b6cb0; /* Azul */
+  font-weight: 600;
+}
+
+.recorrido-costo {
+  color: #059669; /* Verde */
+  font-weight: bold;
+}
