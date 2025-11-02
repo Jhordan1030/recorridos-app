@@ -16,6 +16,11 @@ const Recorridos = () => {
   const [ninosSeleccionados, setNinosSeleccionados] = useState([]);
   const [editando, setEditando] = useState(false);
   const [recorridoId, setRecorridoId] = useState(null);
+  
+  // Estados para el filtro de mes/año
+  const [mesSeleccionado, setMesSeleccionado] = useState(new Date().getMonth() + 1);
+  const [añoSeleccionado, setAñoSeleccionado] = useState(new Date().getFullYear());
+  
   const [formData, setFormData] = useState({
     fecha: new Date().toISOString().split('T')[0],
     hora_inicio: new Date().toTimeString().slice(0, 5),
@@ -23,6 +28,11 @@ const Recorridos = () => {
     tipo_recorrido: 'llevar',
     notas: '',
   });
+
+  const nombresMeses = [
+    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+  ];
 
   useEffect(() => {
     loadRecorridos();
@@ -63,6 +73,38 @@ const Recorridos = () => {
     }
   };
 
+  // Función para filtrar recorridos por mes/año
+  const recorridosFiltrados = recorridos.filter(recorrido => {
+    if (!recorrido.fecha) return false;
+    
+    const fecha = new Date(recorrido.fecha);
+    const mes = fecha.getMonth() + 1;
+    const año = fecha.getFullYear();
+    
+    return mes === mesSeleccionado && año === añoSeleccionado;
+  });
+
+  // Calcular el total del mes
+  const totalMes = recorridosFiltrados.reduce((total, recorrido) => {
+    return total + (parseFloat(recorrido.costo) || 0);
+  }, 0);
+
+  const cambiarMes = (delta) => {
+    let nuevoMes = mesSeleccionado + delta;
+    let nuevoAño = añoSeleccionado;
+    
+    if (nuevoMes > 12) {
+      nuevoMes = 1;
+      nuevoAño += 1;
+    } else if (nuevoMes < 1) {
+      nuevoMes = 12;
+      nuevoAño -= 1;
+    }
+    
+    setMesSeleccionado(nuevoMes);
+    setAñoSeleccionado(nuevoAño);
+  };
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -97,12 +139,6 @@ const Recorridos = () => {
     setNinosSeleccionados(nuevosNinos);
   };
 
-  const actualizarNotaNino = (index, nota) => {
-    const nuevosNinos = [...ninosSeleccionados];
-    nuevosNinos[index].notas = nota;
-    setNinosSeleccionados(nuevosNinos);
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.fecha || !formData.hora_inicio || !formData.vehiculo_id) {
@@ -119,7 +155,6 @@ const Recorridos = () => {
         ninos: ninosSeleccionados,
       };
       if (editando) {
-        // Actualizar recorrido existente
         const response = await updateRecorrido(recorridoId, data);
         if (response.data.success) {
           showAlert('Recorrido actualizado exitosamente', 'success');
@@ -127,7 +162,6 @@ const Recorridos = () => {
           loadRecorridos();
         }
       } else {
-        // Crear nuevo recorrido
         const response = await createRecorrido(data);
         if (response.data.success) {
           showAlert('Recorrido creado exitosamente', 'success');
@@ -157,13 +191,12 @@ const Recorridos = () => {
     setEditando(true);
     setRecorridoId(recorrido.id);
     setFormData({
-      fecha: recorrido.fecha,
+      fecha: recorrido.fecha.split('T')[0],
       hora_inicio: recorrido.hora_inicio,
       vehiculo_id: recorrido.vehiculo_id,
       tipo_recorrido: recorrido.tipo_recorrido,
       notas: recorrido.notas || '',
     });
-    // Cargar los niños del recorrido
     if (recorrido.ninos && recorrido.ninos.length > 0) {
       setNinosSeleccionados(
         recorrido.ninos.map((nino) => ({
@@ -174,7 +207,6 @@ const Recorridos = () => {
         }))
       );
     }
-    // Scroll al formulario
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -196,6 +228,7 @@ const Recorridos = () => {
       <div className="page-header">
         <h2>📍 Gestión de Recorridos</h2>
       </div>
+      
       <div className="form-card">
         <h3>{editando ? 'Editar Recorrido' : 'Crear Nuevo Recorrido'}</h3>
         <form onSubmit={handleSubmit}>
@@ -282,7 +315,6 @@ const Recorridos = () => {
                     <span className="nino-name">
                       {nino.nombre} {nino.apellidos}
                     </span>
-                    
                     <button
                       type="button"
                       className="btn-remove"
@@ -310,8 +342,23 @@ const Recorridos = () => {
           </div>
         </form>
       </div>
+
+      {/* Filtro por mes/año */}
+      <div className="calendar-controls" style={{ marginTop: '2rem', marginBottom: '1rem' }}>
+        <button onClick={() => cambiarMes(-1)} className="btn btn-secondary">{'< Mes Anterior'}</button>
+        <h3>{nombresMeses[mesSeleccionado - 1]} {añoSeleccionado}</h3>
+        <button onClick={() => cambiarMes(1)} className="btn btn-secondary">{'Siguiente Mes >'}</button>
+      </div>
+
+      {/* Resumen del mes */}
+      <div className="dashboard-summary" style={{ marginBottom: '1rem' }}>
+        <h4>Resumen del Mes:</h4>
+        <p><strong>Total de recorridos:</strong> {recorridosFiltrados.length}</p>
+        <p style={{ color: '#333' }}><strong>💰 Costo total:</strong> ${totalMes.toFixed(2)}</p>
+      </div>
+
       <div className="cards-grid">
-        {recorridos.map((recorrido) => (
+        {recorridosFiltrados.map((recorrido) => (
           <div key={recorrido.id} className="card recorrido-card">
             <h4>
               📅 {recorrido.fecha.split('T')[0]} - {recorrido.hora_inicio}
@@ -358,9 +405,10 @@ const Recorridos = () => {
           </div>
         ))}
       </div>
-      {recorridos.length === 0 && (
+      
+      {recorridosFiltrados.length === 0 && (
         <div className="empty-state">
-          <p>No hay recorridos registrados</p>
+          <p>No hay recorridos registrados para {nombresMeses[mesSeleccionado - 1]} {añoSeleccionado}</p>
         </div>
       )}
     </div>
