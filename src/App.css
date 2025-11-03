@@ -1,3 +1,5 @@
+/* src/App.css (MODIFICADO) */
+
 * {
   margin: 0;
   padding: 0;
@@ -6,97 +8,119 @@
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  /* El fondo del body se mantiene, pero la mayor parte de la app usará el degradado del main-content-wrapper */
   min-height: 100vh;
 }
 
 .App {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-/* NAVBAR */
+/* 🚀 ESTRUCTURA PRINCIPAL DEL LAYOUT LATERAL */
+.app-layout {
+  display: flex; /* Layout lateral (Sidebar + Contenido) */
+  min-height: 100vh;
+  flex-grow: 1;
+}
+
+.main-content-wrapper {
+  flex-grow: 1;
+  overflow-y: auto;
+  /* EL FONDO DEGRADADO ESTÁ AQUÍ para el contenido */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+}
+
+/* --- NAVBAR (SIDEBAR) --- */
 .navbar {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  position: sticky;
+  /* Ahora el NAV tendrá el mismo degradado de fondo */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5); /* Sombra más oscura para contraste */
+  position: sticky; 
   top: 0;
   z-index: 1000;
+  min-width: 250px; 
+  height: 100vh; 
+  overflow-y: auto; 
+  padding: 0; 
 }
 
 .nav-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 1rem 2rem;
+  margin: 0;
+  padding: 2rem 1rem;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2rem;
 }
 
 .nav-logo {
-  font-size: 1.5rem;
-  color: #667eea;
+  font-size: 1.75rem; /* Logo un poco más grande */
+  color: white; /* Color blanco para el logo sobre el fondo oscuro */
   font-weight: 700;
+  margin-bottom: 1rem;
 }
 
 .nav-menu {
   display: flex;
+  flex-direction: column; 
   list-style: none;
-  gap: 2rem;
+  gap: 0.5rem;
+  padding: 0;
+  width: 100%;
+}
+
+.nav-menu li {
+  width: 100%;
 }
 
 .nav-menu a {
   text-decoration: none;
-  color: #333;
+  color: #e0e0e0; /* Color claro para los enlaces inactivos */
   font-weight: 600;
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1rem;
   border-radius: 8px;
   transition: all 0.3s;
+  display: block;
+  text-align: left;
 }
 
 .nav-menu a:hover {
-  background: #667eea;
+  background: rgba(255, 255, 255, 0.1); /* Fondo transparente claro al pasar el mouse */
   color: white;
 }
 
 .nav-menu a.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  /* Estilo para el enlace activo */
+  background: white; 
+  color: #667eea; /* Color primario del tema para el texto activo */
+  font-weight: 700;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 /* ALERT */
 .alert {
+  /* Se ajusta para que el alert cubra el espacio del main-content */
   max-width: 1200px;
   margin: 1rem auto;
   padding: 1rem 2rem;
   border-radius: 10px;
   font-weight: 600;
   animation: slideDown 0.3s ease-out;
+  position: absolute; 
+  width: calc(100% - 250px); 
+  left: 250px;
+  top: 0; 
 }
 
 @keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.alert-success {
-  background: #d4edda;
-  color: #155724;
-  border: 2px solid #c3e6cb;
-}
-
-.alert-error {
-  background: #f8d7da;
-  color: #721c24;
-  border: 2px solid #f5c6cb;
-}
+.alert-success { background: #d4edda; color: #155724; border: 2px solid #c3e6cb; }
+.alert-error { background: #f8d7da; color: #721c24; border: 2px solid #f5c6cb; }
 
 /* MAIN CONTENT */
 .main-content {
@@ -105,24 +129,15 @@ body {
   padding: 2rem;
 }
 
-.page {
-  animation: fadeIn 0.5s;
-}
-
+.page { animation: fadeIn 0.5s; }
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .page-header {
   text-align: center;
-  color: white;
+  color: white; /* Color blanco para los encabezados sobre el fondo oscuro */
   margin-bottom: 2rem;
 }
 
@@ -131,6 +146,7 @@ body {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+/* --- (El resto de tus estilos de formularios, botones, cards, etc. sigue aquí) --- */
 /* FORM CARD */
 .form-card {
   background: white;
@@ -743,127 +759,92 @@ body {
   margin: 0;
 }
 
-/* RESPONSIVE */
+/* 📱 RESPONSIVE (Móvil) */
 @media (max-width: 768px) {
+  .app-layout {
+    flex-direction: column; 
+  }
+
+  .navbar {
+    min-width: 100%;
+    height: auto;
+    position: relative; 
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  }
+
   .nav-container {
-    flex-direction: column;
+    flex-direction: row; /* Logo a la izquierda */
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    flex-wrap: wrap;
     gap: 1rem;
+  }
+  
+  .nav-logo {
+    margin-bottom: 0;
+    flex-grow: 1; /* Ocupa el espacio necesario */
   }
 
   .nav-menu {
-    flex-direction: column;
+    flex-direction: row; /* Menú de vuelta a horizontal en móvil */
+    flex-wrap: wrap; 
+    justify-content: flex-end; /* Alinea los links a la derecha del logo (si caben) */
     gap: 0.5rem;
-    width: 100%;
+    width: auto; /* Permite que el menú se ajuste */
   }
-
+  
   .nav-menu a {
     text-align: center;
+    padding: 0.5rem 0.75rem;
+    /* Asegura que los colores sean visibles */
+    color: white; 
+  }
+  
+  .nav-menu a.active {
+    background: white;
+    color: #667eea;
+  }
+  
+  /* Ajuste del alert en móvil */
+  .alert {
+      position: relative;
+      left: 0;
+      width: 100%;
+      padding: 1rem;
   }
 
   .page-header h2 {
     font-size: 1.8rem;
   }
+/* --- (El resto de tus estilos responsivos siguen aquí) --- */
+  .form-grid { grid-template-columns: 1fr; }
+  .cards-grid { grid-template-columns: 1fr; }
+  .main-content { padding: 1rem; }
+  .form-card { padding: 1.5rem; }
 
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .cards-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .main-content {
-    padding: 1rem;
-  }
-
-  .form-card {
-    padding: 1.5rem;
-  }
-
-  .nino-item {
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .nino-item input[type="time"] {
-    width: 100%;
-  }
+  .nino-item { flex-wrap: wrap; gap: 0.5rem; }
+  .nino-item input[type="time"] { width: 100%; }
 
   /* DASHBOARD RESPONSIVE */
-  .dashboard-page {
-    padding: 1rem;
-  }
-
-  .calendar-controls {
-    flex-direction: column;
-    gap: 1rem;
-    text-align: center;
-  }
-
-  .calendar-controls h3 {
-    font-size: 1.2rem;
-  }
-
-  .legend {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: center;
-  }
-
-  .calendar-day {
-    padding: 0.5rem;
-    min-height: 50px;
-    font-size: 0.9rem;
-  }
-
-  .calendar-header span {
-    padding: 0.75rem 0.5rem;
-    font-size: 0.9rem;
-  }
+  .dashboard-page { padding: 1rem; }
+  .calendar-controls { flex-direction: column; gap: 1rem; text-align: center; }
+  .calendar-controls h3 { font-size: 1.2rem; }
+  .legend { flex-direction: column; gap: 1rem; align-items: center; }
+  .calendar-day { padding: 0.5rem; min-height: 50px; font-size: 0.9rem; }
+  .calendar-header span { padding: 0.75rem 0.5rem; font-size: 0.9rem; }
 
   /* RECORRIDOS SUMMARY RESPONSIVE */
-  .summary-header {
-    flex-direction: column;
-    gap: 1rem;
-    text-align: center;
-  }
-
-  .summary-stat {
-    flex: none;
-  }
-
-  .stat-number {
-    font-size: 2rem;
-  }
-
-  .timeline-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .timeline-item {
-    flex-direction: column;
-    text-align: center;
-    gap: 0.75rem;
-  }
-
-  .timeline-date {
-    align-self: center;
-  }
-
-  .recorrido-details {
-    width: 100%;
-  }
-
-  .recorrido-mini {
-    justify-content: center;
-  }
-}
-.recorrido-vehiculo {
-  color: #2b6cb0; /* Azul */
-  font-weight: 600;
+  .summary-header { flex-direction: column; gap: 1rem; text-align: center; }
+  .summary-stat { flex: none; }
+  .stat-number { font-size: 2rem; }
+  .timeline-grid { grid-template-columns: 1fr; }
+  .timeline-item { flex-direction: column; text-align: center; gap: 0.75rem; }
+  .timeline-date { align-self: center; }
+  .recorrido-details { width: 100%; }
+  .recorrido-mini { justify-content: center; }
 }
 
-.recorrido-costo {
-  color: #059669; /* Verde */
-  font-weight: bold;
-}
+/* Colores específicos de la aplicación */
+.recorrido-vehiculo { color: #2b6cb0; font-weight: 600; }
+.recorrido-costo { color: #059669; font-weight: bold; }

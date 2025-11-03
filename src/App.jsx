@@ -1,3 +1,4 @@
+// src/App.jsx
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AppProvider } from './context/AppContext';
 import Navbar from './components/Navbar';
@@ -13,16 +14,21 @@ function App() {
     <AppProvider>
       <Router>
         <div className="App">
-          <Navbar />
           <Alert />
-          <div className="main-content">
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/ninos" element={<Ninos />} />
-              <Route path="/vehiculos" element={<Vehiculos />} />
-              <Route path="/recorridos" element={<Recorridos />} />
-            </Routes>
+          {/* Nuevo contenedor para el layout lateral */}
+          <div className="app-layout"> 
+            <Navbar />
+            <div className="main-content-wrapper"> {/* Contenedor para el contenido principal con su scroll */}
+              <div className="main-content">
+                <Routes>
+                  <Route path="/" element={<Dashboard />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/ninos" element={<Ninos />} />
+                  <Route path="/vehiculos" element={<Vehiculos />} />
+                  <Route path="/recorridos" element={<Recorridos />} />
+                </Routes>
+              </div>
+            </div>
           </div>
         </div>
       </Router>
