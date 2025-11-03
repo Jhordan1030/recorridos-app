@@ -15,10 +15,11 @@ function App() {
       <Router>
         <div className="App">
           <Alert />
-          {/* Nuevo contenedor para el layout lateral */}
-          <div className="app-layout"> 
+          {/* Este es el contenedor CRÍTICO para el layout lateral */}
+          <div className="app-layout">
             <Navbar />
-            <div className="main-content-wrapper"> {/* Contenedor para el contenido principal con su scroll */}
+            {/* Este es el contenedor que lleva el fondo de color y el scroll */}
+            <div className="main-content-wrapper">
               <div className="main-content">
                 <Routes>
                   <Route path="/" element={<Dashboard />} />

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { getNinos, createNino, deleteNino, updateNino } from '../services/api';
+// Importamos el componente Modal
+import Modal from '../components/Modal';
 
 const Ninos = () => {
   const { showAlert, ninos, setNinos } = useApp();
@@ -10,6 +12,10 @@ const Ninos = () => {
     direccion: '',
     telefono_contacto: '',
   });
+
+  // Nuevo estado para el modal
+  const [mostrarModal, setMostrarModal] = useState(false);
+
   const [editMode, setEditMode] = useState(false);
   const [editId, setEditId] = useState(null);
 
@@ -35,6 +41,17 @@ const Ninos = () => {
     });
   };
 
+  const resetForm = () => {
+    setEditMode(false);
+    setEditId(null);
+    setFormData({
+      nombre: '',
+      apellidos: '',
+      direccion: '',
+      telefono_contacto: '',
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.nombre || !formData.apellidos) {
@@ -42,35 +59,28 @@ const Ninos = () => {
       return;
     }
     try {
+      let response;
       if (editMode) {
         // Actualizar niño existente
-        const response = await updateNino(editId, formData);
+        response = await updateNino(editId, formData);
         if (response.data.success) {
           showAlert('Niño actualizado exitosamente', 'success');
-          setEditMode(false);
-          setEditId(null);
-          setFormData({
-            nombre: '',
-            apellidos: '',
-            direccion: '',
-            telefono_contacto: '',
-          });
-          loadNinos();
         }
       } else {
         // Crear nuevo niño
-        const response = await createNino(formData);
+        response = await createNino(formData);
         if (response.data.success) {
           showAlert('Niño creado exitosamente', 'success');
-          setFormData({
-            nombre: '',
-            apellidos: '',
-            direccion: '',
-            telefono_contacto: '',
-          });
-          loadNinos();
         }
       }
+
+      // Acciones comunes tras éxito
+      if (response.data.success) {
+        resetForm();
+        loadNinos();
+        setMostrarModal(false); // Cierra el modal
+      }
+
     } catch (error) {
       showAlert(`Error al ${editMode ? 'actualizar' : 'crear'} niño: ` + error.message, 'error');
     }
@@ -89,6 +99,7 @@ const Ninos = () => {
     }
   };
 
+  // Función para cargar datos de edición y abrir el modal
   const handleEdit = (nino) => {
     setEditMode(true);
     setEditId(nino.id);
@@ -98,96 +109,118 @@ const Ninos = () => {
       direccion: nino.direccion || '',
       telefono_contacto: nino.telefono_contacto || '',
     });
+    setMostrarModal(true); // Abre el modal
   };
 
-  const cancelEdit = () => {
-    setEditMode(false);
-    setEditId(null);
-    setFormData({
-      nombre: '',
-      apellidos: '',
-      direccion: '',
-      telefono_contacto: '',
-    });
+  // Función para abrir el modal en modo creación
+  const handleOpenCreateModal = () => {
+    resetForm();
+    setMostrarModal(true);
   };
+
+  // Función para cancelar edición y cerrar modal
+  const handleCloseModal = () => {
+    resetForm();
+    setMostrarModal(false);
+  };
+
+  // -------------------------------------------------------------------------
+  // COMPONENTE DEL FORMULARIO (renderizado dentro del Modal)
+  // -------------------------------------------------------------------------
+  const NinoForm = (
+    <div className="form-card">
+      <h3>{editMode ? '✏️ Editar Niño' : '➕ Agregar Nuevo Niño'}</h3>
+      <form onSubmit={handleSubmit}>
+        <div className="form-grid">
+          <div className="input-group">
+            <label>Nombre *</label>
+            <input
+              type="text"
+              name="nombre"
+              value={formData.nombre}
+              onChange={handleChange}
+              placeholder="Ej: Juan"
+              required
+            />
+          </div>
+          <div className="input-group">
+            <label>Apellidos *</label>
+            <input
+              type="text"
+              name="apellidos"
+              value={formData.apellidos}
+              onChange={handleChange}
+              placeholder="Ej: Pérez García"
+              required
+            />
+          </div>
+          <div className="input-group">
+            <label>Dirección</label>
+            <input
+              type="text"
+              name="direccion"
+              value={formData.direccion}
+              onChange={handleChange}
+              placeholder="Ej: Calle Principal 123"
+            />
+          </div>
+          <div className="input-group">
+            <label>Teléfono de Contacto</label>
+            <input
+              type="text"
+              name="telefono_contacto"
+              value={formData.telefono_contacto}
+              onChange={handleChange}
+              placeholder="Ej: 0999999999"
+            />
+          </div>
+        </div>
+        <div className="form-actions">
+          <button type="submit" className="btn btn-primary">
+            {editMode ? '💾 Actualizar Niño' : '✅ Agregar Niño'}
+          </button>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={handleCloseModal}
+          >
+            ❌ Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+  );
 
   return (
     <div className="page">
       <div className="page-header">
         <h2>👦 Gestión de Niños</h2>
       </div>
-      <div className="form-card">
-        <h3>{editMode ? 'Editar Niño' : 'Agregar Nuevo Niño'}</h3>
-        <form onSubmit={handleSubmit}>
-          <div className="form-grid">
-            <div className="input-group">
-              <label>Nombre *</label>
-              <input
-                type="text"
-                name="nombre"
-                value={formData.nombre}
-                onChange={handleChange}
-                placeholder="Ej: Juan"
-                required
-              />
-            </div>
-            <div className="input-group">
-              <label>Apellidos *</label>
-              <input
-                type="text"
-                name="apellidos"
-                value={formData.apellidos}
-                onChange={handleChange}
-                placeholder="Ej: Pérez García"
-                required
-              />
-            </div>
-            <div className="input-group">
-              <label>Dirección</label>
-              <input
-                type="text"
-                name="direccion"
-                value={formData.direccion}
-                onChange={handleChange}
-                placeholder="Ej: Calle Principal 123"
-              />
-            </div>
-            <div className="input-group">
-              <label>Teléfono de Contacto</label>
-              <input
-                type="text"
-                name="telefono_contacto"
-                value={formData.telefono_contacto}
-                onChange={handleChange}
-                placeholder="Ej: 0999999999"
-              />
-            </div>
-          </div>
-          <div className="form-actions">
-            <button type="submit" className="btn btn-primary">
-              {editMode ? '✅ Actualizar Niño' : '➕ Agregar Niño'}
-            </button>
-            {editMode && (
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={cancelEdit}
-              >
-                ❌ Cancelar
-              </button>
-            )}
-            {!editMode && (
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={loadNinos}
-              >
-                🔄 Actualizar Lista
-              </button>
-            )}
-          </div>
-        </form>
+
+      {/* Botón para abrir el Modal de Creación */}
+      <div className="form-actions" style={{ marginBottom: '2rem' }}>
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={handleOpenCreateModal}
+        >
+          ➕ Registrar Nuevo Niño
+        </button>
+        <button type="button" className="btn btn-secondary" onClick={loadNinos}>
+          🔄 Actualizar Lista
+        </button>
       </div>
+
+      {/* Modal */}
+      {mostrarModal && (
+        <Modal
+          title={editMode ? 'Editar Datos del Niño' : 'Registrar Nuevo Niño'}
+          onClose={handleCloseModal}
+        >
+          {NinoForm}
+        </Modal>
+      )}
+
       <div className="cards-grid">
         {ninos.map((nino) => (
           <div key={nino.id} className="card">
@@ -196,7 +229,7 @@ const Ninos = () => {
             <p><strong>📞</strong> {nino.telefono_contacto || 'Sin teléfono'}</p>
             <div className="card-actions">
               <button
-                className="btn btn-edit btn-small"
+                className="btn btn-primary btn-small"
                 onClick={() => handleEdit(nino)}
               >
                 ✏️ Editar
