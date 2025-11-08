@@ -1,21 +1,16 @@
 // src/pages/Dashboard.jsx 
-
 import React, { useEffect, useState, useMemo } from 'react';
 import { useApp } from '../context/AppContext';
 import { getRecorridos, getNinos, getVehiculos, createRecorrido, updateRecorrido } from '../services/api';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-
-// =======================================================
-// IMPORTACIÓN DE COMPONENTES DEL MODAL Y FORMULARIO
-// =======================================================
-import Modal from '../components/Modal'; 
+import Modal from '../components/Modal';
 
 const Dashboard = () => {
   const { showAlert } = useApp();
-  
+
   // ESTADOS PARA EL MODAL Y FORMULARIO
-  const [isModalOpen, setIsModalOpen] = useState(false); 
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [editando, setEditando] = useState(false);
   const [recorridoId, setRecorridoId] = useState(null);
   const [ninos, setNinos] = useState([]);
@@ -48,13 +43,13 @@ const Dashboard = () => {
     tipo_recorrido: 'llevar',
     notas: '',
   };
-  
+
   const [formData, setFormData] = useState(estadoInicialFormulario);
 
   // ---------------------------------------------------------------------------
-  // LÓGICA DEL DASHBOARD (sin cambios)
+  // LÓGICA DEL DASHBOARD
   // ---------------------------------------------------------------------------
-  
+
   const formatearHora = (hora) => {
     if (!hora) return '—';
     try {
@@ -76,14 +71,14 @@ const Dashboard = () => {
     try {
       const doc = new jsPDF();
       doc.setFontSize(20);
-      doc.setTextColor(55, 65, 81); 
+      doc.setTextColor(55, 65, 81);
       doc.text('Reporte de Recorridos', doc.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
 
       doc.setFontSize(14);
-      doc.setTextColor(107, 114, 128); 
+      doc.setTextColor(107, 114, 128);
       doc.text(`${nombresMeses[mesActual - 1]} ${añoActual}`, doc.internal.pageSize.getWidth() / 2, 30, { align: 'center' });
 
-      doc.setDrawColor(99, 102, 241); 
+      doc.setDrawColor(99, 102, 241);
       doc.setLineWidth(0.5);
       doc.line(20, 35, 190, 35);
 
@@ -128,7 +123,7 @@ const Dashboard = () => {
           2: { cellWidth: 60 }, 3: { cellWidth: 25, halign: 'right' }
         },
         styles: { fontSize: 10, cellPadding: 3 },
-        alternateRowStyles: { fillColor: [249, 250, 251] } 
+        alternateRowStyles: { fillColor: [249, 250, 251] }
       });
 
       const fechaGeneracion = new Date().toLocaleDateString('es-EC', {
@@ -139,7 +134,7 @@ const Dashboard = () => {
       for (let i = 1; i <= pageCount; i++) {
         doc.setPage(i);
         doc.setFontSize(8);
-        doc.setTextColor(156, 163, 175); 
+        doc.setTextColor(156, 163, 175);
         doc.text(`Generado el: ${fechaGeneracion}`, doc.internal.pageSize.getWidth() / 2, doc.internal.pageSize.height - 10, { align: 'center' });
         doc.text(`Página ${i} de ${pageCount}`, 190, doc.internal.pageSize.height - 10, { align: 'right' });
       }
@@ -224,7 +219,7 @@ const Dashboard = () => {
     const diasEnElMes = new Date(añoActual, mesActual, 0).getDate();
     const matriz = [];
     let dia = 1;
-    const offset = primerDia === 0 ? 6 : primerDia - 1; 
+    const offset = primerDia === 0 ? 6 : primerDia - 1;
     let fila = Array(offset).fill(null);
 
     while (dia <= diasEnElMes) {
@@ -252,11 +247,11 @@ const Dashboard = () => {
   };
 
   const matrizCalendario = useMemo(() => generarCalendario(), [mesActual, añoActual, recorridosMensuales]);
-  
+
   // ---------------------------------------------------------------------------
   // LÓGICA DEL MODAL Y FORMULARIO
   // ---------------------------------------------------------------------------
-  
+
   const loadNinos = async () => {
     try {
       const response = await getNinos();
@@ -316,7 +311,7 @@ const Dashboard = () => {
       tipo_recorrido: recorrido.tipo_recorrido,
       notas: recorrido.notas || '',
     });
-    
+
     if (recorrido.ninos && recorrido.ninos.length > 0) {
       setNinosSeleccionados(
         recorrido.ninos.map((nino) => ({
@@ -408,204 +403,273 @@ const Dashboard = () => {
   };
 
   // ---------------------------------------------------------------------------
-  // 🎨 RENDER (Estilos Tailwind)
+  // 🎨 RENDER MEJORADO CON RESPONSIVIDAD COMPLETA
   // ---------------------------------------------------------------------------
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> 
-      
-      {/* page-header */}
-      <div className="mb-8 pt-4"> 
-        <h2 className="text-3xl font-bold text-gray-800">
-          <span role="img" aria-label="dashboard">📊</span> Dashboard de Recorridos
+    <div className="min-h-screen bg-gray-50 py-4 px-3 sm:px-4 lg:px-6 xl:px-8">
+
+      {/* Header responsivo */}
+      <div className="mb-6 pt-2">
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 text-center sm:text-left px-2">
+          <span role="img" aria-label="dashboard" className="mr-2">📊</span>
+          Dashboard de Recorridos
         </h2>
       </div>
-      
-      {/* calendar-controls */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between bg-white p-4 rounded-xl shadow-lg mb-6 border border-gray-200">
-        
-        {/* Botones de navegación del mes y título */}
-        <div className='flex items-center justify-between w-full md:w-auto mb-3 md:mb-0'>
-            <div className='flex items-center'>
-                <button 
-                  onClick={() => cambiarMes(-1)} 
-                  className="bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-3 rounded-l-lg transition-colors text-sm"
-                >
-                  {'< Anterior'}
-                </button>
-                <h3 className="text-xl font-bold text-indigo-600 mx-2 text-center w-32">
-                  {nombresMeses[mesActual - 1]} {añoActual}
-                </h3>
-                <button 
-                  onClick={() => cambiarMes(1)} 
-                  className="bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-3 rounded-r-lg transition-colors text-sm"
-                >
-                  {'Siguiente >'}
-                </button>
-            </div>
-        </div>
-        
-        {/* Botones de Acción */}
-        <div className='flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full md:w-auto md:ml-auto'>
-            {/* BOTÓN QUE ABRE EL MODAL */}
+
+      {/* Controles de calendario - COMPLETAMENTE REDISEÑADO */}
+      <div className="bg-white p-4 rounded-xl shadow-lg mb-6 border border-gray-200 mx-2 sm:mx-0">
+
+        {/* Navegación del mes - Mejorada para móviles */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          {/* Navegación del mes */}
+          <div className="flex items-center justify-center w-full sm:w-auto order-2 sm:order-1">
             <button
-                onClick={handleOpenModal}
-                className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors w-full sm:w-auto"
+              onClick={() => cambiarMes(-1)}
+              className="bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-3 sm:px-4 rounded-l-lg transition-colors text-sm flex items-center shadow-sm"
             >
-                ➕ Nuevo Recorrido
+              <span className="hidden xs:inline">Anterior</span>
+              <span className="xs:hidden">‹</span>
             </button>
-            
+
+            <h3 className="text-lg sm:text-xl font-bold text-indigo-600 mx-2 sm:mx-4 text-center min-w-[140px] sm:min-w-[160px]">
+              {nombresMeses[mesActual - 1]} {añoActual}
+            </h3>
+
             <button
-                onClick={exportarPDF}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors disabled:bg-indigo-400 w-full sm:w-auto"
-                disabled={loading || totalRecorridosMes === 0}
+              onClick={() => cambiarMes(1)}
+              className="bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-3 sm:px-4 rounded-r-lg transition-colors text-sm flex items-center shadow-sm"
             >
-                📄 Exportar PDF
+              <span className="hidden xs:inline">Siguiente</span>
+              <span className="xs:hidden">›</span>
             </button>
+          </div>
+
+          {/* Botones de acción - Mejorados para móviles */}
+          <div className='flex flex-col xs:flex-row gap-2 w-full sm:w-auto justify-center sm:justify-end order-1 sm:order-2'>
+            <button
+              onClick={handleOpenModal}
+              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-3 sm:px-4 rounded-lg shadow-md transition-colors text-sm sm:text-base flex items-center justify-center gap-1 w-full xs:w-auto"
+            >
+              <span>➕</span>
+              <span className="hidden xs:inline">Nuevo Recorrido</span>
+              <span className="xs:hidden">Nuevo</span>
+            </button>
+
+            <button
+              onClick={exportarPDF}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-3 sm:px-4 rounded-lg shadow-md transition-colors text-sm sm:text-base disabled:bg-indigo-400 flex items-center justify-center gap-1 w-full xs:w-auto"
+              disabled={loading || totalRecorridosMes === 0}
+            >
+              <span>📄</span>
+              <span className="hidden xs:inline">Exportar PDF</span>
+              <span className="xs:hidden">PDF</span>
+            </button>
+          </div>
         </div>
       </div>
-      
+
       {loading ? (
-        <div className="flex justify-center items-center h-48 bg-white rounded-xl shadow-md border border-gray-200">
-          <p className="text-xl text-gray-600">🔄 Cargando datos del recorrido...</p>
+        <div className="flex justify-center items-center h-48 bg-white rounded-xl shadow-md border border-gray-200 mx-2 sm:mx-0">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+            <p className="text-lg text-gray-600">Cargando datos del recorrido...</p>
+          </div>
         </div>
       ) : (
         <>
-          {/* dashboard-summary y legend */}
-          <div className="bg-white p-6 rounded-xl shadow-lg mb-6 border border-gray-200">
-            
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4">
-              <span className="text-lg font-bold text-gray-700 mb-2 sm:mb-0">Resumen del Mes:</span>
-              <span className="text-2xl font-bold text-green-700">
-                💰 Costo total: ${costoTotalMes.toFixed(2)}
-              </span>
-            </div>
-            
-            <h4 className="text-lg font-semibold text-gray-700 mb-3 border-t pt-4 mt-4">Leyenda:</h4>
-            
-            <div className="flex flex-wrap gap-4 text-sm text-gray-600"> 
-              <span className="flex items-center">
-                <span className="w-4 h-4 rounded-full bg-green-500 mr-2"></span>
-                Día con Recorrido
-              </span>
-              <span className="flex items-center">
-                <span className="w-4 h-4 rounded-full bg-gray-300 mr-2 border border-gray-400"></span>
-                Día sin Recorrido
-              </span>
-            </div>
-          </div>
-          
-          {/* calendar-grid */}
-          <div className="bg-white p-4 rounded-xl shadow-lg mb-8 border border-gray-200">
-            <div className="grid grid-cols-7 text-center font-bold text-sm text-white bg-indigo-600 rounded-t-lg border-b-2 border-indigo-700">
-                <span className="p-2">Lun</span><span className="p-2">Mar</span><span className="p-2">Mié</span><span className="p-2">Jue</span><span className="p-2">Vie</span><span className="p-2">Sáb</span><span className="p-2">Dom</span>
-            </div>
+          {/* Resumen y leyenda - MEJORADO */}
+          <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg mb-6 border border-gray-200 mx-2 sm:mx-0">
 
-            {matrizCalendario.map((semana, idx) => (
-              <div key={idx} className="grid grid-cols-7">
-                {semana.map((dia, dIdx) => {
-                  let dayClasses = "p-2 h-16 border border-gray-200 flex items-start justify-end text-lg cursor-default";
-                  
-                  if (!dia) {
-                    dayClasses += " bg-gray-50 text-gray-400 pointer-events-none font-medium"; 
-                  } else {
-                    dayClasses += " hover:bg-gray-100 transition-colors duration-150";
-                    
-                    const tieneRecorridos = dia.tieneRecorridos;
-                    const esHoy = dia.esHoy;
-                    
-                    if (tieneRecorridos) {
-                        dayClasses += " bg-green-100 text-green-800 hover:bg-green-200 font-bold";
-                    } else if (esHoy) {
-                        dayClasses += " bg-indigo-100 text-gray-700 font-bold";
-                    } else {
-                        dayClasses += " bg-white text-gray-700 font-medium";
-                    }
-
-                    if (esHoy) {
-                      dayClasses += " ring-2 ring-indigo-500 ring-offset-2"; 
-                    }
-                  }
-
-                  return (
-                    <div
-                      key={dIdx}
-                      className={dayClasses}
-                      title={dia ? (dia.tieneRecorridos ? `Recorridos: ${recorridosMensuales[dia.numero]?.length || 0}` : 'Sin recorridos') : ''}
-                    >
-                      {dia && dia.numero}
-                    </div>
-                  );
-                })}
+            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full lg:w-auto">
+                <span className="text-lg font-bold text-gray-700 whitespace-nowrap">Resumen del Mes:</span>
+                <div className="bg-green-50 px-4 py-2 rounded-lg border border-green-200 w-full sm:w-auto">
+                  <span className="text-xl sm:text-2xl font-bold text-green-700">
+                    💰 ${costoTotalMes.toFixed(2)}
+                  </span>
+                  <span className="text-green-600 text-sm ml-2">Costo total</span>
+                </div>
               </div>
-            ))}
+
+              {/* Estadísticas rápidas */}
+              <div className="flex flex-wrap gap-3 w-full lg:w-auto justify-start lg:justify-end">
+                <div className="bg-blue-50 px-3 py-1 rounded-lg border border-blue-200 text-center min-w-[80px]">
+                  <div className="text-blue-700 font-bold text-sm">{diasConRecorridos}</div>
+                  <div className="text-blue-600 text-xs">Días activos</div>
+                </div>
+                <div className="bg-purple-50 px-3 py-1 rounded-lg border border-purple-200 text-center min-w-[80px]">
+                  <div className="text-purple-700 font-bold text-sm">{totalRecorridosMes}</div>
+                  <div className="text-purple-600 text-xs">Total viajes</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="border-t pt-4 mt-4">
+              <h4 className="text-md font-semibold text-gray-700 mb-3">Leyenda:</h4>
+
+              <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+                <span className="flex items-center">
+                  <span className="w-3 h-3 rounded-full bg-green-500 mr-2 shadow-sm"></span>
+                  Día con Recorrido
+                </span>
+                <span className="flex items-center">
+                  <span className="w-3 h-3 rounded-full bg-gray-300 mr-2 border border-gray-400 shadow-sm"></span>
+                  Día sin Recorrido
+                </span>
+                <span className="flex items-center">
+                  <span className="w-3 h-3 rounded-full bg-indigo-100 mr-2 border-2 border-indigo-500 shadow-sm"></span>
+                  Día Actual
+                </span>
+              </div>
+            </div>
           </div>
-          
-          {/* recorridos-detail */}
-          <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
-            <h4 className="text-xl font-bold text-gray-800 mb-6 border-b pb-3">
-              📊 Resumen de Recorridos del Mes
+
+          {/* Calendario - MEJORADO PARA MÓVILES */}
+          <div className="bg-white p-3 sm:p-4 rounded-xl shadow-lg mb-6 border border-gray-200 mx-2 sm:mx-0 overflow-hidden">
+            {/* Días de la semana */}
+            <div className="grid grid-cols-7 text-center font-bold text-xs sm:text-sm text-white bg-indigo-600 rounded-t-lg">
+              {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map((dia, index) => (
+                <span key={index} className="p-1 sm:p-2 truncate">{dia}</span>
+              ))}
+            </div>
+
+            {/* Días del mes */}
+            <div className="bg-white">
+              {matrizCalendario.map((semana, idx) => (
+                <div key={idx} className="grid grid-cols-7 border-b border-gray-100 last:border-b-0">
+                  {semana.map((dia, dIdx) => {
+                    let dayClasses = "p-1 sm:p-2 h-12 sm:h-16 border-r border-gray-100 last:border-r-0 flex items-start justify-end text-sm sm:text-lg cursor-default transition-all duration-200";
+
+                    if (!dia) {
+                      dayClasses += " bg-gray-50 text-gray-300 pointer-events-none font-medium";
+                    } else {
+                      dayClasses += " hover:bg-gray-50";
+
+                      const tieneRecorridos = dia.tieneRecorridos;
+                      const esHoy = dia.esHoy;
+
+                      if (tieneRecorridos) {
+                        dayClasses += " bg-green-50 text-green-800 hover:bg-green-100 font-semibold";
+                      } else if (esHoy) {
+                        dayClasses += " bg-indigo-50 text-gray-800 font-bold border-2 border-indigo-400";
+                      } else {
+                        dayClasses += " bg-white text-gray-700 font-normal";
+                      }
+                    }
+
+                    return (
+                      <div
+                        key={dIdx}
+                        className={dayClasses}
+                        title={dia ? (dia.tieneRecorridos ? `Recorridos: ${recorridosMensuales[dia.numero]?.length || 0}` : 'Sin recorridos') : ''}
+                      >
+                        {dia && (
+                          <span className={`
+                            ${dia.tieneRecorridos ? 'bg-green-500 text-white' : ''}
+                            ${dia.esHoy ? 'ring-2 ring-indigo-500' : ''}
+                            w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center rounded-full
+                          `}>
+                            {dia.numero}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Detalles de recorridos - MEJORADO */}
+          <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg border border-gray-200 mx-2 sm:mx-0">
+            <h4 className="text-xl font-bold text-gray-800 mb-6 border-b pb-3 flex items-center">
+              <span className="mr-2">📊</span>
+              Resumen de Recorridos del Mes
             </h4>
-            
+
             {Object.keys(recorridosMensuales).length === 0 ? (
               <div className="p-8 text-center bg-gray-50 rounded-lg">
-                <p className="text-xl text-gray-500">📅 No hay recorridos registrados para este mes.</p>
+                <div className="text-6xl mb-4">📅</div>
+                <p className="text-xl text-gray-500 mb-2">No hay recorridos registrados</p>
+                <p className="text-gray-400">para {nombresMeses[mesActual - 1]} {añoActual}</p>
+                <button
+                  onClick={handleOpenModal}
+                  className="mt-4 bg-indigo-500 hover:bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                >
+                  Crear primer recorrido
+                </button>
               </div>
             ) : (
               <div className="space-y-6">
-                
-                <div className="flex justify-around bg-indigo-50 p-4 rounded-lg shadow-inner">
-                  <div className="text-center">
-                    <span className="stat-number text-3xl font-extrabold text-indigo-700 block">
-                      {diasConRecorridos}
-                    </span>
-                    <span className="stat-label text-sm text-indigo-600">Días con Recorridos</span>
-                  </div>
-                  <div className="text-center">
-                    <span className="stat-number text-3xl font-extrabold text-indigo-700 block">
-                      {totalRecorridosMes}
-                    </span>
-                    <span className="stat-label text-sm text-indigo-600">Total de Recorridos</span>
+
+                {/* Tarjetas de estadísticas */}
+                <div className="w-full max-w-screen-lg mx-auto p-4">
+                  <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <span>📊</span> Resumen de Recorridos del Mes
+                  </h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
+                    <div className="w-full bg-blue-50 p-6 rounded-lg border border-blue-200 text-center flex flex-col items-center justify-center">
+                      <div className="text-3xl font-extrabold text-blue-700">{diasConRecorridos}</div>
+                      <div className="text-blue-600 text-sm mt-1">Días con Recorridos</div>
+                    </div>
+
+                    <div className="w-full bg-green-50 p-6 rounded-lg border border-green-200 text-center flex flex-col items-center justify-center">
+                      <div className="text-3xl font-extrabold text-green-700">{totalRecorridosMes}</div>
+                      <div className="text-green-600 text-sm mt-1">Total de Recorridos</div>
+                    </div>
+
+                    <div className="w-full bg-purple-50 p-6 rounded-lg border border-purple-200 text-center flex flex-col items-center justify-center">
+                      <div className="text-3xl font-extrabold text-purple-700">${costoTotalMes.toFixed(2)}</div>
+                      <div className="text-purple-600 text-sm mt-1">Costo Total</div>
+                    </div>
                   </div>
                 </div>
 
-                <div className="mt-6">
-                  <h5 className="text-lg font-semibold text-gray-700 mb-4 border-l-4 border-indigo-500 pl-3">
-                    🗓️ Cronología del Mes
+
+                {/* Cronología */}
+                <div className="mt-8">
+                  <h5 className="text-lg font-semibold text-gray-700 mb-4 border-l-4 border-indigo-500 pl-3 flex items-center">
+                    <span className="mr-2">🗓️</span>
+                    Cronología del Mes
                   </h5>
-                  
-                  <div className="space-y-6">
+
+                  <div className="space-y-4">
                     {Object.keys(recorridosMensuales)
                       .filter(dia => !isNaN(parseInt(dia)))
                       .sort((a, b) => parseInt(a) - parseInt(b))
                       .map(dia => (
-                        <div key={dia} className="flex border-l-2 border-gray-300 ml-4 pl-4 relative">
-                          
-                          <div className="absolute -left-3 top-0 flex flex-col items-center justify-center w-8 h-8 bg-indigo-600 text-white rounded-full shadow-md">
-                            <span className="dia-numero text-sm font-bold leading-none">{dia}</span>
+                        <div key={dia} className="flex border-l-2 border-gray-300 ml-3 sm:ml-4 pl-3 sm:pl-4 relative">
+
+                          {/* Marcador del día */}
+                          <div className="absolute -left-3 sm:-left-4 top-0 flex flex-col items-center justify-center w-6 h-6 sm:w-8 sm:h-8 bg-indigo-600 text-white rounded-full shadow-md">
+                            <span className="dia-numero text-xs sm:text-sm font-bold leading-none">{dia}</span>
                           </div>
-                          
-                          <div className="flex-grow bg-gray-50 p-3 rounded-lg shadow-sm">
-                            
-                            <div className="font-bold text-indigo-800 mb-2">
-                              {recorridosMensuales[dia].length} recorrido{recorridosMensuales[dia].length > 1 ? 's' : ''} en este día
+
+                          {/* Contenido del día */}
+                          <div className="flex-grow bg-gray-50 p-3 sm:p-4 rounded-lg shadow-sm w-full">
+
+                            <div className="font-bold text-indigo-800 mb-2 text-sm sm:text-base">
+                              {recorridosMensuales[dia].length} recorrido{recorridosMensuales[dia].length > 1 ? 's' : ''} el día {dia}
                             </div>
-                            
-                            <div className="space-y-1">
+
+                            <div className="space-y-2">
                               {recorridosMensuales[dia].map((recorrido, idx) => (
-                                <div key={idx} className="flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm p-2 bg-white rounded border border-gray-100">
-                                  <span className="recorrido-hora font-semibold text-gray-700 w-full sm:w-1/5 mb-1 sm:mb-0">
-                                    {formatearHora(recorrido.hora_inicio)}
-                                  </span>
-                                  <span className="recorrido-vehiculo text-gray-600 flex-grow px-0 sm:px-2 w-full sm:w-auto">
-                                    {recorrido.vehiculo_descripcion || 'Sin Vehículo'}
-                                  </span>
-                                  <span className="recorrido-costo font-bold text-green-600 w-full sm:w-1/5 text-left sm:text-right">
-                                    {recorrido.costo ? `$${parseFloat(recorrido.costo).toFixed(2)}` : '$0.00'}
-                                  </span>
-                                  <div className="flex space-x-2 mt-2 sm:mt-0 w-full sm:w-auto">
+                                <div key={idx} className="flex flex-col xs:flex-row justify-between items-start xs:items-center text-xs sm:text-sm p-2 bg-white rounded border border-gray-100 hover:bg-gray-50 transition-colors">
+                                  <div className="flex flex-col xs:flex-row items-start xs:items-center w-full xs:w-auto gap-2 xs:gap-4">
+                                    <span className="recorrido-hora font-semibold text-gray-700 bg-blue-50 px-2 py-1 rounded min-w-[60px] text-center">
+                                      {formatearHora(recorrido.hora_inicio)}
+                                    </span>
+                                    <span className="recorrido-vehiculo text-gray-600 flex-grow">
+                                      {recorrido.vehiculo_descripcion || 'Sin Vehículo'}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center justify-between xs:justify-end w-full xs:w-auto mt-2 xs:mt-0 gap-2">
+                                    <span className="recorrido-costo font-bold text-green-600 text-sm sm:text-base">
+                                      {recorrido.costo ? `$${parseFloat(recorrido.costo).toFixed(2)}` : '$0.00'}
+                                    </span>
                                     <button
                                       onClick={() => handleEdit(recorrido)}
-                                      className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+                                      className="text-indigo-600 hover:text-indigo-800 font-medium text-xs sm:text-sm bg-indigo-50 hover:bg-indigo-100 px-2 py-1 rounded transition-colors"
                                     >
                                       ✏️ Editar
                                     </button>
@@ -623,21 +687,25 @@ const Dashboard = () => {
           </div>
         </>
       )}
-      
+
       {/* ========================================
-        MODAL PARA CREAR/EDITAR RECORRIDOS
+        MODAL PARA CREAR/EDITAR RECORRIDOS - MEJORADO
         ======================================== */}
       {isModalOpen && (
-        <Modal 
+        <Modal
           title={editando ? '✏️ Editar Recorrido Existente' : '➕ Crear Nuevo Recorrido'}
           onClose={() => handleCloseModal(false)}
+          size="max-w-2xl"
         >
           {loadingForm ? (
             <div className="min-h-52 flex items-center justify-center bg-white p-6 rounded-xl">
-              <p className="text-gray-600 font-medium">🔄 Cargando datos necesarios...</p>
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+                <p className="text-gray-600 font-medium">Cargando datos necesarios...</p>
+              </div>
             </div>
           ) : (
-            <div className="bg-white p-4 sm:p-6 rounded-xl shadow-2xl max-w-2xl mx-auto w-full">
+            <div className="bg-white p-4 sm:p-6 rounded-xl max-h-[90vh] overflow-y-auto">
               <h3 className="text-xl sm:text-2xl font-bold text-indigo-700 mb-6 border-b pb-3">
                 {editando ? '✏️ Editar Recorrido' : '➕ Crear Nuevo Recorrido'}
               </h3>
@@ -652,7 +720,7 @@ const Dashboard = () => {
                       value={formData.fecha}
                       onChange={handleChange}
                       required
-                      className="p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full transition-colors duration-150 shadow-sm bg-white"
+                      className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full transition-colors duration-150 shadow-sm bg-white"
                     />
                   </div>
 
@@ -665,7 +733,7 @@ const Dashboard = () => {
                       value={formData.hora_inicio}
                       onChange={handleChange}
                       required
-                      className="p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full transition-colors duration-150 shadow-sm bg-white"
+                      className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full transition-colors duration-150 shadow-sm bg-white"
                     />
                   </div>
 
@@ -677,9 +745,9 @@ const Dashboard = () => {
                       value={formData.vehiculo_id}
                       onChange={handleChange}
                       required
-                      className="p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full transition-colors duration-150 shadow-sm bg-white"
+                      className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full transition-colors duration-150 shadow-sm bg-white"
                     >
-                      <option value="">Seleccionar...</option>
+                      <option value="">Seleccionar vehículo...</option>
                       {vehiculos.map((vehiculo) => (
                         <option key={vehiculo.id} value={vehiculo.id}>
                           {vehiculo.descripcion} (${parseFloat(vehiculo.costo_por_recorrido || 0).toFixed(2)})
@@ -696,7 +764,7 @@ const Dashboard = () => {
                       value={formData.tipo_recorrido}
                       onChange={handleChange}
                       required
-                      className="p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full transition-colors duration-150 shadow-sm bg-white"
+                      className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full transition-colors duration-150 shadow-sm bg-white"
                     >
                       <option value="llevar">Llevar</option>
                       <option value="traer">Traer</option>
@@ -712,19 +780,27 @@ const Dashboard = () => {
                       name="notas"
                       value={formData.notas}
                       onChange={handleChange}
-                      placeholder="Observaciones del recorrido"
-                      className="p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full transition-colors duration-150 shadow-sm bg-white"
+                      placeholder="Observaciones del recorrido..."
+                      className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full transition-colors duration-150 shadow-sm bg-white"
                     />
                   </div>
                 </div>
 
                 {/* Niños en el Recorrido */}
-                <div className="mt-8 pt-4 border-t border-gray-200">
-                  <h4 className="text-lg font-semibold text-gray-800 mb-4">👦 Niños en el Recorrido ({ninosSeleccionados.length})</h4>
+                <div className="mt-6 pt-4 border-t border-gray-200">
+                  <h4 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <span className="mr-2">👦</span>
+                    Niños en el Recorrido ({ninosSeleccionados.length})
+                  </h4>
+
                   <div className="mb-4">
-                    <label className="text-sm font-medium text-gray-700 block mb-1">Agregar Niño</label>
-                    <select onChange={agregarNino} value="" className="p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full transition-colors duration-150 shadow-sm bg-white">
-                      <option value="">Seleccionar...</option>
+                    <label className="text-sm font-medium text-gray-700 block mb-2">Agregar Niño</label>
+                    <select
+                      onChange={agregarNino}
+                      value=""
+                      className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full transition-colors duration-150 shadow-sm bg-white"
+                    >
+                      <option value="">Seleccionar niño...</option>
                       {ninos
                         .filter(nino => !ninosSeleccionados.some(ns => ns.nino_id.toString() === nino.id.toString()))
                         .map((nino) => (
@@ -737,25 +813,29 @@ const Dashboard = () => {
 
                   <div className="space-y-3 max-h-48 overflow-y-auto pr-2">
                     {ninosSeleccionados.length === 0 ? (
-                      <p className="text-gray-500 italic py-2">No hay niños agregados</p>
+                      <div className="text-center py-6 text-gray-500 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                        <div className="text-4xl mb-2">👶</div>
+                        <p>No hay niños agregados al recorrido</p>
+                      </div>
                     ) : (
                       ninosSeleccionados.map((nino, index) => (
-                        <div key={nino.nino_id} className="flex flex-col sm:flex-row items-start sm:items-center border border-indigo-200 p-3 rounded-lg bg-indigo-50 shadow-sm">
-                          <div className="flex justify-between items-center w-full sm:w-auto sm:flex-grow sm:pr-4 mb-2 sm:mb-0">
-                            <span className="font-semibold text-indigo-800 flex-grow">
+                        <div key={nino.nino_id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between border border-indigo-200 p-3 rounded-lg bg-indigo-50 shadow-sm hover:bg-indigo-100 transition-colors">
+                          <div className="flex items-center w-full sm:w-auto sm:flex-grow mb-2 sm:mb-0">
+                            <span className="font-semibold text-indigo-800">
                               {nino.nombre} {nino.apellidos}
                             </span>
+                          </div>
+
+                          <div className="flex items-center w-full sm:w-auto justify-between sm:justify-end">
                             <button
                               type="button"
                               onClick={() => eliminarNino(index)}
-                              className="text-red-500 hover:text-red-700 p-1 text-xl transition-colors ml-4 sm:ml-0 flex-shrink-0"
+                              className="text-red-500 hover:text-red-700 p-1 text-lg transition-colors bg-white rounded-full w-8 h-8 flex items-center justify-center shadow-sm"
                               title="Eliminar niño"
                             >
                               ✖
                             </button>
                           </div>
-                          
-                          
                         </div>
                       ))
                     )}
@@ -763,16 +843,29 @@ const Dashboard = () => {
                 </div>
 
                 {/* Botones de acción */}
-                <div className="mt-8 pt-6 border-t border-gray-200 flex flex-col-reverse sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3">
+                <div className="mt-8 pt-6 border-t border-gray-200 flex flex-col-reverse sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3">
                   <button
                     type="button"
                     onClick={() => handleCloseModal(false)}
-                    className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg shadow-sm transition-colors w-full sm:w-auto"
+                    className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 px-6 rounded-lg shadow-sm transition-colors w-full sm:w-auto text-sm sm:text-base"
                   >
                     ❌ Cancelar
                   </button>
-                  <button type="submit" className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors disabled:bg-indigo-400 w-full sm:w-auto">
-                    {editando ? '💾 Actualizar Recorrido' : '✅ Crear Recorrido'}
+                  <button
+                    type="submit"
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-colors disabled:bg-indigo-400 w-full sm:w-auto text-sm sm:text-base flex items-center justify-center gap-2"
+                  >
+                    {editando ? (
+                      <>
+                        <span>💾</span>
+                        Actualizar Recorrido
+                      </>
+                    ) : (
+                      <>
+                        <span>✅</span>
+                        Crear Recorrido
+                      </>
+                    )}
                   </button>
                 </div>
               </form>

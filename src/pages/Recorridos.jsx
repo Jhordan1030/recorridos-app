@@ -21,11 +21,6 @@ const Recorridos = () => {
     "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
   ];
 
-  // Clases de utilidad
-  const btnPrimaryClass = "bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50";
-  const btnSecondaryClass = "bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-6 rounded-lg shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50";
-  const btnDangerClass = "bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50";
-
   useEffect(() => {
     loadRecorridos();
   }, []);
@@ -126,41 +121,42 @@ const Recorridos = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-4 sm:py-6 lg:py-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
         
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-            <div className="mb-4 sm:mb-0">
-              <h2 className="text-3xl font-bold text-gray-900 flex items-center">
-                <span className="mr-3">📍</span>
+        <div className="mb-6 sm:mb-8">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            {/* Título y descripción */}
+            <div className="text-center lg:text-left">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 flex items-center justify-center lg:justify-start mb-2">
+                <span className="mr-2 sm:mr-3">📍</span>
                 Gestión de Recorridos
-              </h2>
-              <p className="text-gray-600 mt-2">
+              </h1>
+              <p className="text-gray-600 text-sm sm:text-base">
                 Administra y visualiza todos los recorridos registrados en el sistema
               </p>
             </div>
             
             {/* Botones de acción */}
-            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
-              <button
-                type="button"
-                className={`${btnPrimaryClass} flex items-center justify-center w-full sm:w-auto`}
-                onClick={handleOpenCreateModal}
-                disabled={loading}
-              >
-                <span className="mr-2">➕</span>
-                Nuevo Recorrido
-              </button>
+            <div className="flex flex-col sm:flex-row gap-2 justify-center lg:justify-end">
               <button 
                 type="button" 
-                className={`${btnSecondaryClass} flex items-center justify-center w-full sm:w-auto`} 
+                className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2.5 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center text-sm sm:text-base whitespace-nowrap"
                 onClick={loadRecorridos}
                 disabled={loading}
               >
                 <span className="mr-2">🔄</span>
                 Actualizar
+              </button>
+              <button
+                type="button"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center text-sm sm:text-base whitespace-nowrap"
+                onClick={handleOpenCreateModal}
+                disabled={loading}
+              >
+                <span className="mr-2">➕</span>
+                Nuevo Recorrido
               </button>
             </div>
           </div>
@@ -171,6 +167,7 @@ const Recorridos = () => {
           <Modal 
             title={recorridoAEditar ? '✏️ Editar Recorrido Existente' : '➕ Registrar Nuevo Recorrido'} 
             onClose={() => handleCloseModal(false)}
+            size="max-w-2xl"
           >
             <RecorridoForm
               recorridoParaEditar={recorridoAEditar}
@@ -180,37 +177,46 @@ const Recorridos = () => {
           </Modal>
         )}
 
-        {/* Controles de mes/año */}
-        <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-6">
-          <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
-            <div className="flex items-center space-x-4">
+        {/* Controles de mes/año - VERSIÓN MEJORADA RESPONSIVE */}
+        <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-4 sm:p-6 mb-6 overflow-hidden">
+          <div className="flex flex-col gap-4">
+            
+            {/* Navegación del mes - MEJORADA PARA MOBILE */}
+            <div className="flex items-center justify-between gap-2 sm:gap-3 w-full">
               <button 
                 onClick={() => cambiarMes(-1)} 
-                className={`${btnSecondaryClass} flex items-center py-2 px-4`}
+                className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-2 sm:px-4 rounded-lg transition-colors duration-200 flex items-center justify-center text-sm flex-shrink-0"
                 disabled={loading}
               >
-                <span className="mr-2">‹</span>
-                Anterior
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                <span className="hidden sm:inline">Anterior</span>
               </button>
               
-              <h3 className="text-xl font-bold text-indigo-600 text-center min-w-[200px]">
-                {nombresMeses[mesSeleccionado - 1]} {añoSeleccionado}
-              </h3>
+              <div className="text-center flex-1 px-2">
+                <h3 className="text-lg sm:text-xl font-bold text-indigo-600">
+                  {nombresMeses[mesSeleccionado - 1]}
+                </h3>
+                <p className="text-gray-600 text-sm sm:text-base">{añoSeleccionado}</p>
+              </div>
               
               <button 
                 onClick={() => cambiarMes(1)} 
-                className={`${btnSecondaryClass} flex items-center py-2 px-4`}
+                className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-2 sm:px-4 rounded-lg transition-colors duration-200 flex items-center justify-center text-sm flex-shrink-0"
                 disabled={loading}
               >
-                Siguiente
-                <span className="ml-2">›</span>
+                <span className="hidden sm:inline">Siguiente</span>
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 sm:ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
               </button>
             </div>
             
-            {/* Resumen del mes */}
-            <div className="text-center sm:text-right">
-              <div className="text-sm text-gray-600">Total del mes</div>
-              <div className="text-2xl font-bold text-green-600">
+            {/* Total del mes */}
+            <div className="text-center pt-4 border-t border-gray-200">
+              <div className="text-sm text-gray-600 font-medium mb-1">Total del mes</div>
+              <div className="text-2xl sm:text-3xl font-bold text-green-600">
                 ${totalMes.toFixed(2)}
               </div>
             </div>
@@ -218,52 +224,52 @@ const Recorridos = () => {
         </div>
 
         {/* Resumen estadístico */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 text-center">
-            <div className="text-3xl font-bold text-indigo-600 mb-2">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-4 sm:p-6 text-center">
+            <div className="text-2xl sm:text-3xl font-bold text-indigo-600 mb-2">
               {recorridosFiltrados.length}
             </div>
-            <div className="text-gray-600 font-medium">Total Recorridos</div>
+            <div className="text-gray-600 font-medium text-sm sm:text-base">Total Recorridos</div>
           </div>
           
-          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 text-center">
-            <div className="text-3xl font-bold text-green-600 mb-2">
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-4 sm:p-6 text-center">
+            <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-2">
               ${totalMes.toFixed(2)}
             </div>
-            <div className="text-gray-600 font-medium">Costo Total</div>
+            <div className="text-gray-600 font-medium text-sm sm:text-base">Costo Total</div>
           </div>
           
-          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 text-center">
-            <div className="text-3xl font-bold text-blue-600 mb-2">
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-4 sm:p-6 text-center">
+            <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-2">
               {new Set(recorridosFiltrados.map(r => r.vehiculo_id)).size}
             </div>
-            <div className="text-gray-600 font-medium">Vehículos Usados</div>
+            <div className="text-gray-600 font-medium text-sm sm:text-base">Vehículos Usados</div>
           </div>
         </div>
 
         {/* Loading State */}
         {loading && recorridosFiltrados.length === 0 && (
-          <div className="flex justify-center items-center h-64 bg-white rounded-xl shadow-lg">
+          <div className="flex justify-center items-center h-48 sm:h-64 bg-white rounded-xl shadow-lg">
             <div className="text-center">
-              <svg className="animate-spin h-12 w-12 text-indigo-600 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <svg className="animate-spin h-8 sm:h-12 w-8 sm:w-12 text-indigo-600 mx-auto mb-3 sm:mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              <p className="text-gray-600 text-lg">Cargando recorridos...</p>
+              <p className="text-gray-600 text-sm sm:text-lg">Cargando recorridos...</p>
             </div>
           </div>
         )}
 
         {/* Grid de recorridos */}
-        {!loading && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        {!loading && recorridosFiltrados.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
             {recorridosFiltrados.map((recorrido) => (
-              <div key={recorrido.id} className="bg-white rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                <div className="p-6">
+              <div key={recorrido.id} className="bg-white rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300">
+                <div className="p-4 sm:p-6">
                   {/* Header de la tarjeta */}
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-4">
+                    <div className="flex-1">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 flex items-center">
                         <span className="mr-2">📅</span>
                         {recorrido.fecha.split('T')[0]}
                       </h3>
@@ -271,11 +277,11 @@ const Recorridos = () => {
                         {formatearHora(recorrido.hora_inicio)}
                       </p>
                     </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-green-600">
+                    <div className="text-left sm:text-right">
+                      <div className="text-xl sm:text-2xl font-bold text-green-600">
                         ${parseFloat(recorrido.costo || 0).toFixed(2)}
                       </div>
-                      <span className="inline-block px-2 py-1 text-xs font-medium bg-indigo-100 text-indigo-800 rounded-full capitalize">
+                      <span className="inline-block px-2 py-1 text-xs font-medium bg-indigo-100 text-indigo-800 rounded-full capitalize mt-1">
                         {recorrido.tipo_recorrido}
                       </span>
                     </div>
@@ -284,10 +290,10 @@ const Recorridos = () => {
                   {/* Información del recorrido */}
                   <div className="space-y-3">
                     <div className="flex items-center text-gray-600">
-                      <span className="mr-3 text-lg">🚗</span>
-                      <div className="flex-1">
+                      <span className="mr-3 text-lg flex-shrink-0">🚗</span>
+                      <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-gray-500">Vehículo</p>
-                        <p className="text-gray-900 font-medium">
+                        <p className="text-gray-900 font-medium truncate">
                           {recorrido.vehiculo_descripcion || 'Sin vehículo'}
                         </p>
                       </div>
@@ -296,10 +302,10 @@ const Recorridos = () => {
                     {/* Niños en el recorrido */}
                     {recorrido.ninos && recorrido.ninos.length > 0 && (
                       <div className="flex items-start text-gray-600">
-                        <span className="mr-3 text-lg mt-1">👦</span>
-                        <div className="flex-1">
+                        <span className="mr-3 text-lg mt-1 flex-shrink-0">👦</span>
+                        <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-500 mb-1">Niños ({recorrido.ninos.length})</p>
-                          <div className="space-y-1">
+                          <div className="space-y-1 max-h-20 overflow-y-auto">
                             {recorrido.ninos.map((nino, idx) => (
                               <div key={idx} className="text-gray-900 text-sm">
                                 • {nino.nombre} {nino.apellidos}
@@ -316,19 +322,19 @@ const Recorridos = () => {
                     {/* Notas del recorrido */}
                     {recorrido.notas && (
                       <div className="flex items-start text-gray-600">
-                        <span className="mr-3 text-lg mt-1">📝</span>
-                        <div className="flex-1">
+                        <span className="mr-3 text-lg mt-1 flex-shrink-0">📝</span>
+                        <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-500">Notas</p>
-                          <p className="text-gray-900 text-sm">{recorrido.notas}</p>
+                          <p className="text-gray-900 text-sm break-words">{recorrido.notas}</p>
                         </div>
                       </div>
                     )}
                   </div>
 
                   {/* Botones de acción */}
-                  <div className="mt-6 pt-4 border-t border-gray-200 flex space-x-2">
+                  <div className="mt-6 pt-4 border-t border-gray-200 flex gap-2">
                     <button
-                      className="flex-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold py-2 px-3 rounded-lg text-sm transition-colors duration-200 flex items-center justify-center"
+                      className="flex-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold py-2.5 px-3 rounded-lg text-sm transition-colors duration-200 flex items-center justify-center"
                       onClick={() => handleEdit(recorrido)}
                       disabled={loading}
                     >
@@ -336,7 +342,7 @@ const Recorridos = () => {
                       Editar
                     </button>
                     <button
-                      className="flex-1 bg-red-50 hover:bg-red-100 text-red-700 font-semibold py-2 px-3 rounded-lg text-sm transition-colors duration-200 flex items-center justify-center"
+                      className="flex-1 bg-red-50 hover:bg-red-100 text-red-700 font-semibold py-2.5 px-3 rounded-lg text-sm transition-colors duration-200 flex items-center justify-center"
                       onClick={() => handleDelete(recorrido.id)}
                       disabled={loading}
                     >
@@ -352,18 +358,18 @@ const Recorridos = () => {
 
         {/* Empty State */}
         {!loading && recorridosFiltrados.length === 0 && (
-          <div className="text-center py-16 bg-white rounded-xl shadow-lg border border-gray-200">
-            <div className="max-w-md mx-auto">
-              <div className="text-6xl mb-4">📍</div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">
+          <div className="text-center py-12 sm:py-16 bg-white rounded-xl shadow-lg border border-gray-200">
+            <div className="max-w-md mx-auto px-4">
+              <div className="text-4xl sm:text-6xl mb-4">📍</div>
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
                 No hay recorridos registrados
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p className="text-gray-600 mb-6 text-sm sm:text-base">
                 No se encontraron recorridos para {nombresMeses[mesSeleccionado - 1]} {añoSeleccionado}.
               </p>
               <button
                 onClick={handleOpenCreateModal}
-                className={`${btnPrimaryClass} inline-flex items-center`}
+                className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-6 rounded-lg transition-colors duration-200 inline-flex items-center text-sm sm:text-base"
               >
                 <span className="mr-2">➕</span>
                 Crear Primer Recorrido
