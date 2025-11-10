@@ -1,0 +1,6 @@
+{
+  "appId": "com.recorridosapp.app",
+  "appName": "Recorridos App",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}

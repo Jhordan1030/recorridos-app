@@ -10,6 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@capacitor/cli": "^7.4.4",
+    "@capacitor/core": "^7.4.4",
+    "@capacitor/ios": "^7.4.4",
     "axios": "^1.12.2",
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.3",
