@@ -1,6 +1,6 @@
 // src/pages/Dashboard.jsx 
 import React, { useEffect, useState, useMemo } from 'react';
-import { useApp } from '../context/AppContext';
+import { useAlert } from '../context/AlertContext';
 import { getRecorridos, getNinos, getVehiculos, createRecorrido, updateRecorrido } from '../services/api';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -8,7 +8,7 @@ import Modal from '../components/Modal';
 import Alert from '../components/Alert';
 
 const Dashboard = () => {
-  const { showAlert } = useApp();
+  const { showAlert } = useAlert();
 
   // ESTADOS PARA EL MODAL Y FORMULARIO
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -41,16 +41,13 @@ const Dashboard = () => {
     fecha: `${year}-${month}-${day}`,
     hora_inicio: `${hours}:${minutes}`,
     vehiculo_id: '',
-    tipo_recorrido: 'traer', // ✅ "Traer" como valor por defecto
+    tipo_recorrido: 'traer',
     notas: '',
   };
 
   const [formData, setFormData] = useState(estadoInicialFormulario);
 
-  // ---------------------------------------------------------------------------
   // LÓGICA DEL DASHBOARD
-  // ---------------------------------------------------------------------------
-
   const formatearHora = (hora) => {
     if (!hora) return '—';
     try {
@@ -249,10 +246,7 @@ const Dashboard = () => {
 
   const matrizCalendario = useMemo(() => generarCalendario(), [mesActual, añoActual, recorridosMensuales]);
 
-  // ---------------------------------------------------------------------------
   // LÓGICA DEL MODAL Y FORMULARIO
-  // ---------------------------------------------------------------------------
-
   const loadNinos = async () => {
     try {
       const response = await getNinos();
@@ -362,12 +356,6 @@ const Dashboard = () => {
     setNinosSeleccionados(nuevosNinos);
   };
 
-  const handleNinoNotasChange = (index, value) => {
-    const nuevosNinos = [...ninosSeleccionados];
-    nuevosNinos[index].notas = value;
-    setNinosSeleccionados(nuevosNinos);
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.fecha || !formData.hora_inicio || !formData.vehiculo_id) {
@@ -403,16 +391,10 @@ const Dashboard = () => {
     }
   };
 
-  // ---------------------------------------------------------------------------
-  // 🎨 RENDER MEJORADO CON RESPONSIVIDAD COMPLETA
-  // ---------------------------------------------------------------------------
   return (
     <div className="min-h-screen bg-gray-50 py-4 px-3 sm:px-4 lg:px-6 xl:px-8">
-
-      {/* ✅ COMPONENTE ALERT AGREGADO AQUÍ */}
       <Alert />
-
-      {/* Header responsivo */}
+      
       <div className="mb-6 pt-2">
         <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 text-center sm:text-left px-2">
           <span role="img" aria-label="dashboard" className="mr-2">📊</span>
@@ -420,12 +402,8 @@ const Dashboard = () => {
         </h2>
       </div>
 
-      {/* Controles de calendario - COMPLETAMENTE REDISEÑADO */}
       <div className="bg-white p-4 rounded-xl shadow-lg mb-6 border border-gray-200 mx-2 sm:mx-0">
-
-        {/* Navegación del mes - Mejorada para móviles */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          {/* Navegación del mes */}
           <div className="flex items-center justify-center w-full sm:w-auto order-2 sm:order-1">
             <button
               onClick={() => cambiarMes(-1)}
@@ -448,7 +426,6 @@ const Dashboard = () => {
             </button>
           </div>
 
-          {/* Botones de acción - Mejorados para móviles */}
           <div className='flex flex-col xs:flex-row gap-2 w-full sm:w-auto justify-center sm:justify-end order-1 sm:order-2'>
             <button
               onClick={handleOpenModal}
@@ -481,9 +458,7 @@ const Dashboard = () => {
         </div>
       ) : (
         <>
-          {/* Resumen y leyenda - MEJORADO */}
           <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg mb-6 border border-gray-200 mx-2 sm:mx-0">
-
             <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-4">
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full lg:w-auto">
                 <span className="text-lg font-bold text-gray-700 whitespace-nowrap">Resumen del Mes:</span>
@@ -495,7 +470,6 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              {/* Estadísticas rápidas */}
               <div className="flex flex-wrap gap-3 w-full lg:w-auto justify-start lg:justify-end">
                 <div className="bg-blue-50 px-3 py-1 rounded-lg border border-blue-200 text-center min-w-[80px]">
                   <div className="text-blue-700 font-bold text-sm">{diasConRecorridos}</div>
@@ -510,7 +484,6 @@ const Dashboard = () => {
 
             <div className="border-t pt-4 mt-4">
               <h4 className="text-md font-semibold text-gray-700 mb-3">Leyenda:</h4>
-
               <div className="flex flex-wrap gap-4 text-sm text-gray-600">
                 <span className="flex items-center">
                   <span className="w-3 h-3 rounded-full bg-green-500 mr-2 shadow-sm"></span>
@@ -528,16 +501,13 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Calendario - MEJORADO PARA MÓVILES */}
           <div className="bg-white p-3 sm:p-4 rounded-xl shadow-lg mb-6 border border-gray-200 mx-2 sm:mx-0 overflow-hidden">
-            {/* Días de la semana */}
             <div className="grid grid-cols-7 text-center font-bold text-xs sm:text-sm text-white bg-indigo-600 rounded-t-lg">
               {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map((dia, index) => (
                 <span key={index} className="p-1 sm:p-2 truncate">{dia}</span>
               ))}
             </div>
 
-            {/* Días del mes */}
             <div className="bg-white">
               {matrizCalendario.map((semana, idx) => (
                 <div key={idx} className="grid grid-cols-7 border-b border-gray-100 last:border-b-0">
@@ -584,7 +554,6 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Detalles de recorridos - MEJORADO */}
           <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg border border-gray-200 mx-2 sm:mx-0">
             <h4 className="text-xl font-bold text-gray-800 mb-6 border-b pb-3 flex items-center">
               <span className="mr-2">📊</span>
@@ -605,10 +574,7 @@ const Dashboard = () => {
               </div>
             ) : (
               <div className="space-y-6">
-
-                {/* Tarjetas de estadísticas */}
                 <div className="w-full max-w-screen-lg mx-auto p-4">
-                  
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
                     <div className="w-full bg-blue-50 p-6 rounded-lg border border-blue-200 text-center flex flex-col items-center justify-center">
                       <div className="text-3xl font-extrabold text-blue-700">{diasConRecorridos}</div>
@@ -627,8 +593,6 @@ const Dashboard = () => {
                   </div>
                 </div>
 
-
-                {/* Cronología */}
                 <div className="mt-8">
                   <h5 className="text-lg font-semibold text-gray-700 mb-4 border-l-4 border-indigo-500 pl-3 flex items-center">
                     <span className="mr-2">🗓️</span>
@@ -641,15 +605,11 @@ const Dashboard = () => {
                       .sort((a, b) => parseInt(a) - parseInt(b))
                       .map(dia => (
                         <div key={dia} className="flex border-l-2 border-gray-300 ml-3 sm:ml-4 pl-3 sm:pl-4 relative">
-
-                          {/* Marcador del día */}
                           <div className="absolute -left-3 sm:-left-4 top-0 flex flex-col items-center justify-center w-6 h-6 sm:w-8 sm:h-8 bg-indigo-600 text-white rounded-full shadow-md">
                             <span className="dia-numero text-xs sm:text-sm font-bold leading-none">{dia}</span>
                           </div>
 
-                          {/* Contenido del día */}
                           <div className="flex-grow bg-gray-50 p-3 sm:p-4 rounded-lg shadow-sm w-full">
-
                             <div className="font-bold text-indigo-800 mb-2 text-sm sm:text-base">
                               {recorridosMensuales[dia].length} recorrido{recorridosMensuales[dia].length > 1 ? 's' : ''} el día {dia}
                             </div>
@@ -690,9 +650,6 @@ const Dashboard = () => {
         </>
       )}
 
-      {/* ========================================
-        MODAL PARA CREAR/EDITAR RECORRIDOS - MEJORADO
-        ======================================== */}
       {isModalOpen && (
         <Modal
           title={editando ? '✏️ Editar Recorrido Existente' : '➕ Crear Nuevo Recorrido'}
@@ -713,7 +670,6 @@ const Dashboard = () => {
               </h3>
               <form onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Fecha */}
                   <div className="flex flex-col space-y-1">
                     <label className="text-sm font-medium text-gray-700">Fecha *</label>
                     <input
@@ -726,7 +682,6 @@ const Dashboard = () => {
                     />
                   </div>
 
-                  {/* Hora */}
                   <div className="flex flex-col space-y-1">
                     <label className="text-sm font-medium text-gray-700">Hora *</label>
                     <input
@@ -739,7 +694,6 @@ const Dashboard = () => {
                     />
                   </div>
 
-                  {/* Vehículo */}
                   <div className="flex flex-col space-y-1">
                     <label className="text-sm font-medium text-gray-700">Vehículo *</label>
                     <select
@@ -758,7 +712,6 @@ const Dashboard = () => {
                     </select>
                   </div>
 
-                  {/* Tipo de Recorrido */}
                   <div className="flex flex-col space-y-1">
                     <label className="text-sm font-medium text-gray-700">Tipo de Recorrido *</label>
                     <select
@@ -774,7 +727,6 @@ const Dashboard = () => {
                     </select>
                   </div>
 
-                  {/* Notas Generales */}
                   <div className="flex flex-col space-y-1 md:col-span-2">
                     <label className="text-sm font-medium text-gray-700">Notas Generales del Recorrido</label>
                     <input
@@ -788,7 +740,6 @@ const Dashboard = () => {
                   </div>
                 </div>
 
-                {/* Niños en el Recorrido */}
                 <div className="mt-6 pt-4 border-t border-gray-200">
                   <h4 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
                     <span className="mr-2">👦</span>
@@ -844,7 +795,6 @@ const Dashboard = () => {
                   </div>
                 </div>
 
-                {/* Botones de acción */}
                 <div className="mt-8 pt-6 border-t border-gray-200 flex flex-col-reverse sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3">
                   <button
                     type="button"

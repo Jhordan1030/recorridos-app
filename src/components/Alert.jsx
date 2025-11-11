@@ -40,23 +40,49 @@ const Alert = () => {
   const config = alertConfig[alert.type] || alertConfig.info;
 
   return (
-    // ✅ CAMBIO: bottom-4 right-4 en lugar de top-4 right-4
-    <div className="fixed bottom-4 right-4 z-50 max-w-sm w-full">
-      <div className={`${config.bg} ${config.border} ${config.text} rounded-xl shadow-lg border p-4 animate-slide-in-right`}>
+    // ✅ RESPONSIVE: Diferentes posiciones y tamaños para móvil y desktop
+    <div className="fixed z-50 w-full max-w-sm 
+                    bottom-4 right-4 
+                    sm:bottom-6 sm:right-6
+                    md:bottom-8 md:right-8
+                    px-4 sm:px-0">
+      
+      <div className={`
+        ${config.bg} ${config.border} ${config.text} 
+        rounded-xl shadow-lg border p-4 
+        animate-slide-in-right
+        w-full
+      `}>
+        
         <div className="flex items-start space-x-3">
-          <div className={`flex-shrink-0 w-8 h-8 rounded-full ${config.iconBg} flex items-center justify-center`}>
-            <span className="text-sm">{config.icon}</span>
+          {/* ✅ Icono responsivo */}
+          <div className={`
+            flex-shrink-0 
+            w-6 h-6 
+            sm:w-8 sm:h-8 
+            rounded-full ${config.iconBg} 
+            flex items-center justify-center
+          `}>
+            <span className="text-xs sm:text-sm">{config.icon}</span>
           </div>
+          
+          {/* ✅ Contenido de texto responsivo */}
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium capitalize mb-1">{alert.type}</p>
-            <p className="text-sm opacity-90">{alert.message}</p>
+            <p className="text-xs sm:text-sm font-medium capitalize mb-1">
+              {alert.type}
+            </p>
+            <p className="text-xs sm:text-sm opacity-90 leading-relaxed">
+              {alert.message}
+            </p>
           </div>
+          
+          {/* ✅ Botón de cerrar responsivo */}
           <button
             onClick={hideAlert}
             className="flex-shrink-0 rounded-lg p-1 hover:bg-black hover:bg-opacity-10 transition-colors"
+            aria-label="Cerrar alerta"
           >
-            <span className="sr-only">Cerrar</span>
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
