@@ -5,6 +5,7 @@ import { getRecorridos, getNinos, getVehiculos, createRecorrido, updateRecorrido
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import Modal from '../components/Modal';
+import Alert from '../components/Alert';
 
 const Dashboard = () => {
   const { showAlert } = useApp();
@@ -40,7 +41,7 @@ const Dashboard = () => {
     fecha: `${year}-${month}-${day}`,
     hora_inicio: `${hours}:${minutes}`,
     vehiculo_id: '',
-    tipo_recorrido: 'llevar',
+    tipo_recorrido: 'traer', // ✅ "Traer" como valor por defecto
     notas: '',
   };
 
@@ -140,10 +141,10 @@ const Dashboard = () => {
       }
 
       doc.save(`Recorridos_${nombresMeses[mesActual - 1]}_${añoActual}.pdf`);
-      showAlert('PDF generado exitosamente', 'success');
+      showAlert('success', 'PDF generado exitosamente');
     } catch (error) {
       console.error('Error al generar PDF:', error);
-      showAlert('Error al generar el PDF: ' + (error?.message || error), 'error');
+      showAlert('error', 'Error al generar el PDF: ' + (error?.message || error));
     }
   };
 
@@ -195,7 +196,7 @@ const Dashboard = () => {
       procesarRecorridos(data || []);
     } catch (error) {
       console.error('Error al cargar recorridos:', error);
-      showAlert('Error de conexión al cargar recorridos.', 'error');
+      showAlert('error', 'Error de conexión al cargar recorridos.');
       setRecorridosMensuales({});
       setLoading(false);
     }
@@ -259,7 +260,7 @@ const Dashboard = () => {
         setNinos(response.data.data);
       }
     } catch (error) {
-      showAlert('Error al cargar niños: ' + error.message, 'error');
+      showAlert('error', 'Error al cargar niños: ' + error.message);
     }
   };
 
@@ -270,7 +271,7 @@ const Dashboard = () => {
         setVehiculos(response.data.data);
       }
     } catch (error) {
-      showAlert('Error al cargar vehículos: ' + error.message, 'error');
+      showAlert('error', 'Error al cargar vehículos: ' + error.message);
     }
   };
 
@@ -287,7 +288,7 @@ const Dashboard = () => {
     try {
       await Promise.all([loadNinos(), loadVehiculos()]);
     } catch (error) {
-      showAlert('Error al cargar datos del formulario', 'error');
+      showAlert('error', 'Error al cargar datos del formulario');
     } finally {
       setLoadingForm(false);
     }
@@ -341,7 +342,7 @@ const Dashboard = () => {
     if (!nino) return;
     const yaExiste = ninosSeleccionados.find((n) => n.nino_id.toString() === ninoId.toString());
     if (yaExiste) {
-      showAlert('Este niño ya está agregado', 'error');
+      showAlert('error', 'Este niño ya está agregado');
       return;
     }
     setNinosSeleccionados([
@@ -370,7 +371,7 @@ const Dashboard = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.fecha || !formData.hora_inicio || !formData.vehiculo_id) {
-      showAlert('Fecha, hora de inicio y vehículo son requeridos', 'error');
+      showAlert('error', 'Fecha, hora de inicio y vehículo son requeridos');
       return;
     }
 
@@ -387,18 +388,18 @@ const Dashboard = () => {
       if (editando) {
         const response = await updateRecorrido(recorridoId, data);
         if (response.data.success) {
-          showAlert('Recorrido actualizado exitosamente', 'success');
+          showAlert('success', 'Recorrido actualizado exitosamente');
           handleCloseModal(true);
         }
       } else {
         const response = await createRecorrido(data);
         if (response.data.success) {
-          showAlert('Recorrido creado exitosamente', 'success');
+          showAlert('success', 'Recorrido creado exitosamente');
           handleCloseModal(true);
         }
       }
     } catch (error) {
-      showAlert('Error al guardar recorrido: ' + error.message, 'error');
+      showAlert('error', 'Error al guardar recorrido: ' + error.message);
     }
   };
 
@@ -407,6 +408,9 @@ const Dashboard = () => {
   // ---------------------------------------------------------------------------
   return (
     <div className="min-h-screen bg-gray-50 py-4 px-3 sm:px-4 lg:px-6 xl:px-8">
+
+      {/* ✅ COMPONENTE ALERT AGREGADO AQUÍ */}
+      <Alert />
 
       {/* Header responsivo */}
       <div className="mb-6 pt-2">
@@ -703,7 +707,7 @@ const Dashboard = () => {
               </div>
             </div>
           ) : (
-            <div className="bg-white p-4 sm:p-6 rounded-xl max-h-[90vh] overflow-y-auto">
+            <div className="bg-white p-4 sm:p-6 rounded-xl">
               <h3 className="text-xl sm:text-2xl font-bold text-indigo-700 mb-6 border-b pb-3">
                 {editando ? '✏️ Editar Recorrido' : '➕ Crear Nuevo Recorrido'}
               </h3>
@@ -764,8 +768,8 @@ const Dashboard = () => {
                       required
                       className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full transition-colors duration-150 shadow-sm bg-white"
                     >
-                      <option value="llevar">Llevar</option>
                       <option value="traer">Traer</option>
+                      <option value="llevar">Llevar</option>
                       <option value="ambos">Ambos</option>
                     </select>
                   </div>
@@ -809,7 +813,7 @@ const Dashboard = () => {
                     </select>
                   </div>
 
-                  <div className="space-y-3 max-h-48 overflow-y-auto pr-2">
+                  <div className="space-y-3">
                     {ninosSeleccionados.length === 0 ? (
                       <div className="text-center py-6 text-gray-500 bg-gray-50 rounded-lg border border-dashed border-gray-300">
                         <div className="text-4xl mb-2">👶</div>
