@@ -1,6 +1,6 @@
-// src/components/Navbar.jsx
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext'; // ← Cambio aquí
 
 /**
  * Componente Navbar/Sidebar responsivo.
@@ -10,6 +10,14 @@ import { Link, useLocation } from 'react-router-dom';
  */
 const Navbar = ({ isOpen, onClose }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth(); // ← Usamos nuestro contexto JWT
+
+  // Función para cerrar sesión con nuestro JWT
+  const handleLogout = () => {
+    logout();
+    navigate('/login'); // redirige al login
+  };
 
   // Clases CSS base
   const linkBaseClass = "flex items-center p-3 text-sm font-semibold transition-colors duration-200 rounded-lg mx-2";
@@ -20,6 +28,16 @@ const Navbar = ({ isOpen, onClose }) => {
   // Contenido de la navegación (compartido entre sidebar fijo y modal móvil)
   const menuContent = (
     <div className="flex flex-col space-y-1">
+      {/* Información del usuario */}
+      <div className="mx-2 p-3 bg-white/10 rounded-lg mb-2">
+        <p className="text-white font-medium text-sm truncate">
+          {user?.nombre || 'Usuario'}
+        </p>
+        <p className="text-gray-300 text-xs truncate">
+          {user?.email}
+        </p>
+      </div>
+
       {/* Dashboard */}
       <Link
         onClick={onClose} 
@@ -56,6 +74,13 @@ const Navbar = ({ isOpen, onClose }) => {
         <span className="mr-3">🚗</span> Vehículos
       </Link>
 
+      {/* Cerrar sesión */}
+      <button
+        onClick={handleLogout}
+        className="flex items-center p-3 text-sm font-semibold transition-colors duration-200 rounded-lg mx-2 mt-4 bg-white/20 text-red-100 hover:bg-red-600 hover:text-white"
+      >
+        <span className="mr-3">🚪</span> Cerrar sesión
+      </button>
     </div>
   );
 
@@ -79,7 +104,6 @@ const Navbar = ({ isOpen, onClose }) => {
       {/* ---------------------------------------------------- */}
       {/* 2. Menú Móvil Deslizable (Solo visible en móvil/tablet pequeña) */}
       {/* ---------------------------------------------------- */}
-      {/* Overlay Oscuro (visible solo cuando isOpen es true) */}
       {isOpen && (
         <div
           className="fixed inset-0 z-50 transition-opacity md:hidden bg-gray-900/50"
@@ -89,7 +113,6 @@ const Navbar = ({ isOpen, onClose }) => {
           {/* Panel del Menú */}
           <div 
             className={`fixed inset-y-0 left-0 ${sidebarBaseClasses} shadow-xl overflow-y-auto transform transition-transform ease-in-out duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
-            // Importante: evita que el clic dentro del menú cierre el modal
             onClick={(e) => e.stopPropagation()} 
           >
             {/* Encabezado del Menú Móvil */}
