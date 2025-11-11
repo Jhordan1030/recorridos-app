@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// Usa tu API desplegada en Vercel
-const API_URL = 'https://api-recorridos.vercel.app/api';
+// ✅ Tu API en Vercel
+const API_URL = 'https://api-recorridos.vercel.app';
 
 const api = axios.create({
   baseURL: API_URL,
@@ -41,6 +41,14 @@ api.interceptors.response.use(
 export const login = (credentials) => api.post('/auth/login', credentials);
 export const register = (userData) => api.post('/auth/register', userData);
 export const verifyToken = () => api.get('/auth/verify');
+export const getCurrentUser = () => api.get('/auth/me');
+
+// ========== USUARIOS (Solo Admin) ==========
+export const getUsers = () => api.get('/users');
+export const getUserById = (id) => api.get(`/users/${id}`);
+export const createUser = (data) => api.post('/users', data);
+export const updateUser = (id, data) => api.put(`/users/${id}`, data);
+export const deleteUser = (id) => api.delete(`/users/${id}`);
 
 // ========== NIÑOS ==========
 export const getNinos = () => api.get('/ninos');
@@ -65,5 +73,20 @@ export const updateRecorrido = (id, data) => api.put(`/recorridos/${id}`, data);
 export const deleteRecorrido = (id) => api.delete(`/recorridos/${id}`);
 export const addNinoToRecorrido = (data) => api.post('/recorridos/ninos', data);
 export const removeNinoFromRecorrido = (id) => api.delete(`/recorridos/ninos/${id}`);
+
+// ✅ NUEVO: Helpers para manejar roles
+export const isAdmin = () => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return user.rol === 'admin';
+};
+
+export const getUserRole = () => {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  return user.rol;
+};
+
+export const getCurrentUserInfo = () => {
+  return JSON.parse(localStorage.getItem('user') || '{}');
+};
 
 export default api;

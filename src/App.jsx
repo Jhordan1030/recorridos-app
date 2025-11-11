@@ -3,13 +3,16 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Navbar from './components/Navbar';
 import Alert from './components/Alert';
 import { AppProvider } from './context/AppContext';
-import { AuthProvider, useAuth } from './context/AuthContext'; // ← Cambio aquí
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { AlertProvider } from './context/AlertContext'; // ✅ NUEVO
 import Dashboard from './pages/Dashboard';
 import Ninos from './pages/Ninos';
 import Vehiculos from './pages/Vehiculos';
 import Recorridos from './pages/Recorridos';
+import Users from './pages/Users';
 import Login from './pages/Login';
 import ProtectedRoute from './components/ProtectedRoute';
+import AdminRoute from './components/AdminRoute';
 import './App.css';
 
 // Ícono del menú (hamburguesa)
@@ -22,11 +25,10 @@ const MenuIcon = (props) => (
 // Componente principal que usa el contexto de auth
 function AppContent() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { user, loading } = useAuth(); // ← Usamos nuestro contexto JWT
+  const { user, loading, isAdmin } = useAuth();
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
-  // Mostrar loading mientras verifica autenticación
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -39,11 +41,15 @@ function AppContent() {
     <AppProvider>
       <Router>
         <div className="min-h-screen bg-gray-50 flex">
+          {/* Alert Component - Ahora usa el contexto global */}
+          <Alert />
+
           {/* Navbar - Solo mostrar si el usuario está autenticado */}
           {user && (
             <Navbar
               isOpen={isSidebarOpen}
               onClose={() => setIsSidebarOpen(false)}
+              isAdmin={isAdmin}
             />
           )}
 
@@ -61,9 +67,6 @@ function AppContent() {
                 </button>
               </div>
             )}
-
-            {/* Alert flotante */}
-            <Alert />
 
             {/* Rutas */}
             <div className="px-4 sm:px-8">
@@ -118,7 +121,17 @@ function AppContent() {
                   }
                 />
 
-                {/* Ruta catch-all para redirigir a dashboard si está autenticado, o login si no */}
+                {/* Ruta de usuarios solo para admin */}
+                <Route
+                  path="/users"
+                  element={
+                    <AdminRoute>
+                      <Users />
+                    </AdminRoute>
+                  }
+                />
+
+                {/* Ruta catch-all */}
                 <Route 
                   path="*" 
                   element={<Navigate to={user ? "/dashboard" : "/login"} replace />} 
@@ -132,12 +145,14 @@ function AppContent() {
   );
 }
 
-// Componente principal envuelto en AuthProvider
+// Componente principal envuelto en los providers
 function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <AlertProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </AlertProvider>
   );
 }
 

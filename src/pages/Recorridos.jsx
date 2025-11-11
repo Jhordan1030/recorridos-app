@@ -1,15 +1,19 @@
 import { useState, useEffect } from 'react';
-import { useApp } from '../context/AppContext';
+import { useAlert } from '../context/AlertContext';
 import { getRecorridos, deleteRecorrido } from '../services/api';
-import Modal from '../components/Modal';
+import ConfirmModal from '../components/ConfirmModal';
 import RecorridoForm from '../components/RecorridoForm';
+import Alert from '../components/Alert';
 
 const Recorridos = () => {
-  const { showAlert, recorridos, setRecorridos } = useApp();
+  const { showAlert } = useAlert();
+  const [recorridos, setRecorridos] = useState([]);
   
   // Estados para el modal
   const [mostrarModal, setMostrarModal] = useState(false); 
   const [recorridoAEditar, setRecorridoAEditar] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [recorridoAEliminar, setRecorridoAEliminar] = useState(null);
   
   // Estados para el filtro de mes/año
   const [mesSeleccionado, setMesSeleccionado] = useState(new Date().getMonth() + 1);
@@ -33,7 +37,7 @@ const Recorridos = () => {
         setRecorridos(response.data.data);
       }
     } catch (error) {
-      showAlert('Error al cargar recorridos: ' + error.message, 'error');
+      showAlert('error', 'Error al cargar recorridos: ' + (error.response?.data?.error || error.message));
     } finally {
       setLoading(false);
     }
@@ -83,27 +87,50 @@ const Recorridos = () => {
     setMostrarModal(true);
   };
 
-  const handleCloseModal = (shouldReload = false) => {
+  const handleCloseModal = (shouldReload = false, message = null) => {
     setMostrarModal(false);
     setRecorridoAEditar(null);
+    
+    // ✅ MOSTRAR ALERTA SI HAY UN MENSAJE
+    if (message) {
+      showAlert('success', message);
+    }
+    
     if (shouldReload) {
       loadRecorridos();
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('¿Estás seguro de eliminar este recorrido?')) return;
+  // ✅ NUEVA FUNCIÓN PARA MANEJAR ÉXITO DEL FORMULARIO
+  const handleFormSuccess = (isEdit = false) => {
+    const message = isEdit 
+      ? 'Recorrido actualizado exitosamente' 
+      : 'Recorrido registrado exitosamente';
+    
+    handleCloseModal(true, message);
+  };
+
+  const handleDelete = (recorrido) => {
+    setRecorridoAEliminar(recorrido);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!recorridoAEliminar) return;
+    
     setLoading(true);
     try {
-      const response = await deleteRecorrido(id);
+      const response = await deleteRecorrido(recorridoAEliminar.id);
       if (response.data.success) {
-        showAlert('Recorrido eliminado exitosamente', 'success');
+        showAlert('success', 'Recorrido eliminado exitosamente');
         loadRecorridos();
       }
     } catch (error) {
-      showAlert('Error al eliminar: ' + error.message, 'error');
+      showAlert('error', 'Error al eliminar: ' + (error.response?.data?.error || error.message));
     } finally {
       setLoading(false);
+      setShowDeleteModal(false);
+      setRecorridoAEliminar(null);
     }
   };
 
@@ -122,6 +149,10 @@ const Recorridos = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-4 sm:py-6 lg:py-8">
+      
+      {/* ✅ COMPONENTE ALERT AGREGADO AQUÍ */}
+      <Alert />
+      
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
         
         {/* Header */}
@@ -162,19 +193,45 @@ const Recorridos = () => {
           </div>
         </div>
 
-        {/* Modal */}
+        {/* Modal de Confirmación para Eliminar */}
+        <ConfirmModal
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          onConfirm={confirmDelete}
+          title="Eliminar Recorrido"
+          message={`¿Estás seguro de que quieres eliminar el recorrido del ${recorridoAEliminar?.fecha?.split('T')[0]}? Esta acción no se puede deshacer.`}
+          confirmText="Eliminar"
+          type="danger"
+        />
+
+        {/* Modal de Formulario */}
         {mostrarModal && (
-          <Modal 
-            title={recorridoAEditar ? '✏️ Editar Recorrido Existente' : '➕ Registrar Nuevo Recorrido'} 
-            onClose={() => handleCloseModal(false)}
-            size="max-w-2xl"
-          >
-            <RecorridoForm
-              recorridoParaEditar={recorridoAEditar}
-              onSuccess={() => handleCloseModal(true)}
-              onCancel={() => handleCloseModal(false)}
-            />
-          </Modal>
+          <div className="fixed inset-0 z-50 overflow-y-auto">
+            <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+              <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onClick={() => handleCloseModal(false)} />
+              <div className="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl">
+                <div className="bg-white px-6 pt-6 pb-4 sm:p-6 sm:pb-4">
+                  <div className="sm:flex sm:items-start">
+                    <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100 sm:mx-0 sm:h-10 sm:w-10">
+                      <span className="text-xl">
+                        {recorridoAEditar ? '✏️' : '➕'}
+                      </span>
+                    </div>
+                    <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                      <h3 className="text-lg font-semibold leading-6 text-gray-900 mb-4">
+                        {recorridoAEditar ? 'Editar Recorrido Existente' : 'Registrar Nuevo Recorrido'}
+                      </h3>
+                      <RecorridoForm
+                        recorridoParaEditar={recorridoAEditar}
+                        onSuccess={() => handleFormSuccess(!!recorridoAEditar)} // ✅ ACTUALIZADO
+                        onCancel={() => handleCloseModal(false)}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
 
         {/* Controles de mes/año - VERSIÓN MEJORADA RESPONSIVE */}
@@ -343,7 +400,7 @@ const Recorridos = () => {
                     </button>
                     <button
                       className="flex-1 bg-red-50 hover:bg-red-100 text-red-700 font-semibold py-2.5 px-3 rounded-lg text-sm transition-colors duration-200 flex items-center justify-center"
-                      onClick={() => handleDelete(recorrido.id)}
+                      onClick={() => handleDelete(recorrido)}
                       disabled={loading}
                     >
                       <span className="mr-1">🗑️</span>

@@ -604,9 +604,7 @@ const Dashboard = () => {
 
                 {/* Tarjetas de estadísticas */}
                 <div className="w-full max-w-screen-lg mx-auto p-4">
-                  <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <span>📊</span> Resumen de Recorridos del Mes
-                  </h2>
+                  
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
                     <div className="w-full bg-blue-50 p-6 rounded-lg border border-blue-200 text-center flex flex-col items-center justify-center">
                       <div className="text-3xl font-extrabold text-blue-700">{diasConRecorridos}</div>

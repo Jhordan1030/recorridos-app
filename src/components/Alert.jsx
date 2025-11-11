@@ -1,46 +1,65 @@
-// src/components/Alert.jsx
 import React from 'react';
-import { useApp } from '../context/AppContext';
+import { useAlert } from '../context/AlertContext';
 
-// Mapeo de tipos de alerta a clases de Tailwind (usando colores suaves para el fondo y texto contrastante)
-const alertClasses = {
-  success: "bg-green-50 border-green-400 text-green-700", // Éxito: Verde claro
-  error: "bg-red-50 border-red-400 text-red-700",        // Error: Rojo
-  warning: "bg-yellow-50 border-yellow-400 text-yellow-700", // Advertencia: Amarillo
-  info: "bg-blue-50 border-blue-400 text-blue-700",       // Información: Azul
-};
-
-const iconMap = {
-  success: '✅',
-  error: '❌',
-  warning: '⚠️',
-  info: 'ℹ️',
+const alertConfig = {
+  success: {
+    bg: "bg-emerald-50",
+    border: "border-emerald-200",
+    text: "text-emerald-800",
+    icon: "✅",
+    iconBg: "bg-emerald-100"
+  },
+  error: {
+    bg: "bg-rose-50",
+    border: "border-rose-200",
+    text: "text-rose-800",
+    icon: "❌",
+    iconBg: "bg-rose-100"
+  },
+  warning: {
+    bg: "bg-amber-50",
+    border: "border-amber-200",
+    text: "text-amber-800",
+    icon: "⚠️",
+    iconBg: "bg-amber-100"
+  },
+  info: {
+    bg: "bg-blue-50",
+    border: "border-blue-200",
+    text: "text-blue-800",
+    icon: "ℹ️",
+    iconBg: "bg-blue-100"
+  },
 };
 
 const Alert = () => {
-  const { alert } = useApp();
+  const { alert, hideAlert } = useAlert();
 
   if (!alert.show) return null;
 
-  // Clases base: Fijo en la pantalla, z-index alto, padding.
-  // CLAVE: bottom-5 right-5 para la esquina inferior derecha.
-  const baseClasses = "fixed bottom-5 right-5 z-50 p-4 border rounded-xl shadow-lg max-w-xs w-full transition-all duration-300 transform translate-x-0";
-
-  // Clases dinámicas: Se añaden las clases específicas del tipo de alerta
-  const typeClass = alertClasses[alert.type] || alertClasses.info;
-  const icon = iconMap[alert.type] || iconMap.info;
+  const config = alertConfig[alert.type] || alertConfig.info;
 
   return (
-    // Agregamos una animación simple de entrada (scale-in)
-    <div
-      className={`${baseClasses} ${typeClass} animate-slide-in-right`}
-      style={{ animationName: 'slideInRight', animationDuration: '0.4s' }}
-    >
-      <div className="flex items-center">
-        <span className="mr-3 text-xl leading-none">{icon}</span>
-        <div>
-          <p className="font-semibold text-sm capitalize">{alert.type}</p>
-          <p className="text-sm">{alert.message}</p>
+    // ✅ CAMBIO: bottom-4 right-4 en lugar de top-4 right-4
+    <div className="fixed bottom-4 right-4 z-50 max-w-sm w-full">
+      <div className={`${config.bg} ${config.border} ${config.text} rounded-xl shadow-lg border p-4 animate-slide-in-right`}>
+        <div className="flex items-start space-x-3">
+          <div className={`flex-shrink-0 w-8 h-8 rounded-full ${config.iconBg} flex items-center justify-center`}>
+            <span className="text-sm">{config.icon}</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium capitalize mb-1">{alert.type}</p>
+            <p className="text-sm opacity-90">{alert.message}</p>
+          </div>
+          <button
+            onClick={hideAlert}
+            className="flex-shrink-0 rounded-lg p-1 hover:bg-black hover:bg-opacity-10 transition-colors"
+          >
+            <span className="sr-only">Cerrar</span>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
       </div>
     </div>

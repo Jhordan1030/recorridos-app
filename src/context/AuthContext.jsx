@@ -81,10 +81,18 @@ export const AuthProvider = ({ children }) => {
     window.location.href = '/login';
   };
 
+  // ✅ NUEVO: Propiedad para verificar si es admin
+  const isAdmin = user?.rol === 'admin';
+
+  // ✅ NUEVO: Propiedad para verificar autenticación
+  const isAuthenticated = !!user;
+
   const value = {
     user,
     loading,
     error,
+    isAuthenticated, // ✅ NUEVO
+    isAdmin, // ✅ NUEVO
     login,
     register,
     logout,
