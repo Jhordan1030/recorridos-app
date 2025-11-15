@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { getUsers, deleteUser, createUser, updateUser } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import ConfirmModal from '../components/ConfirmModal';
-import Alert from '../components/Alert';
+import ConfirmModal from '../components/ui/ConfirmModal'; // ✅ CORREGIDO
+import Alert from '../components/ui/Alert'; // ✅ CORREGIDO
 import { useAlert } from '../context/AlertContext';
+import Modal from '../components/ui/Modal'; // ✅
 
 const Users = () => {
   const [users, setUsers] = useState([]);

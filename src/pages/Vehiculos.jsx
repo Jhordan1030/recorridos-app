@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { getVehiculos, createVehiculo, deleteVehiculo, updateVehiculo } from '../services/api';
-import Modal from '../components/Modal';
+import Modal from '../components/ui/Modal'; // ✅
 
 const Vehiculos = () => {
   const { showAlert, vehiculos, setVehiculos } = useApp();

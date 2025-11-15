@@ -1,12 +1,11 @@
-// src/components/RecorridoForm.jsx
 import React, { useState, useEffect } from 'react';
-import { useApp } from '../context/AppContext';
+import { useApp } from '../../context/AppContext'; // ✅ CORREGIDO - agrega ../ extra
 import {
   createRecorrido,
   updateRecorrido,
   getNinos,
   getVehiculos,
-} from '../services/api';
+} from '../../services/api'; // También verifica esta línea
 
 const RecorridoForm = ({ recorridoParaEditar, onSuccess, onCancel }) => {
   const { showAlert } = useApp();

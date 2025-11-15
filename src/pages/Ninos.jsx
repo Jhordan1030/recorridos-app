@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { useApp } from '../context/AppContext';
-import { getNinos, createNino, deleteNino, updateNino } from '../services/api';
-import Modal from '../components/Modal';
+import { useApp } from "../context/AppContext";
+import { getNinos, createNino, deleteNino, updateNino } from "../services/api";
+import Modal from "../components/ui/Modal"; // ✅ CORREGIDO
+import Alert from "../components/ui/Alert";
 
 const Ninos = () => {
   const { showAlert, ninos, setNinos } = useApp();

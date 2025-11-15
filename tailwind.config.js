@@ -1,12 +1,27 @@
+// tailwind.config.js
 /** @type {import('tailwindcss').Config} */
-module.exports = {
-  // MUY IMPORTANTE: Asegúrate de que esto incluye todos tus archivos .jsx
+export default {
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        primary: {
+          50: '#f0f9ff',
+          500: '#3b82f6', 
+          600: '#2563eb',
+          700: '#1d4ed8',
+        },
+        medical: {
+          50: '#f0fdf4',
+          100: '#dcfce7',
+          500: '#22c55e',
+          600: '#16a34a',
+        }
+      }
+    },
   },
   plugins: [],
 }

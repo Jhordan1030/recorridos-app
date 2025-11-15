@@ -15,7 +15,7 @@ const ConfirmModal = ({
   const typeConfig = {
     warning: {
       icon: "⚠️",
-      confirmColor: "bg-red-500 hover:bg-red-600 focus:ring-red-500",
+      confirmColor: "bg-yellow-500 hover:bg-yellow-600 focus:ring-yellow-500",
       iconColor: "text-yellow-500"
     },
     danger: {
@@ -25,13 +25,13 @@ const ConfirmModal = ({
     },
     info: {
       icon: "ℹ️",
-      confirmColor: "bg-blue-500 hover:bg-blue-600 focus:ring-blue-500",
-      iconColor: "text-blue-500"
+      confirmColor: "bg-primary-500 hover:bg-primary-600 focus:ring-primary-500",
+      iconColor: "text-primary-500"
     },
     success: {
       icon: "✅",
-      confirmColor: "bg-green-500 hover:bg-green-600 focus:ring-green-500",
-      iconColor: "text-green-500"
+      confirmColor: "bg-medical-500 hover:bg-medical-600 focus:ring-medical-500",
+      iconColor: "text-medical-500"
     }
   };
 

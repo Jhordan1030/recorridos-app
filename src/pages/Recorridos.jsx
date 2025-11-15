@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useAlert } from '../context/AlertContext';
 import { getRecorridos, deleteRecorrido } from '../services/api';
-import ConfirmModal from '../components/ConfirmModal';
-import RecorridoForm from '../components/RecorridoForm';
-import Alert from '../components/Alert';
+import Modal from '../components/ui/Modal';
+import ConfirmModal from '../components/ui/ConfirmModal';
+import RecorridoForm from '../components/forms/RecorridoForm';
+import Alert from '../components/ui/Alert';
 
 const Recorridos = () => {
   const { showAlert } = useAlert();
@@ -91,7 +92,6 @@ const Recorridos = () => {
     setMostrarModal(false);
     setRecorridoAEditar(null);
     
-    // ✅ MOSTRAR ALERTA SI HAY UN MENSAJE
     if (message) {
       showAlert('success', message);
     }
@@ -101,7 +101,7 @@ const Recorridos = () => {
     }
   };
 
-  // ✅ NUEVA FUNCIÓN PARA MANEJAR ÉXITO DEL FORMULARIO
+  // Función para manejar éxito del formulario
   const handleFormSuccess = (isEdit = false) => {
     const message = isEdit 
       ? 'Recorrido actualizado exitosamente' 
@@ -150,7 +150,7 @@ const Recorridos = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-4 sm:py-6 lg:py-8">
       
-      {/* ✅ COMPONENTE ALERT AGREGADO AQUÍ */}
+      {/* Componente Alert */}
       <Alert />
       
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
@@ -169,7 +169,7 @@ const Recorridos = () => {
               </p>
             </div>
             
-            {/* Botones de acción */}
+            {/* Botones de acción - CORREGIDOS */}
             <div className="flex flex-col sm:flex-row gap-2 justify-center lg:justify-end">
               <button 
                 type="button" 
@@ -180,11 +180,9 @@ const Recorridos = () => {
                 <span className="mr-2">🔄</span>
                 Actualizar
               </button>
-              <button
-                type="button"
-                className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center text-sm sm:text-base whitespace-nowrap"
+              <button 
                 onClick={handleOpenCreateModal}
-                disabled={loading}
+                className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center text-sm sm:text-base whitespace-nowrap"
               >
                 <span className="mr-2">➕</span>
                 Nuevo Recorrido
@@ -223,7 +221,7 @@ const Recorridos = () => {
                       </h3>
                       <RecorridoForm
                         recorridoParaEditar={recorridoAEditar}
-                        onSuccess={() => handleFormSuccess(!!recorridoAEditar)} // ✅ ACTUALIZADO
+                        onSuccess={() => handleFormSuccess(!!recorridoAEditar)}
                         onCancel={() => handleCloseModal(false)}
                       />
                     </div>
@@ -234,11 +232,11 @@ const Recorridos = () => {
           </div>
         )}
 
-        {/* Controles de mes/año - VERSIÓN MEJORADA RESPONSIVE */}
+        {/* Controles de mes/año */}
         <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-4 sm:p-6 mb-6 overflow-hidden">
           <div className="flex flex-col gap-4">
             
-            {/* Navegación del mes - MEJORADA PARA MOBILE */}
+            {/* Navegación del mes */}
             <div className="flex items-center justify-between gap-2 sm:gap-3 w-full">
               <button 
                 onClick={() => cambiarMes(-1)} 

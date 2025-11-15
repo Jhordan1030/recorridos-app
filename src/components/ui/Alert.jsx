@@ -1,34 +1,34 @@
 import React from 'react';
-import { useAlert } from '../context/AlertContext';
+import { useAlert } from '../../context/AlertContext';
 
 const alertConfig = {
   success: {
-    bg: "bg-emerald-50",
-    border: "border-emerald-200",
-    text: "text-emerald-800",
+    bg: "bg-medical-50",
+    border: "border-medical-200",
+    text: "text-medical-800",
     icon: "✅",
-    iconBg: "bg-emerald-100"
+    iconBg: "bg-medical-100"
   },
   error: {
-    bg: "bg-rose-50",
-    border: "border-rose-200",
-    text: "text-rose-800",
+    bg: "bg-red-50",
+    border: "border-red-200",
+    text: "text-red-800",
     icon: "❌",
-    iconBg: "bg-rose-100"
+    iconBg: "bg-red-100"
   },
   warning: {
-    bg: "bg-amber-50",
-    border: "border-amber-200",
-    text: "text-amber-800",
+    bg: "bg-yellow-50",
+    border: "border-yellow-200",
+    text: "text-yellow-800",
     icon: "⚠️",
-    iconBg: "bg-amber-100"
+    iconBg: "bg-yellow-100"
   },
   info: {
-    bg: "bg-blue-50",
-    border: "border-blue-200",
-    text: "text-blue-800",
+    bg: "bg-primary-50",
+    border: "border-primary-200",
+    text: "text-primary-800",
     icon: "ℹ️",
-    iconBg: "bg-blue-100"
+    iconBg: "bg-primary-100"
   },
 };
 
@@ -40,7 +40,6 @@ const Alert = () => {
   const config = alertConfig[alert.type] || alertConfig.info;
 
   return (
-    // ✅ RESPONSIVE: Diferentes posiciones y tamaños para móvil y desktop
     <div className="fixed z-50 w-full max-w-sm 
                     bottom-4 right-4 
                     sm:bottom-6 sm:right-6
@@ -55,7 +54,6 @@ const Alert = () => {
       `}>
         
         <div className="flex items-start space-x-3">
-          {/* ✅ Icono responsivo */}
           <div className={`
             flex-shrink-0 
             w-6 h-6 
@@ -66,7 +64,6 @@ const Alert = () => {
             <span className="text-xs sm:text-sm">{config.icon}</span>
           </div>
           
-          {/* ✅ Contenido de texto responsivo */}
           <div className="flex-1 min-w-0">
             <p className="text-xs sm:text-sm font-medium capitalize mb-1">
               {alert.type}
@@ -76,7 +73,6 @@ const Alert = () => {
             </p>
           </div>
           
-          {/* ✅ Botón de cerrar responsivo */}
           <button
             onClick={hideAlert}
             className="flex-shrink-0 rounded-lg p-1 hover:bg-black hover:bg-opacity-10 transition-colors"
