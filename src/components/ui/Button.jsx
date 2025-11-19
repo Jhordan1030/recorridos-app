@@ -1,3 +1,4 @@
+// components/ui/Button.jsx
 import React from 'react';
 
 const Button = ({ 
@@ -7,15 +8,18 @@ const Button = ({
   loading = false,
   disabled = false,
   className = '',
+  icon = null,
   ...props 
 }) => {
-  const baseClasses = 'font-semibold rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+  const baseClasses = 'font-semibold rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center';
   
   const variants = {
-    primary: 'bg-primary-600 hover:bg-primary-700 text-white focus:ring-primary-500',
+    primary: 'bg-indigo-600 hover:bg-indigo-700 text-white focus:ring-indigo-500',
     secondary: 'bg-gray-200 hover:bg-gray-300 text-gray-800 focus:ring-gray-500',
     danger: 'bg-red-600 hover:bg-red-700 text-white focus:ring-red-500',
-    success: 'bg-medical-500 hover:bg-medical-600 text-white focus:ring-medical-500'
+    success: 'bg-green-600 hover:bg-green-700 text-white focus:ring-green-500',
+    warning: 'bg-yellow-500 hover:bg-yellow-600 text-white focus:ring-yellow-500',
+    info: 'bg-blue-500 hover:bg-blue-600 text-white focus:ring-blue-500'
   };
 
   const sizes = {
@@ -37,7 +41,10 @@ const Button = ({
           Cargando...
         </span>
       ) : (
-        children
+        <>
+          {icon && <span className="mr-2">{icon}</span>}
+          {children}
+        </>
       )}
     </button>
   );

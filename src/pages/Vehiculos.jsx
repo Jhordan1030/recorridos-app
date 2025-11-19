@@ -1,10 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
+import { useAlert } from '../context/AlertContext';
 import { getVehiculos, createVehiculo, deleteVehiculo, updateVehiculo } from '../services/api';
-import Modal from '../components/ui/Modal'; // ✅
+import Modal from '../components/ui/Modal';
+import ConfirmModal from '../components/ui/ConfirmModal';
+import Alert from '../components/ui/Alert';
+import Button from '../components/ui/Button';
+import Card from '../components/ui/Card';
+import Input from '../components/ui/Input';
 
 const Vehiculos = () => {
-  const { showAlert, vehiculos, setVehiculos } = useApp();
+  const { vehiculos, setVehiculos } = useApp();
+  const { showAlert } = useAlert();
+  
   const [formData, setFormData] = useState({
     tipo: 'propio',
     descripcion: '',
@@ -14,15 +22,11 @@ const Vehiculos = () => {
   });
 
   const [mostrarModal, setMostrarModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [vehiculoAEliminar, setVehiculoAEliminar] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [editId, setEditId] = useState(null);
   const [loading, setLoading] = useState(false);
-
-  // Clases de utilidad
-  const inputClass = "p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full transition-all duration-200 shadow-sm bg-white text-gray-900 placeholder-gray-500";
-  const btnPrimaryClass = "bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50";
-  const btnSecondaryClass = "bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-6 rounded-lg shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:opacity-50";
-  const btnDangerClass = "bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50";
 
   useEffect(() => {
     loadVehiculos();
@@ -36,7 +40,7 @@ const Vehiculos = () => {
         setVehiculos(response.data.data);
       }
     } catch (error) {
-      showAlert('Error al cargar vehículos: ' + error.message, 'error');
+      showAlert('error', 'Error al cargar vehículos: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -69,7 +73,7 @@ const Vehiculos = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.descripcion || !formData.costo_por_recorrido) {
-      showAlert('Descripción y costo son requeridos', 'error');
+      showAlert('error', 'Descripción y costo son requeridos');
       return;
     }
 
@@ -86,14 +90,10 @@ const Vehiculos = () => {
       let response;
       if (editMode) {
         response = await updateVehiculo(editId, data);
-        if (response.data.success) {
-          showAlert('Vehículo actualizado exitosamente', 'success');
-        }
+        showAlert('success', 'Vehículo actualizado exitosamente');
       } else {
         response = await createVehiculo(data);
-        if (response.data.success) {
-          showAlert('Vehículo creado exitosamente', 'success');
-        }
+        showAlert('success', 'Vehículo creado exitosamente');
       }
 
       if (response.data.success) {
@@ -101,27 +101,34 @@ const Vehiculos = () => {
         loadVehiculos();
         setMostrarModal(false);
       }
-
     } catch (error) {
-      showAlert(`Error al ${editMode ? 'actualizar' : 'crear'} vehículo: ` + error.message, 'error');
+      showAlert('error', `Error al ${editMode ? 'actualizar' : 'crear'} vehículo: ` + error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('¿Estás seguro de desactivar este vehículo?')) return;
+  const handleDeleteClick = (id) => {
+    setVehiculoAEliminar(id);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!vehiculoAEliminar) return;
+    
     setLoading(true);
     try {
-      const response = await deleteVehiculo(id);
+      const response = await deleteVehiculo(vehiculoAEliminar);
       if (response.data.success) {
-        showAlert('Vehículo desactivado exitosamente', 'success');
+        showAlert('success', 'Vehículo desactivado exitosamente');
         loadVehiculos();
       }
     } catch (error) {
-      showAlert('Error al eliminar: ' + error.message, 'error');
+      showAlert('error', 'Error al eliminar: ' + error.message);
     } finally {
       setLoading(false);
+      setShowDeleteModal(false);
+      setVehiculoAEliminar(null);
     }
   };
 
@@ -143,335 +150,318 @@ const Vehiculos = () => {
     setMostrarModal(true);
   };
 
-  // Función para obtener el icono según el tipo de vehículo
-  const getTipoIcono = (tipo) => {
-    switch (tipo) {
-      case 'propio': return '🚗';
-      case 'empresa': return '🏢';
-      case 'alquilado': return '📋';
-      case 'taxi': return '🚕';
-      default: return '🚗';
-    }
+  // Helpers de UI
+  const getTipoInfo = (tipo) => {
+    const config = {
+      propio: { icon: '🚗', color: 'bg-blue-50 text-blue-700 border-blue-200' },
+      empresa: { icon: '🏢', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+      alquilado: { icon: '📋', color: 'bg-violet-50 text-violet-700 border-violet-200' },
+      taxi: { icon: '🚕', color: 'bg-amber-50 text-amber-700 border-amber-200' },
+      default: { icon: '🚗', color: 'bg-gray-50 text-gray-700 border-gray-200' }
+    };
+    return config[tipo] || config.default;
   };
-
-  // Función para obtener el color según el tipo de vehículo
-  const getTipoColor = (tipo) => {
-    switch (tipo) {
-      case 'propio': return 'bg-blue-100 text-blue-800';
-      case 'empresa': return 'bg-green-100 text-green-800';
-      case 'alquilado': return 'bg-purple-100 text-purple-800';
-      case 'taxi': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  // -------------------------------------------------------------------------
-  // COMPONENTE DEL FORMULARIO
-  // -------------------------------------------------------------------------
-  const VehiculoForm = (
-    <div className="space-y-6">
-      <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-          
-          {/* Tipo */}
-          <div className="flex flex-col space-y-2">
-            <label className="text-sm font-medium text-gray-700 flex items-center">
-              <span className="mr-2">🏷️</span>
-              Tipo *
-            </label>
-            <select 
-              name="tipo" 
-              value={formData.tipo} 
-              onChange={handleChange} 
-              required
-              className={inputClass}
-              disabled={loading}
-            >
-              <option value="propio">Propio</option>
-              <option value="empresa">Empresa</option>
-              <option value="alquilado">Alquilado</option>
-              <option value="taxi">Taxi</option>
-            </select>
-          </div>
-
-          {/* Descripción */}
-          <div className="flex flex-col space-y-2">
-            <label className="text-sm font-medium text-gray-700 flex items-center">
-              <span className="mr-2">📝</span>
-              Descripción *
-            </label>
-            <input
-              type="text"
-              name="descripcion"
-              value={formData.descripcion}
-              onChange={handleChange}
-              placeholder="Ej: Toyota Corolla Blanco 2023"
-              required
-              className={inputClass}
-              disabled={loading}
-            />
-          </div>
-
-          {/* Placa */}
-          <div className="flex flex-col space-y-2">
-            <label className="text-sm font-medium text-gray-700 flex items-center">
-              <span className="mr-2">🔢</span>
-              Placa
-            </label>
-            <input
-              type="text"
-              name="placa"
-              value={formData.placa}
-              onChange={handleChange}
-              placeholder="Ej: ABC-1234"
-              className={inputClass}
-              disabled={loading}
-            />
-          </div>
-
-          {/* Capacidad */}
-          <div className="flex flex-col space-y-2">
-            <label className="text-sm font-medium text-gray-700 flex items-center">
-              <span className="mr-2">👥</span>
-              Capacidad
-            </label>
-            <input
-              type="number"
-              name="capacidad"
-              value={formData.capacidad}
-              onChange={handleChange}
-              placeholder="Ej: 5"
-              min="1"
-              className={inputClass}
-              disabled={loading}
-            />
-          </div>
-
-          {/* Costo por Recorrido */}
-          <div className="flex flex-col space-y-2 md:col-span-2">
-            <label className="text-sm font-medium text-gray-700 flex items-center">
-              <span className="mr-2">💰</span>
-              Costo por Recorrido ($) *
-            </label>
-            <input
-              type="number"
-              step="0.01"
-              name="costo_por_recorrido"
-              value={formData.costo_por_recorrido}
-              onChange={handleChange}
-              placeholder="Ej: 3.50"
-              required
-              min="0"
-              className={inputClass}
-              disabled={loading}
-            />
-          </div>
-        </div>
-
-        {/* Botones de acción */}
-        <div className="mt-8 pt-6 border-t border-gray-200 flex flex-col-reverse sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4">
-          <button
-            type="button"
-            className={`${btnSecondaryClass} w-full sm:w-auto`}
-            onClick={handleCloseModal}
-            disabled={loading}
-          >
-            ❌ Cancelar
-          </button>
-          <button 
-            type="submit" 
-            className={`${btnPrimaryClass} w-full sm:w-auto flex items-center justify-center`}
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                {editMode ? 'Actualizando...' : 'Creando...'}
-              </>
-            ) : (
-              editMode ? '💾 Actualizar Vehículo' : '✅ Agregar Vehículo'
-            )}
-          </button>
-        </div>
-      </form>
-    </div>
-  );
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-            <div className="mb-4 sm:mb-0">
-              <h2 className="text-3xl font-bold text-gray-900 flex items-center">
-                <span className="mr-3">🚗</span>
-                Gestión de Vehículos
-              </h2>
-              <p className="text-gray-600 mt-2">
-                Administra la flota de vehículos disponibles para los recorridos
+    <div className="min-h-screen bg-gray-50/50 py-8 px-4 sm:px-6 lg:px-8">
+      <Alert />
+      
+      {/* --- Header Section --- */}
+      <div className="max-w-7xl mx-auto mb-8">
+        <div className="md:flex md:items-center md:justify-between md:space-x-5">
+          <div className="flex items-start space-x-5">
+            <div className="pt-1.5">
+              <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">Gestión de Vehículos</h1>
+              <p className="text-sm font-medium text-gray-500 mt-1">
+                Administra la flota disponible para recorridos y asignaciones.
               </p>
             </div>
-            
-            {/* Botones de acción */}
-            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
-              <button
-                type="button"
-                className={`${btnPrimaryClass} flex items-center justify-center w-full sm:w-auto`}
-                onClick={handleOpenCreateModal}
-                disabled={loading}
-              >
-                <span className="mr-2">➕</span>
-                Nuevo Vehículo
-              </button>
-              <button 
-                type="button" 
-                className={`${btnSecondaryClass} flex items-center justify-center w-full sm:w-auto`} 
-                onClick={loadVehiculos}
-                disabled={loading}
-              >
-                <span className="mr-2">🔄</span>
-                Actualizar
-              </button>
-            </div>
+          </div>
+          <div className="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-y-0 sm:space-x-3 sm:space-x-reverse md:mt-0 md:flex-row md:space-x-3">
+            <Button
+              variant="white"
+              onClick={loadVehiculos}
+              disabled={loading}
+              icon="🔄"
+              className="w-full md:w-auto justify-center shadow-sm"
+            >
+              Actualizar
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handleOpenCreateModal}
+              icon="➕"
+              className="w-full md:w-auto justify-center shadow-md hover:shadow-lg transition-shadow"
+            >
+              Nuevo Vehículo
+            </Button>
           </div>
         </div>
+      </div>
 
-        {/* Modal */}
-        {mostrarModal && (
-          <Modal
-            title={
-              <div className="flex items-center">
-                <span className="mr-2 text-2xl">{editMode ? '✏️' : '🚗'}</span>
-                {editMode ? 'Editar Vehículo' : 'Registrar Nuevo Vehículo'}
-              </div>
-            }
-            onClose={handleCloseModal}
-          >
-            {VehiculoForm}
-          </Modal>
-        )}
+      {/* --- Stats & Content --- */}
+      <div className="max-w-7xl mx-auto">
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+          <div className="bg-white overflow-hidden rounded-xl border border-gray-100 shadow-sm px-4 py-5 sm:p-6">
+            <dt className="text-sm font-medium text-gray-500 truncate">Total Flota</dt>
+            <dd className="mt-1 text-3xl font-semibold text-gray-900">{vehiculos.length}</dd>
+          </div>
+          <div className="bg-white overflow-hidden rounded-xl border border-gray-100 shadow-sm px-4 py-5 sm:p-6">
+            <dt className="text-sm font-medium text-gray-500 truncate">Vehículos Propios</dt>
+            <dd className="mt-1 text-3xl font-semibold text-blue-600">
+              {vehiculos.filter(v => v.tipo === 'propio').length}
+            </dd>
+          </div>
+        </div>
 
         {/* Loading State */}
         {loading && vehiculos.length === 0 && (
-          <div className="flex justify-center items-center h-64">
+          <div className="flex justify-center items-center h-64 bg-white rounded-xl border border-gray-200 border-dashed">
             <div className="text-center">
-              <svg className="animate-spin h-12 w-12 text-indigo-600 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              <p className="text-gray-600 text-lg">Cargando vehículos...</p>
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-500 font-medium">Cargando información...</p>
             </div>
-          </div>
-        )}
-
-        {/* Grid de vehículos */}
-        {!loading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {vehiculos.map((vehiculo) => (
-              <div key={vehiculo.id} className="bg-white rounded-xl shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                <div className="p-6">
-                  {/* Header de la tarjeta */}
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center">
-                      <div className="text-3xl mr-3">
-                        {getTipoIcono(vehiculo.tipo)}
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">
-                          {vehiculo.descripcion}
-                        </h3>
-                        <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${getTipoColor(vehiculo.tipo)} capitalize`}>
-                          {vehiculo.tipo}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Información del vehículo */}
-                  <div className="space-y-3">
-                    <div className="flex items-center text-gray-600">
-                      <span className="mr-3 text-lg">🔢</span>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-500">Placa</p>
-                        <p className="text-gray-900 font-mono">
-                          {vehiculo.placa || 'No registrada'}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center text-gray-600">
-                      <span className="mr-3 text-lg">👥</span>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-500">Capacidad</p>
-                        <p className="text-gray-900">
-                          {vehiculo.capacidad ? `${vehiculo.capacidad} personas` : 'No especificada'}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center text-gray-600">
-                      <span className="mr-3 text-lg">💰</span>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-500">Costo por Recorrido</p>
-                        <p className="text-2xl font-bold text-green-600">
-                          ${parseFloat(vehiculo.costo_por_recorrido || 0).toFixed(2)}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Botones de acción */}
-                  <div className="mt-6 pt-4 border-t border-gray-200 flex space-x-2">
-                    <button
-                      className="flex-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold py-2 px-3 rounded-lg text-sm transition-colors duration-200 flex items-center justify-center"
-                      onClick={() => handleEdit(vehiculo)}
-                      disabled={loading}
-                    >
-                      <span className="mr-1">✏️</span>
-                      Editar
-                    </button>
-                    <button
-                      className="flex-1 bg-red-50 hover:bg-red-100 text-red-700 font-semibold py-2 px-3 rounded-lg text-sm transition-colors duration-200 flex items-center justify-center"
-                      onClick={() => handleDelete(vehiculo.id)}
-                      disabled={loading}
-                    >
-                      <span className="mr-1">🗑️</span>
-                      Eliminar
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
           </div>
         )}
 
         {/* Empty State */}
         {!loading && vehiculos.length === 0 && (
-          <div className="text-center py-16 bg-white rounded-xl shadow-lg border border-gray-200">
-            <div className="max-w-md mx-auto">
-              <div className="text-6xl mb-4">🚗</div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                No hay vehículos registrados
-              </h3>
-              <p className="text-gray-600 mb-6">
-                Comienza agregando el primer vehículo para poder asignarlo a recorridos.
-              </p>
-              <button
-                onClick={handleOpenCreateModal}
-                className={`${btnPrimaryClass} inline-flex items-center`}
-              >
-                <span className="mr-2">➕</span>
-                Registrar Primer Vehículo
-              </button>
+          <div className="text-center py-16 bg-white rounded-xl border border-gray-200 border-dashed">
+            <div className="mx-auto h-12 w-12 text-gray-400 text-4xl">🚗</div>
+            <h3 className="mt-2 text-sm font-medium text-gray-900">No hay vehículos</h3>
+            <p className="mt-1 text-sm text-gray-500">Comienza registrando un nuevo vehículo en el sistema.</p>
+            <div className="mt-6">
+              <Button variant="primary" onClick={handleOpenCreateModal} icon="➕">
+                Registrar Vehículo
+              </Button>
             </div>
           </div>
         )}
+
+        {/* Grid de Vehículos */}
+        {!loading && vehiculos.length > 0 && (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {vehiculos.map((vehiculo) => {
+              const styleInfo = getTipoInfo(vehiculo.tipo);
+              return (
+                <div 
+                  key={vehiculo.id} 
+                  className="group bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md hover:border-blue-300 transition-all duration-300 flex flex-col overflow-hidden"
+                >
+                  {/* Card Header */}
+                  <div className="p-5 flex-1">
+                    <div className="flex justify-between items-start mb-4">
+                      <span className="text-3xl filter drop-shadow-sm">{styleInfo.icon}</span>
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${styleInfo.color} capitalize`}>
+                        {vehiculo.tipo}
+                      </span>
+                    </div>
+                    
+                    <h3 className="text-lg font-bold text-gray-900 mb-1 line-clamp-1" title={vehiculo.descripcion}>
+                      {vehiculo.descripcion}
+                    </h3>
+                    
+                    <div className="space-y-3 mt-4">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-500 flex items-center gap-1">
+                          <span className="opacity-60">🔢</span> Placa
+                        </span>
+                        <span className="font-mono font-medium text-gray-700 bg-gray-50 px-2 py-0.5 rounded">
+                          {vehiculo.placa || 'N/A'}
+                        </span>
+                      </div>
+                      
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-500 flex items-center gap-1">
+                          <span className="opacity-60">👥</span> Capacidad
+                        </span>
+                        <span className="font-medium text-gray-700">
+                          {vehiculo.capacidad ? `${vehiculo.capacidad} Pas.` : '--'}
+                        </span>
+                      </div>
+
+                      <div className="pt-3 mt-3 border-t border-gray-100 flex items-center justify-between">
+                        <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">Costo/Recorrido</span>
+                        <span className="text-lg font-bold text-emerald-600">
+                          ${parseFloat(vehiculo.costo_por_recorrido || 0).toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Card Actions */}
+                  <div className="bg-gray-50 px-5 py-3 border-t border-gray-100 flex gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
+                    <Button
+                      variant="white"
+                      size="sm"
+                      className="flex-1 justify-center text-xs"
+                      onClick={() => handleEdit(vehiculo)}
+                      icon="✏️"
+                    >
+                      Editar
+                    </Button>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      className="flex-1 justify-center text-xs"
+                      onClick={() => handleDeleteClick(vehiculo.id)}
+                      icon="🗑️"
+                    >
+                      Eliminar
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
+
+      {/* --- Modals --- */}
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={confirmDelete}
+        title="Desactivar Vehículo"
+        message="¿Estás seguro de que quieres desactivar este vehículo? Esta acción podría afectar recorridos históricos."
+        confirmText="Sí, desactivar"
+        cancelText="Cancelar"
+        type="danger"
+      />
+
+      <Modal
+        isOpen={mostrarModal}
+        onClose={handleCloseModal}
+        title={editMode ? 'Editar Vehículo' : 'Nuevo Vehículo'}
+        size="max-w-2xl"
+      >
+        <div className="p-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+              
+              {/* Tipo - Full Width on Mobile, Half on Desktop */}
+              <div className="sm:col-span-3">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Tipo de Vehículo <span className="text-red-500">*</span>
+                </label>
+                <select
+                  name="tipo"
+                  value={formData.tipo}
+                  onChange={handleChange}
+                  required
+                  className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2.5 px-3 border"
+                  disabled={loading}
+                >
+                  <option value="propio">🚗 Propio</option>
+                  <option value="empresa">🏢 Empresa</option>
+                  <option value="alquilado">📋 Alquilado</option>
+                  <option value="taxi">🚕 Taxi</option>
+                </select>
+              </div>
+
+              {/* Placa */}
+              <div className="sm:col-span-3">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Placa
+                </label>
+                <Input
+                  type="text"
+                  name="placa"
+                  value={formData.placa}
+                  onChange={handleChange}
+                  placeholder="ABC-1234"
+                  className="uppercase"
+                  disabled={loading}
+                />
+              </div>
+
+              {/* Descripción - Full Width */}
+              <div className="sm:col-span-6">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Descripción / Modelo <span className="text-red-500">*</span>
+                </label>
+                <Input
+                  type="text"
+                  name="descripcion"
+                  value={formData.descripcion}
+                  onChange={handleChange}
+                  placeholder="Ej: Toyota Hilux Blanca 2023"
+                  required
+                  disabled={loading}
+                />
+              </div>
+
+              {/* Capacidad */}
+              <div className="sm:col-span-3">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Capacidad (Personas)
+                </label>
+                <div className="relative rounded-md shadow-sm">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                    <span className="text-gray-500 sm:text-sm">👥</span>
+                  </div>
+                  <Input
+                    type="number"
+                    name="capacidad"
+                    value={formData.capacidad}
+                    onChange={handleChange}
+                    placeholder="4"
+                    min="1"
+                    className="pl-10" // Padding for icon
+                    disabled={loading}
+                  />
+                </div>
+              </div>
+
+              {/* Costo */}
+              <div className="sm:col-span-3">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Costo por Recorrido <span className="text-red-500">*</span>
+                </label>
+                <div className="relative rounded-md shadow-sm">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                    <span className="text-gray-500 sm:text-sm">$</span>
+                  </div>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    name="costo_por_recorrido"
+                    value={formData.costo_por_recorrido}
+                    onChange={handleChange}
+                    placeholder="0.00"
+                    required
+                    min="0"
+                    className="pl-7" // Padding for icon
+                    disabled={loading}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Footer Actions */}
+            <div className="mt-8 pt-5 border-t border-gray-100 flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-3 gap-3 sm:gap-0">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={handleCloseModal}
+                disabled={loading}
+                className="w-full sm:w-auto justify-center"
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                variant="primary"
+                loading={loading}
+                className="w-full sm:w-auto justify-center"
+              >
+                {editMode ? 'Guardar Cambios' : 'Registrar Vehículo'}
+              </Button>
+            </div>
+          </form>
+        </div>
+      </Modal>
     </div>
   );
 };
