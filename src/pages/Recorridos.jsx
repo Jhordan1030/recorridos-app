@@ -158,13 +158,8 @@ const Recorridos = () => {
     }
   };
 
-  // Función para exportar datos
-  const handleExportData = () => {
-    showAlert('info', 'Función de exportación en desarrollo');
-  };
-
   return (
-    <div className="min-h-screen bg-gray-50 py-4 px-3 sm:px-4 lg:px-6 xl:px-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 py-4 px-3 sm:px-4 lg:px-6 xl:px-8 transition-colors duration-300">
       
       {/* Componente Alert */}
       <Alert />
@@ -172,49 +167,55 @@ const Recorridos = () => {
       {/* Header Principal */}
       <div className="mb-6 pt-4">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 text-center sm:text-left mb-2">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white text-center sm:text-left mb-2">
             Gestión de Recorridos
           </h1>
-          <p className="text-gray-600 text-center sm:text-left text-sm sm:text-base lg:text-lg">
+          <p className="text-gray-600 dark:text-slate-400 text-center sm:text-left text-sm sm:text-base lg:text-lg">
             Administra y visualiza todos los recorridos registrados en el sistema
           </p>
         </div>
       </div>
 
-      {/* Controles del Mes */}
-      <Card className="mb-6 shadow-sm border border-gray-200">
+      {/* Controles del Mes (CORREGIDO) */}
+      <Card className="mb-6 shadow-sm border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-4 p-4 sm:p-6">
-          {/* Navegación del Mes */}
+          
+          {/* Navegación del Mes - ESTILO MANUAL CORREGIDO */}
           <div className="flex items-center justify-center w-full lg:w-auto">
-            <div className="flex flex-col sm:flex-row items-center bg-white rounded-lg shadow-sm border border-gray-200 p-2 sm:p-3 w-full sm:w-auto">
-              <div className="flex w-full sm:w-auto mb-2 sm:mb-0">
-                <Button
-                  variant="secondary"
-                  onClick={() => cambiarMes(-1)}
-                  className="rounded-l-lg rounded-r-sm sm:rounded-r-none p-2 sm:p-3 hover:bg-gray-50 transition-colors flex-1 sm:flex-none border-r border-gray-200"
-                  disabled={loading}
-                >
-                  <span className="hidden xs:inline text-sm">Anterior</span>
-                  <span className="xs:hidden">‹</span>
-                </Button>
+            <div className="flex items-center bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden">
+              
+              {/* Botón Anterior */}
+              <button
+                onClick={() => cambiarMes(-1)}
+                disabled={loading}
+                className="px-4 py-2 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-600 dark:text-slate-200 transition-colors border-r border-gray-200 dark:border-slate-700 flex items-center disabled:opacity-50"
+                title="Mes anterior"
+              >
+                <span className="hidden xs:inline text-sm font-medium mr-1">Anterior</span>
+                <span className="text-xl font-bold leading-none">‹</span>
+              </button>
 
-                <div className="flex flex-col items-center mx-2 sm:mx-4 min-w-[120px] sm:min-w-[160px] flex-1">
-                  <h3 className="text-base sm:text-xl font-bold text-indigo-600 text-center">
-                    {nombresMeses[mesSeleccionado - 1]}
-                  </h3>
-                  <p className="text-gray-600 text-sm sm:text-base">{añoSeleccionado}</p>
-                </div>
-
-                <Button
-                  variant="secondary"
-                  onClick={() => cambiarMes(1)}
-                  className="rounded-r-lg rounded-l-sm sm:rounded-l-none p-2 sm:p-3 hover:bg-gray-50 transition-colors flex-1 sm:flex-none border-l border-gray-200"
-                  disabled={loading}
-                >
-                  <span className="hidden xs:inline text-sm">Siguiente</span>
-                  <span className="xs:hidden">›</span>
-                </Button>
+              {/* Texto del Mes */}
+              <div className="px-6 py-2 min-w-[140px] text-center bg-white dark:bg-slate-800">
+                <h3 className="text-base sm:text-xl font-bold text-indigo-600 dark:text-indigo-400 whitespace-nowrap">
+                  {nombresMeses[mesSeleccionado - 1]}
+                </h3>
+                <span className="text-xs text-gray-500 dark:text-slate-400 font-medium">
+                  {añoSeleccionado}
+                </span>
               </div>
+
+              {/* Botón Siguiente */}
+              <button
+                onClick={() => cambiarMes(1)}
+                disabled={loading}
+                className="px-4 py-2 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-600 dark:text-slate-200 transition-colors border-l border-gray-200 dark:border-slate-700 flex items-center disabled:opacity-50"
+                title="Mes siguiente"
+              >
+                <span className="text-xl font-bold leading-none">›</span>
+                <span className="hidden xs:inline text-sm font-medium ml-1">Siguiente</span>
+              </button>
+
             </div>
           </div>
 
@@ -225,7 +226,7 @@ const Recorridos = () => {
               onClick={loadRecorridos}
               disabled={loading}
               icon="🔄"
-              className="flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 sm:py-3 rounded-lg hover:bg-gray-50 transition-colors shadow-sm bg-white text-gray-700 border border-gray-300 text-sm sm:text-base w-full xs:w-auto"
+              className="flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 sm:py-3 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors shadow-sm bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200 border border-gray-300 dark:border-slate-600 text-sm sm:text-base w-full xs:w-auto"
             >
               <span className="font-semibold whitespace-nowrap">
                 <span className="hidden sm:inline">Actualizar</span>
@@ -244,28 +245,26 @@ const Recorridos = () => {
                 <span className="sm:hidden">Nuevo</span>
               </span>
             </Button>
-
-            
           </div>
         </div>
 
         {/* Total del Mes */}
-        <div className="border-t border-gray-200 pt-4 mt-4 px-4 sm:px-6">
+        <div className="border-t border-gray-200 dark:border-slate-800 pt-4 mt-4 px-4 sm:px-6 pb-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-center sm:text-left">
-              <div className="text-sm text-gray-600 font-medium">Total del mes</div>
-              <div className="text-2xl sm:text-3xl font-bold text-green-600">
+              <div className="text-sm text-gray-600 dark:text-slate-400 font-medium">Total del mes</div>
+              <div className="text-2xl sm:text-3xl font-bold text-green-600 dark:text-green-400">
                 ${estadisticas.totalMes.toFixed(2)}
               </div>
             </div>
             <div className="flex gap-4">
               <div className="text-center">
-                <div className="text-xs text-gray-500">Recorridos</div>
-                <div className="text-lg font-semibold text-indigo-600">{estadisticas.totalRecorridos}</div>
+                <div className="text-xs text-gray-500 dark:text-slate-500 uppercase">Recorridos</div>
+                <div className="text-lg font-semibold text-indigo-600 dark:text-indigo-400">{estadisticas.totalRecorridos}</div>
               </div>
               <div className="text-center">
-                <div className="text-xs text-gray-500">Vehículos</div>
-                <div className="text-lg font-semibold text-blue-600">{estadisticas.vehiculosUsados}</div>
+                <div className="text-xs text-gray-500 dark:text-slate-500 uppercase">Vehículos</div>
+                <div className="text-lg font-semibold text-blue-600 dark:text-blue-400">{estadisticas.vehiculosUsados}</div>
               </div>
             </div>
           </div>
@@ -274,25 +273,25 @@ const Recorridos = () => {
 
       {/* Resumen Estadístico */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
-        <Card className="text-center p-4 sm:p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
-          <div className="text-2xl sm:text-3xl font-bold text-indigo-600 mb-2">
+        <Card className="text-center p-4 sm:p-6 shadow-sm border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:shadow-md transition-all duration-200">
+          <div className="text-2xl sm:text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">
             {estadisticas.totalRecorridos}
           </div>
-          <div className="text-gray-600 font-medium text-sm sm:text-base">Total Recorridos</div>
+          <div className="text-gray-600 dark:text-slate-400 font-medium text-sm sm:text-base">Total Recorridos</div>
         </Card>
         
-        <Card className="text-center p-4 sm:p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
-          <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-2">
+        <Card className="text-center p-4 sm:p-6 shadow-sm border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:shadow-md transition-all duration-200">
+          <div className="text-2xl sm:text-3xl font-bold text-green-600 dark:text-green-400 mb-2">
             ${estadisticas.totalMes.toFixed(2)}
           </div>
-          <div className="text-gray-600 font-medium text-sm sm:text-base">Costo Total</div>
+          <div className="text-gray-600 dark:text-slate-400 font-medium text-sm sm:text-base">Costo Total</div>
         </Card>
         
-        <Card className="text-center p-4 sm:p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200">
-          <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-2">
+        <Card className="text-center p-4 sm:p-6 shadow-sm border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:shadow-md transition-all duration-200">
+          <div className="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">
             {estadisticas.vehiculosUsados}
           </div>
-          <div className="text-gray-600 font-medium text-sm sm:text-base">Vehículos Usados</div>
+          <div className="text-gray-600 dark:text-slate-400 font-medium text-sm sm:text-base">Vehículos Usados</div>
         </Card>
       </div>
 
@@ -314,7 +313,7 @@ const Recorridos = () => {
         title={recorridoAEditar ? '✏️ Editar Recorrido' : '➕ Crear Recorrido'}
         size="max-w-2xl"
       >
-        <div className="p-4 sm:p-6">
+        <div className="p-4 sm:p-6 bg-white dark:bg-slate-900">
           <RecorridoForm
             recorridoParaEditar={recorridoAEditar}
             onSuccess={() => handleFormSuccess(!!recorridoAEditar)}
@@ -325,10 +324,10 @@ const Recorridos = () => {
 
       {/* Loading State */}
       {loading && recorridosFiltrados.length === 0 && (
-        <Card className="flex justify-center items-center h-48 sm:h-64 shadow-sm border border-gray-200">
+        <Card className="flex justify-center items-center h-48 sm:h-64 shadow-sm border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-b-2 border-blue-500 mx-auto mb-3 sm:mb-4"></div>
-            <p className="text-base sm:text-lg text-gray-600 font-medium">Cargando recorridos...</p>
+            <p className="text-base sm:text-lg text-gray-600 dark:text-slate-400 font-medium">Cargando recorridos...</p>
           </div>
         </Card>
       )}
@@ -337,24 +336,24 @@ const Recorridos = () => {
       {!loading && recorridosFiltrados.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
           {recorridosFiltrados.map((recorrido) => (
-            <Card key={recorrido.id} className="hover:shadow-lg transition-all duration-300 border border-gray-200 overflow-hidden">
+            <Card key={recorrido.id} className="hover:shadow-lg transition-all duration-300 border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden">
               <div className="p-4 sm:p-6">
                 {/* Header de la tarjeta */}
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-4">
                   <div className="flex-1">
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 flex items-center">
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white flex items-center">
                       <span className="mr-2">📅</span>
                       {recorrido.fecha.split('T')[0]}
                     </h3>
-                    <p className="text-gray-600 text-sm mt-1">
+                    <p className="text-gray-600 dark:text-slate-400 text-sm mt-1">
                       {formatearHora(recorrido.hora_inicio)}
                     </p>
                   </div>
                   <div className="text-left sm:text-right">
-                    <div className="text-xl sm:text-2xl font-bold text-green-600">
+                    <div className="text-xl sm:text-2xl font-bold text-green-600 dark:text-green-400">
                       ${parseFloat(recorrido.costo || 0).toFixed(2)}
                     </div>
-                    <span className="inline-block px-2 py-1 text-xs font-medium bg-indigo-100 text-indigo-800 rounded-full capitalize mt-1">
+                    <span className="inline-block px-2 py-1 text-xs font-medium bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-300 rounded-full capitalize mt-1">
                       {recorrido.tipo_recorrido}
                     </span>
                   </div>
@@ -362,11 +361,11 @@ const Recorridos = () => {
 
                 {/* Información del recorrido */}
                 <div className="space-y-3">
-                  <div className="flex items-center text-gray-600">
+                  <div className="flex items-center text-gray-600 dark:text-slate-400">
                     <span className="mr-3 text-lg flex-shrink-0">🚗</span>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-500">Vehículo</p>
-                      <p className="text-gray-900 font-medium truncate">
+                      <p className="text-sm font-medium text-gray-500 dark:text-slate-500">Vehículo</p>
+                      <p className="text-gray-900 dark:text-slate-200 font-medium truncate">
                         {recorrido.vehiculo_descripcion || 'Sin vehículo'}
                       </p>
                     </div>
@@ -374,16 +373,16 @@ const Recorridos = () => {
 
                   {/* Niños en el recorrido */}
                   {recorrido.ninos && recorrido.ninos.length > 0 && (
-                    <div className="flex items-start text-gray-600">
+                    <div className="flex items-start text-gray-600 dark:text-slate-400">
                       <span className="mr-3 text-lg mt-1 flex-shrink-0">👦</span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-500 mb-1">Niños ({recorrido.ninos.length})</p>
-                        <div className="space-y-1 max-h-20 overflow-y-auto">
+                        <p className="text-sm font-medium text-gray-500 dark:text-slate-500 mb-1">Niños ({recorrido.ninos.length})</p>
+                        <div className="space-y-1 max-h-20 overflow-y-auto custom-scrollbar">
                           {recorrido.ninos.map((nino, idx) => (
-                            <div key={idx} className="text-gray-900 text-sm">
+                            <div key={idx} className="text-gray-900 dark:text-slate-300 text-sm">
                               • {nino.nombre} {nino.apellidos}
                               {nino.notas && (
-                                <span className="text-gray-500 text-xs ml-2">({nino.notas})</span>
+                                <span className="text-gray-500 dark:text-slate-500 text-xs ml-2">({nino.notas})</span>
                               )}
                             </div>
                           ))}
@@ -394,18 +393,18 @@ const Recorridos = () => {
 
                   {/* Notas del recorrido */}
                   {recorrido.notas && (
-                    <div className="flex items-start text-gray-600">
+                    <div className="flex items-start text-gray-600 dark:text-slate-400">
                       <span className="mr-3 text-lg mt-1 flex-shrink-0">📝</span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-500">Notas</p>
-                        <p className="text-gray-900 text-sm break-words">{recorrido.notas}</p>
+                        <p className="text-sm font-medium text-gray-500 dark:text-slate-500">Notas</p>
+                        <p className="text-gray-900 dark:text-slate-300 text-sm break-words">{recorrido.notas}</p>
                       </div>
                     </div>
                   )}
                 </div>
 
                 {/* Botones de acción */}
-                <div className="mt-6 pt-4 border-t border-gray-200 flex gap-2">
+                <div className="mt-6 pt-4 border-t border-gray-200 dark:border-slate-800 flex gap-2">
                   <Button
                     variant="primary"
                     size="sm"
@@ -435,13 +434,13 @@ const Recorridos = () => {
 
       {/* Empty State */}
       {!loading && recorridosFiltrados.length === 0 && (
-        <Card className="text-center py-12 sm:py-16 shadow-sm border border-gray-200">
+        <Card className="text-center py-12 sm:py-16 shadow-sm border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900">
           <div className="max-w-md mx-auto px-4">
-            <div className="text-4xl sm:text-6xl mb-4">📍</div>
-            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+            <div className="text-4xl sm:text-6xl mb-4 opacity-60">📍</div>
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">
               No hay recorridos registrados
             </h3>
-            <p className="text-gray-600 mb-6 text-sm sm:text-base">
+            <p className="text-gray-600 dark:text-slate-400 mb-6 text-sm sm:text-base">
               No se encontraron recorridos para {nombresMeses[mesSeleccionado - 1]} {añoSeleccionado}.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -458,6 +457,7 @@ const Recorridos = () => {
                 variant="secondary"
                 size="lg"
                 icon="🔄"
+                className="bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200 border border-gray-300 dark:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-700"
               >
                 Reintentar
               </Button>

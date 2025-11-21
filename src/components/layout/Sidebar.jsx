@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { 
+import {
   Home,
   Users,
   Car,
@@ -33,36 +33,36 @@ const Sidebar = ({ isOpen, onClose, isAdmin, isMobile }) => {
   };
 
   const menuItems = [
-    { 
-      icon: Home, 
-      label: 'Dashboard', 
+    {
+      icon: Home,
+      label: 'Dashboard',
       path: '/dashboard',
       description: 'Resumen general'
     },
-    { 
-      icon: MapPin, 
-      label: 'Recorridos', 
+    {
+      icon: MapPin,
+      label: 'Recorridos',
       path: '/recorridos',
       description: 'Gestión de rutas'
     },
-    { 
-      icon: Users, 
-      label: 'Niños', 
+    {
+      icon: Users,
+      label: 'Niños',
       path: '/ninos',
       description: 'Gestión de estudiantes'
     },
-    { 
-      icon: Car, 
-      label: 'Vehículos', 
+    {
+      icon: Car,
+      label: 'Vehículos',
       path: '/vehiculos',
       description: 'Flota de transporte'
     },
   ];
 
   if (isAdmin) {
-    menuItems.push({ 
-      icon: Settings, 
-      label: 'Administración', 
+    menuItems.push({
+      icon: Settings,
+      label: 'Administración',
       path: '/users',
       description: 'Gestión de usuarios',
       badge: 'Admin'
@@ -73,16 +73,16 @@ const Sidebar = ({ isOpen, onClose, isAdmin, isMobile }) => {
     <>
       {/* Overlay para móvil */}
       {isOpen && isMobile && (
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-40 lg:hidden transition-all duration-300"
           onClick={onClose}
         />
       )}
-      
+
       {/* Sidebar */}
       <aside className={`
         fixed lg:sticky inset-y-0 left-0 z-50 lg:z-30
-        bg-white/95 backdrop-blur-md border-r border-gray-100
+        bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-r border-gray-100 dark:border-slate-800
         transform transition-all duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         ${collapsed && !isMobile ? 'w-20' : 'w-80'}
@@ -91,39 +91,39 @@ const Sidebar = ({ isOpen, onClose, isAdmin, isMobile }) => {
         h-screen
         overflow-hidden
       `}>
-        
+
         {/* Header - SIN LOGO DEL CARRITO */}
-        <div className={`flex-shrink-0 ${collapsed && !isMobile ? 'px-4 py-5' : 'px-6 py-5'} border-b border-gray-100 bg-gradient-to-r from-white to-gray-50/50`}>
+        <div className={`flex-shrink-0 ${collapsed && !isMobile ? 'px-4 py-5' : 'px-6 py-5'} border-b border-gray-100 dark:border-slate-800 bg-gradient-to-r from-white to-gray-50/50 dark:from-slate-900 dark:to-slate-800/50`}>
           <div className="flex items-center justify-between">
             {/* Solo texto del nombre - SIN LOGO */}
             {(!collapsed || isMobile) ? (
               <div className="flex flex-col">
-                <h2 className="text-lg font-bold text-gray-900">Recorridos App</h2>
-                <p className="text-xs text-gray-500 font-medium">Sistema de transporte</p>
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white">Recorridos App</h2>
+                <p className="text-xs text-gray-500 dark:text-slate-400 font-medium">Sistema de transporte</p>
               </div>
             ) : (
               <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/20 mx-auto">
                 <span className="text-white font-bold text-sm">RA</span>
               </div>
             )}
-            
+
             {/* Botones de control */}
             <div className="flex items-center space-x-1">
               {/* Botón cerrar en móvil */}
               {isMobile && (
-                <button 
+                <button
                   onClick={onClose}
-                  className="lg:hidden p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-xl transition-all duration-200"
+                  className="lg:hidden p-2 text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition-all duration-200"
                 >
                   <X size={18} />
                 </button>
               )}
-              
+
               {/* Botón colapsar en desktop */}
               {!isMobile && (
-                <button 
+                <button
                   onClick={() => setCollapsed(!collapsed)}
-                  className="hidden lg:flex p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-xl transition-all duration-200"
+                  className="hidden lg:flex p-2 text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition-all duration-200"
                 >
                   {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
                 </button>
@@ -137,9 +137,9 @@ const Sidebar = ({ isOpen, onClose, isAdmin, isMobile }) => {
           <ul className="space-y-2 px-4">
             {menuItems.map((item) => {
               const Icon = item.icon;
-              const isActive = location.pathname === item.path || 
-                             (item.path === '/dashboard' && location.pathname === '/');
-              
+              const isActive = location.pathname === item.path ||
+                (item.path === '/dashboard' && location.pathname === '/');
+
               return (
                 <li key={item.path}>
                   <Link
@@ -151,25 +151,23 @@ const Sidebar = ({ isOpen, onClose, isAdmin, isMobile }) => {
                     }}
                     className={`
                       group relative flex items-center rounded-2xl transition-all duration-200
-                      ${isActive 
-                        ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/25' 
-                        : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900 hover:shadow-md'
+                      ${isActive
+                        ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/25'
+                        : 'text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white hover:shadow-md'
                       }
                       ${(collapsed && !isMobile) ? 'justify-center p-3' : 'space-x-4 px-4 py-3'}
                       overflow-hidden
                     `}
                   >
-                    <div className={`absolute inset-0 bg-gradient-to-r from-white/10 to-white/5 ${
-                      isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-                    } transition-opacity duration-200`} />
-                    
-                    <Icon 
-                      size={20} 
-                      className={`relative z-10 flex-shrink-0 ${
-                        isActive ? 'text-white' : 'text-gray-400 group-hover:text-primary-500'
-                      } transition-colors duration-200`} 
+                    <div className={`absolute inset-0 bg-gradient-to-r from-white/10 to-white/5 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                      } transition-opacity duration-200`} />
+
+                    <Icon
+                      size={20}
+                      className={`relative z-10 flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-400 dark:text-slate-500 group-hover:text-primary-500 dark:group-hover:text-white'
+                        } transition-colors duration-200`}
                     />
-                    
+
                     {(!collapsed || isMobile) && (
                       <div className="relative z-10 flex-1 min-w-0">
                         <div className="flex items-center justify-between">
@@ -180,9 +178,8 @@ const Sidebar = ({ isOpen, onClose, isAdmin, isMobile }) => {
                             </span>
                           )}
                         </div>
-                        <p className={`text-xs mt-0.5 truncate ${
-                          isActive ? 'text-primary-100' : 'text-gray-500'
-                        }`}>
+                        <p className={`text-xs mt-0.5 truncate ${isActive ? 'text-primary-100' : 'text-gray-500 dark:text-slate-500'
+                          }`}>
                           {item.description}
                         </p>
                       </div>
@@ -199,35 +196,34 @@ const Sidebar = ({ isOpen, onClose, isAdmin, isMobile }) => {
         </nav>
 
         {/* Footer - SOLO LOGOUT */}
-        <div className={`flex-shrink-0 p-4 border-t border-gray-100 bg-gray-50/50 ${
-          (collapsed && !isMobile) ? 'text-center' : ''
-        }`}>
+        <div className={`flex-shrink-0 p-4 border-t border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-900/50 ${(collapsed && !isMobile) ? 'text-center' : ''
+          }`}>
           <button
             onClick={handleLogout}
             className={`
               group flex items-center rounded-2xl transition-all duration-200
-              text-gray-600 hover:bg-red-50 hover:text-red-600 w-full
+              text-gray-600 dark:text-slate-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 w-full
               ${(collapsed && !isMobile) ? 'justify-center p-3' : 'space-x-3 px-4 py-3'}
               relative overflow-hidden
             `}
           >
             <div className="absolute inset-0 bg-red-500/5 group-hover:bg-red-500/10 transition-colors duration-200 rounded-2xl" />
-            <LogOut 
-              size={20} 
-              className="relative z-10 flex-shrink-0 text-gray-400 group-hover:text-red-500 transition-colors duration-200" 
+            <LogOut
+              size={20}
+              className="relative z-10 flex-shrink-0 text-gray-400 group-hover:text-red-500 transition-colors duration-200"
             />
             {(!collapsed || isMobile) && (
               <span className="relative z-10 font-semibold text-sm">Cerrar sesión</span>
             )}
           </button>
-          
+
           {/* Información de versión */}
           {(!collapsed || isMobile) && (
             <div className="mt-4 text-center">
-              <div className="text-xs text-gray-500 font-medium">
-                v2.1
+              <div className="text-xs text-gray-500 dark:text-slate-500 font-medium">
+                v3.0.1
               </div>
-              <div className="text-[10px] text-gray-400 mt-1">
+              <div className="text-[10px] text-gray-400 dark:text-slate-600 mt-1">
                 Sistema de Transporte Escolar
               </div>
             </div>

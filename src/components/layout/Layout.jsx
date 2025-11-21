@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import Sidebar from './Sidebar';
 import Header from './Header';
+// 1. IMPORTAR EL BOTÓN AQUÍ
+// Asumiendo que FloatingThemeToggle.jsx está en src/components/ui/
+import FloatingThemeToggle from '../ui/FloatingThemeToggle';
 
 const Layout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -17,36 +20,35 @@ const Layout = ({ children }) => {
     const checkDevice = () => {
       const mobile = window.innerWidth < 1024;
       setIsMobile(mobile);
-      
+
       // En desktop, siempre mostrar sidebar abierto
       if (!mobile) {
-        setIsSidebarOpen(false); // Cambiado a false para que no interfiera
+        setIsSidebarOpen(false); 
       } else {
-        setIsSidebarOpen(false); // En móvil empezar cerrado
+        setIsSidebarOpen(false); 
       }
     };
 
     checkDevice();
     window.addEventListener('resize', checkDevice);
-    
+
     return () => window.removeEventListener('resize', checkDevice);
   }, []);
 
-  // Cerrar sidebar al hacer clic fuera en móvil - CORREGIDO
+  // Cerrar sidebar al hacer clic fuera en móvil
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // Solo cerrar si es móvil, el sidebar está abierto y se hizo clic fuera
-      if (isMobile && isSidebarOpen && 
-          sidebarRef.current && 
-          !sidebarRef.current.contains(event.target) &&
-          !event.target.closest('[data-sidebar-toggle]')) {
+      if (isMobile && isSidebarOpen &&
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target) &&
+        !event.target.closest('[data-sidebar-toggle]')) {
         closeSidebar();
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     document.addEventListener('touchstart', handleClickOutside);
-    
+
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('touchstart', handleClickOutside);
@@ -67,7 +69,7 @@ const Layout = ({ children }) => {
   }, [isMobile, isSidebarOpen]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex transition-colors duration-300">
       {/* Sidebar */}
       {user && (
         <div ref={sidebarRef}>
@@ -81,25 +83,28 @@ const Layout = ({ children }) => {
       )}
 
       {/* Contenido principal */}
-      <div className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${
-        user && !isMobile && isSidebarOpen ? 'lg:ml-80' : 'lg:ml-0'
-      }`}>
+      <div className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${user && !isMobile && isSidebarOpen ? 'lg:ml-80' : 'lg:ml-0'
+        }`}>
         {/* Header */}
         {user && (
-          <Header 
-            onToggleSidebar={toggleSidebar} 
+          <Header
+            onToggleSidebar={toggleSidebar}
             isSidebarOpen={isSidebarOpen}
             isMobile={isMobile}
           />
         )}
 
         {/* Contenido de la página */}
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-slate-950">
           <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-4 lg:py-6">
             {children}
           </div>
         </main>
       </div>
+
+      {/* 2. AGREGAR EL COMPONENTE AQUÍ AL FINAL */}
+      <FloatingThemeToggle />
+      
     </div>
   );
 };

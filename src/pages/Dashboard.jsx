@@ -12,7 +12,7 @@ import Input from '../components/ui/Input';
 const Dashboard = () => {
   const { showAlert } = useAlert();
 
-  // ESTADOS
+  // --- ESTADOS ---
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editando, setEditando] = useState(false);
   const [recorridoId, setRecorridoId] = useState(null);
@@ -76,11 +76,11 @@ const Dashboard = () => {
 
   const procesarRecorridos = (data) => {
     const recorridosAgrupados = {};
-    
+
     if (Array.isArray(data)) {
       data.forEach(recorrido => {
         if (!recorrido?.fecha) return;
-        
+
         const [anioStr, mesStr, diaStr] = recorrido.fecha.split('-');
         const anioRecorrido = parseInt(anioStr);
         const mesRecorrido = parseInt(mesStr);
@@ -100,7 +100,7 @@ const Dashboard = () => {
       .map(k => parseInt(k))
       .filter(k => !isNaN(k) && k > 0 && k <= 31)
       .sort((a, b) => a - b)
-      .forEach(k => { 
+      .forEach(k => {
         recorridosLimpios[k] = recorridosAgrupados[k];
         recorridosLimpios[k].sort((a, b) => {
           const horaA = a.hora_inicio || '00:00';
@@ -118,7 +118,7 @@ const Dashboard = () => {
     try {
       const response = await getRecorridos();
       let data = [];
-      
+
       if (response?.data) {
         if (response.data.success && response.data.data) {
           data = response.data.data;
@@ -134,9 +134,9 @@ const Dashboard = () => {
           });
         }
       }
-      
+
       procesarRecorridos(data || []);
-      
+
     } catch (error) {
       showAlert('error', 'Error de conexión al cargar recorridos');
       setRecorridosMensuales({});
@@ -146,6 +146,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     loadRecorridosData();
+    // eslint-disable-next-line
   }, [mesActual, añoActual]);
 
   const { diasConRecorridos, totalRecorridosMes, costoTotalMes } = useMemo(() => {
@@ -161,33 +162,33 @@ const Dashboard = () => {
     const diasEnElMes = new Date(añoActual, mesActual, 0).getDate();
     const matriz = [];
     let dia = 1;
-    
+
     const offset = primerDia === 0 ? 6 : primerDia - 1;
     let fila = Array(offset).fill(null);
 
     while (dia <= diasEnElMes) {
-      if (fila.length === 7) { 
-        matriz.push(fila); 
-        fila = []; 
+      if (fila.length === 7) {
+        matriz.push(fila);
+        fila = [];
       }
 
       const tieneRecorridos = Array.isArray(recorridosMensuales[dia]) && recorridosMensuales[dia].length > 0;
       const hoy = new Date();
-      const esHoy = dia === hoy.getDate() && 
-                   mesActual === (hoy.getMonth() + 1) && 
-                   añoActual === hoy.getFullYear();
+      const esHoy = dia === hoy.getDate() &&
+        mesActual === (hoy.getMonth() + 1) &&
+        añoActual === hoy.getFullYear();
 
-      fila.push({ 
-        numero: dia, 
-        tieneRecorridos, 
+      fila.push({
+        numero: dia,
+        tieneRecorridos,
         esHoy
       });
       dia++;
     }
-    
+
     while (fila.length < 7) fila.push(null);
     if (fila.length > 0) matriz.push(fila);
-    
+
     return matriz;
   };
 
@@ -198,11 +199,6 @@ const Dashboard = () => {
     else if (nuevoMes < 1) { nuevoMes = 12; nuevoAño--; }
     setMesActual(nuevoMes);
     setAñoActual(nuevoAño);
-  };
-
-  const cambiarAMes = (mes, año) => {
-    setMesActual(mes);
-    setAñoActual(año);
   };
 
   const matrizCalendario = useMemo(() => generarCalendario(), [mesActual, añoActual, recorridosMensuales]);
@@ -268,11 +264,11 @@ const Dashboard = () => {
   const handleEdit = (recorrido) => {
     setEditando(true);
     setRecorridoId(recorrido.id);
-    
+
     // Para edición, usar la fecha del recorrido existente
     const fechaRecorrido = recorrido.fecha.split('T')[0];
     const horaRecorrido = recorrido.hora_inicio?.slice(0, 5) || obtenerHoraActual();
-    
+
     setFormData({
       fecha: fechaRecorrido,
       hora_inicio: horaRecorrido,
@@ -347,14 +343,15 @@ const Dashboard = () => {
         ninos: ninosSeleccionados,
       };
 
+      let response;
       if (editando) {
-        const response = await updateRecorrido(recorridoId, data);
+        response = await updateRecorrido(recorridoId, data);
         if (response.data.success) {
           showAlert('success', 'Recorrido actualizado exitosamente');
           handleCloseModal(true);
         }
       } else {
-        const response = await createRecorrido(data);
+        response = await createRecorrido(data);
         if (response.data.success) {
           showAlert('success', 'Recorrido creado exitosamente');
           handleCloseModal(true);
@@ -365,6 +362,7 @@ const Dashboard = () => {
     }
   };
 
+  // --- FUNCIÓN EXPORTAR PDF ---
   const exportarPDF = () => {
     try {
       const doc = new jsPDF();
@@ -422,187 +420,192 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-4 px-3 sm:px-4 lg:px-6 xl:px-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 py-4 px-3 sm:px-4 lg:px-6 xl:px-8 transition-colors duration-300">
       <Alert />
       
-      {/* Header Principal */}
-      <div className="mb-6 pt-4">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 text-center sm:text-left mb-2">
+      {/* Header Principal Simplificado */}
+      <div className="mb-8 pt-4 max-w-7xl mx-auto">
+        <div className="text-center sm:text-left">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-2">
             Dashboard de Recorridos
           </h1>
-          <p className="text-gray-600 text-center sm:text-left text-sm sm:text-base lg:text-lg">
+          <p className="text-gray-600 dark:text-slate-400 text-sm sm:text-base lg:text-lg">
             Gestión y seguimiento de transportes escolares
           </p>
         </div>
       </div>
 
-      {/* Controles del Calendario */}
-      <Card className="mb-6 shadow-sm border border-gray-200">
+      {/* Controles del Calendario - CORREGIDO */}
+      <Card className="mb-6 shadow-sm border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors duration-300">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-4 p-4 sm:p-6">
+          
           {/* Navegación del Mes */}
           <div className="flex items-center justify-center w-full lg:w-auto order-2 lg:order-1">
-            <div className="flex flex-col sm:flex-row items-center bg-white rounded-lg shadow-sm border border-gray-200 p-2 sm:p-3 w-full sm:w-auto">
-              <div className="flex w-full sm:w-auto mb-2 sm:mb-0">
-                <Button
-                  variant="secondary"
-                  onClick={() => cambiarMes(-1)}
-                  className="rounded-l-lg rounded-r-sm sm:rounded-r-none p-2 sm:p-3 hover:bg-gray-50 transition-colors flex-1 sm:flex-none border-r border-gray-200"
-                >
-                  <span className="hidden xs:inline text-sm">Anterior</span>
-                  <span className="xs:hidden">‹</span>
-                </Button>
+            <div className="flex items-center bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden">
+              
+              {/* Botón Anterior */}
+              <button
+                onClick={() => cambiarMes(-1)}
+                className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-600 dark:text-slate-200 transition-colors border-r border-gray-200 dark:border-slate-700 flex items-center focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+                title="Mes anterior"
+              >
+                <span className="hidden xs:inline text-sm font-medium mr-1">Anterior</span>
+                <span className="text-xl font-bold leading-none">‹</span>
+              </button>
 
-                <div className="flex flex-col items-center mx-2 sm:mx-4 min-w-[120px] sm:min-w-[160px] flex-1">
-                  <h3 className="text-base sm:text-xl font-bold text-gray-900 text-center">
-                    {nombresMeses[mesActual - 1]} {añoActual}
-                  </h3>
-                </div>
-
-                <Button
-                  variant="secondary"
-                  onClick={() => cambiarMes(1)}
-                  className="rounded-r-lg rounded-l-sm sm:rounded-l-none p-2 sm:p-3 hover:bg-gray-50 transition-colors flex-1 sm:flex-none border-l border-gray-200"
-                >
-                  <span className="hidden xs:inline text-sm">Siguiente</span>
-                  <span className="xs:hidden">›</span>
-                </Button>
+              {/* Texto del Mes */}
+              <div className="px-6 py-2 min-w-[160px] text-center bg-white dark:bg-slate-800">
+                <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white whitespace-nowrap">
+                  {nombresMeses[mesActual - 1]}
+                </h3>
+                <span className="text-xs text-gray-500 dark:text-slate-400 font-medium">
+                  {añoActual}
+                </span>
               </div>
+
+              {/* Botón Siguiente */}
+              <button
+                onClick={() => cambiarMes(1)}
+                className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-600 dark:text-slate-200 transition-colors border-l border-gray-200 dark:border-slate-700 flex items-center focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+                title="Mes siguiente"
+              >
+                <span className="text-xl font-bold leading-none">›</span>
+                <span className="hidden xs:inline text-sm font-medium ml-1">Siguiente</span>
+              </button>
+
             </div>
           </div>
 
           {/* Botones de Acción */}
-          <div className='flex flex-col xs:flex-row gap-2 sm:gap-3 w-full lg:w-auto justify-center lg:justify-end order-1 lg:order-2'>
+          <div className='flex flex-col xs:flex-row gap-3 w-full lg:w-auto justify-center lg:justify-end order-1 lg:order-2'>
             <Button
               variant="primary"
               onClick={handleOpenModal}
-              className="flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 sm:py-3 rounded-lg hover:bg-blue-600 transition-colors shadow-sm bg-blue-500 text-white text-sm sm:text-base w-full xs:w-auto"
+              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg hover:bg-blue-600 transition-colors shadow-md bg-blue-500 text-white font-medium text-sm sm:text-base w-full xs:w-auto"
             >
-              <span className="text-sm sm:text-base">➕</span>
-              <span className="font-semibold whitespace-nowrap">
-                <span className="hidden sm:inline">Nuevo Recorrido</span>
-                <span className="sm:hidden">Nuevo</span>
-              </span>
+              <span>➕</span>
+              <span className="whitespace-nowrap">Nuevo Recorrido</span>
             </Button>
 
             <Button
               variant="secondary"
               onClick={exportarPDF}
               disabled={loading || totalRecorridosMes === 0}
-              className="flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 sm:py-3 rounded-lg hover:bg-gray-50 transition-colors shadow-sm bg-white text-gray-700 border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base w-full xs:w-auto"
+              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors shadow-sm bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200 border border-gray-300 dark:border-slate-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base w-full xs:w-auto"
             >
-              <span className="text-sm sm:text-base">📄</span>
-              <span className="font-semibold whitespace-nowrap">
-                <span className="hidden sm:inline">Exportar PDF</span>
-                <span className="sm:hidden">PDF</span>
-              </span>
+              <span>📄</span>
+              <span className="whitespace-nowrap">Exportar PDF</span>
             </Button>
           </div>
         </div>
       </Card>
 
       {loading ? (
-        <Card className="flex justify-center items-center h-48 sm:h-64 shadow-sm border border-gray-200">
+        <Card className="flex justify-center items-center h-48 sm:h-64 shadow-sm border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-b-2 border-blue-500 mx-auto mb-3 sm:mb-4"></div>
-            <p className="text-base sm:text-lg text-gray-600 font-medium">Cargando datos del recorrido...</p>
+            <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+            <p className="text-base sm:text-lg text-gray-600 dark:text-slate-400 font-medium">Cargando datos...</p>
           </div>
         </Card>
       ) : (
         <>
-          {/* Resumen del Mes */}
-          <Card className="mb-6 shadow-sm border border-gray-200">
-            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 sm:gap-6 mb-4 sm:mb-6 p-4 sm:p-6">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 w-full lg:w-auto">
-                <span className="text-lg sm:text-xl font-bold text-gray-700 whitespace-nowrap">Resumen del Mes:</span>
-                <div className="bg-gray-900 px-4 sm:px-6 py-3 sm:py-4 rounded-lg shadow-sm w-full sm:w-auto">
-                  <div className="flex items-center gap-2 sm:gap-3">
-                    <span className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">
+          {/* Resumen del Mes - Grid Responsivo */}
+          <Card className="mb-6 shadow-sm border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors">
+            <div className="p-4 sm:p-6">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-6">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                  <span className="text-lg font-bold text-gray-700 dark:text-slate-200">Resumen:</span>
+                  <div className="bg-gray-900 dark:bg-black/40 px-5 py-3 rounded-xl shadow-sm w-full sm:w-auto border border-gray-800 dark:border-slate-700 flex items-center gap-3">
+                    <span className="text-2xl sm:text-3xl font-bold text-white">
                       ${costoTotalMes.toFixed(2)}
                     </span>
-                    <span className="text-gray-300 text-xs sm:text-sm font-medium">Costo total</span>
+                    <span className="text-gray-400 text-xs uppercase tracking-wide font-semibold">Costo Total</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 sm:flex sm:flex-row gap-3">
+                  <div className="bg-blue-500 dark:bg-blue-600/90 px-4 py-3 rounded-lg shadow-sm text-center flex-1">
+                    <div className="text-xl sm:text-2xl font-bold text-white">{diasConRecorridos}</div>
+                    <div className="text-blue-100 text-xs font-medium uppercase">Días Activos</div>
+                  </div>
+                  <div className="bg-green-500 dark:bg-green-600/90 px-4 py-3 rounded-lg shadow-sm text-center flex-1">
+                    <div className="text-xl sm:text-2xl font-bold text-white">{totalRecorridosMes}</div>
+                    <div className="text-green-100 text-xs font-medium uppercase">Viajes</div>
                   </div>
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-2 sm:gap-4 w-full lg:w-auto justify-start lg:justify-end">
-                <div className="bg-blue-500 px-4 sm:px-6 py-3 sm:py-4 rounded-lg shadow-sm text-center min-w-[100px] sm:min-w-[120px]">
-                  <div className="text-xl sm:text-2xl font-bold text-white">{diasConRecorridos}</div>
-                  <div className="text-blue-100 text-xs sm:text-sm font-medium">Días activos</div>
-                </div>
-                <div className="bg-green-500 px-4 sm:px-6 py-3 sm:py-4 rounded-lg shadow-sm text-center min-w-[100px] sm:min-w-[120px]">
-                  <div className="text-xl sm:text-2xl font-bold text-white">{totalRecorridosMes}</div>
-                  <div className="text-green-100 text-xs sm:text-sm font-medium">Total viajes</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="border-t border-gray-200 pt-4 sm:pt-6 mt-4 sm:mt-6 px-4 sm:px-6 pb-4 sm:pb-6">
-              <h4 className="text-base sm:text-lg font-semibold text-gray-700 mb-3 sm:mb-4">Leyenda:</h4>
-              <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 sm:gap-6 text-sm">
-                <div className="flex items-center">
-                  <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-green-500 mr-2 sm:mr-3 shadow-sm"></div>
-                  <span className="text-gray-600 font-medium text-sm sm:text-base">Día con Recorrido</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-gray-300 mr-2 sm:mr-3 border border-gray-400 shadow-sm"></div>
-                  <span className="text-gray-600 font-medium text-sm sm:text-base">Día sin Recorrido</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-white mr-2 sm:mr-3 border-2 border-blue-500 shadow-sm"></div>
-                  <span className="text-gray-600 font-medium text-sm sm:text-base">Día Actual</span>
+              <div className="border-t border-gray-100 dark:border-slate-800 pt-4">
+                <div className="flex flex-wrap gap-4 text-xs sm:text-sm font-medium text-gray-600 dark:text-slate-400">
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
+                    <span>Con Recorrido</span>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 rounded-full bg-white dark:bg-slate-800 border-2 border-blue-500 mr-2"></div>
+                    <span>Hoy</span>
+                  </div>
                 </div>
               </div>
             </div>
           </Card>
 
           {/* Calendario */}
-          <Card className="mb-6 p-0 overflow-hidden shadow-sm border border-gray-200">
-            <div className="grid grid-cols-7 text-center font-bold text-xs sm:text-sm text-white bg-gray-800 rounded-t-lg">
+          <Card className="mb-6 p-0 overflow-hidden shadow-sm border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors">
+            <div className="grid grid-cols-7 text-center font-semibold text-xs sm:text-sm text-white bg-gray-800 dark:bg-slate-950 border-b border-gray-700 dark:border-slate-800">
               {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map((dia, index) => (
-                <span key={index} className="p-2 sm:p-3 lg:p-4 border-r border-gray-700 last:border-r-0 text-xs sm:text-sm">
+                <span key={index} className="py-3 border-r border-gray-700/50 last:border-r-0">
                   {dia}
                 </span>
               ))}
             </div>
 
-            <div className="bg-white">
+            <div className="bg-white dark:bg-slate-900">
               {matrizCalendario.map((semana, idx) => (
-                <div key={idx} className="grid grid-cols-7 border-b border-gray-200 last:border-b-0">
+                <div key={idx} className="grid grid-cols-7 border-b border-gray-200 dark:border-slate-800 last:border-b-0">
                   {semana.map((dia, dIdx) => {
-                    let dayClasses = "p-1 sm:p-2 lg:p-3 h-12 sm:h-16 lg:h-20 border-r border-gray-200 last:border-r-0 flex items-start justify-end text-sm sm:text-base lg:text-lg cursor-default transition-all duration-200";
+                    let dayClasses = "relative p-1 sm:p-2 h-14 sm:h-20 lg:h-24 border-r border-gray-200 dark:border-slate-800 last:border-r-0 flex flex-col items-center sm:items-end justify-start transition-all duration-200";
 
                     if (!dia) {
-                      dayClasses += " bg-gray-50 text-gray-300 pointer-events-none";
+                      dayClasses += " bg-gray-50 dark:bg-slate-950/50 pointer-events-none";
                     } else {
-                      dayClasses += " hover:bg-gray-50";
-
-                      const tieneRecorridos = dia.tieneRecorridos;
-                      const esHoy = dia.esHoy;
-
-                      if (tieneRecorridos) {
-                        dayClasses += " bg-green-50 text-green-800 hover:bg-green-100 font-semibold";
-                      } else if (esHoy) {
-                        dayClasses += " bg-blue-50 text-blue-800 font-bold border-2 border-blue-400";
+                      dayClasses += " hover:bg-gray-50 dark:hover:bg-slate-800 cursor-pointer";
+                      
+                      if (dia.tieneRecorridos) {
+                        dayClasses += " bg-green-50 dark:bg-green-900/10";
+                      } else if (dia.esHoy) {
+                        dayClasses += " bg-blue-50 dark:bg-blue-900/10";
                       } else {
-                        dayClasses += " bg-white text-gray-700";
+                        dayClasses += " bg-white dark:bg-slate-900";
                       }
                     }
 
                     return (
-                      <div
-                        key={dIdx}
-                        className={dayClasses}
-                        title={dia ? (dia.tieneRecorridos ? `Recorridos: ${recorridosMensuales[dia.numero]?.length || 0}` : 'Sin recorridos') : ''}
-                      >
+                      <div key={dIdx} className={dayClasses}>
                         {dia && (
-                          <span className={`
-                            ${dia.tieneRecorridos ? 'bg-green-500 text-white shadow-sm' : ''}
-                            ${dia.esHoy ? 'ring-2 ring-blue-500 bg-blue-500 text-white' : ''}
-                            w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8 flex items-center justify-center rounded-full font-semibold transition-all duration-200 text-xs sm:text-sm
-                          `}>
-                            {dia.numero}
-                          </span>
+                          <>
+                            <span className={`
+                              flex items-center justify-center rounded-full text-xs sm:text-sm font-medium mb-1
+                              w-6 h-6 sm:w-7 sm:h-7
+                              ${dia.esHoy 
+                                ? 'bg-blue-500 text-white ring-2 ring-blue-200 dark:ring-blue-900' 
+                                : dia.tieneRecorridos 
+                                  ? 'text-green-700 dark:text-green-400 font-bold' 
+                                  : 'text-gray-700 dark:text-slate-400'}
+                            `}>
+                              {dia.numero}
+                            </span>
+                            
+                            {/* Indicadores de Recorridos (Puntos) */}
+                            {dia.tieneRecorridos && (
+                              <div className="flex gap-1 mt-auto sm:mb-1">
+                                <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+                                {recorridosMensuales[dia.numero]?.length > 1 && (
+                                  <div className="w-1.5 h-1.5 rounded-full bg-green-500/50"></div>
+                                )}
+                              </div>
+                            )}
+                          </>
                         )}
                       </div>
                     );
@@ -612,287 +615,241 @@ const Dashboard = () => {
             </div>
           </Card>
 
-          {/* Resumen Detallado */}
-          <Card className="shadow-sm border border-gray-200">
-            <div className="border-b border-gray-200 pb-3 sm:pb-4 mb-4 sm:mb-6 p-4 sm:p-6">
-              <h4 className="text-xl sm:text-2xl font-bold text-gray-900 text-center sm:text-left">
-                Resumen de Recorridos del Mes
+          {/* Lista Detallada de Recorridos */}
+          <Card className="shadow-sm border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors">
+            <div className="border-b border-gray-200 dark:border-slate-800 p-4 sm:p-6">
+              <h4 className="text-xl font-bold text-gray-900 dark:text-white">
+                Detalle de Actividad
               </h4>
             </div>
 
             {Object.keys(recorridosMensuales).length === 0 ? (
-              <div className="p-6 sm:p-8 lg:p-12 text-center bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 m-4 sm:m-6">
-                <div className="text-5xl sm:text-6xl lg:text-7xl mb-4 sm:mb-6">📅</div>
-                <p className="text-lg sm:text-xl lg:text-2xl text-gray-500 mb-2 sm:mb-3 font-medium">No hay recorridos registrados</p>
-                <p className="text-gray-400 text-sm sm:text-base lg:text-lg mb-4 sm:mb-6">para {nombresMeses[mesActual - 1]} {añoActual}</p>
+              <div className="p-10 text-center">
+                <div className="text-5xl mb-4 opacity-50">📅</div>
+                <p className="text-gray-500 dark:text-slate-400 text-lg">No hay recorridos registrados este mes.</p>
                 <Button
                   variant="primary"
                   onClick={handleOpenModal}
-                  className="px-6 sm:px-8 py-3 sm:py-4 rounded-lg text-base sm:text-lg font-semibold hover:bg-blue-600 transition-colors bg-blue-500 text-white"
+                  className="mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
                 >
-                  Crear primer recorrido
+                  Crear el primero
                 </Button>
               </div>
             ) : (
-              <div className="space-y-6 sm:space-y-8 p-4 sm:p-6">
-                {/* Estadísticas */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                  <div className="bg-blue-500 p-4 sm:p-6 lg:p-8 rounded-lg shadow-sm text-center text-white">
-                    <div className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2">{diasConRecorridos}</div>
-                    <div className="text-blue-100 font-medium text-sm sm:text-base">Días con Recorridos</div>
-                  </div>
+              <div className="p-4 sm:p-6 space-y-6">
+                {Object.keys(recorridosMensuales)
+                  .filter(dia => !isNaN(parseInt(dia)))
+                  .sort((a, b) => parseInt(a) - parseInt(b))
+                  .map(dia => (
+                    <div key={dia} className="relative pl-6 sm:pl-8 border-l-2 border-gray-200 dark:border-slate-700 pb-2 last:pb-0">
+                      {/* Badge de Día */}
+                      <div className="absolute -left-[11px] top-0 bg-blue-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-sm ring-4 ring-white dark:ring-slate-900">
+                        {dia}
+                      </div>
 
-                  <div className="bg-green-500 p-4 sm:p-6 lg:p-8 rounded-lg shadow-sm text-center text-white">
-                    <div className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2">{totalRecorridosMes}</div>
-                    <div className="text-green-100 font-medium text-sm sm:text-base">Total de Recorridos</div>
-                  </div>
+                      <div className="mb-3">
+                        <span className="text-sm font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
+                           {dia} de {nombresMeses[mesActual-1]}
+                        </span>
+                      </div>
 
-                  <div className="bg-purple-500 p-4 sm:p-6 lg:p-8 rounded-lg shadow-sm text-center text-white">
-                    <div className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2">${costoTotalMes.toFixed(2)}</div>
-                    <div className="text-purple-100 font-medium text-sm sm:text-base">Costo Total</div>
-                  </div>
-                </div>
-
-                {/* Cronología */}
-                <div className="mt-6 sm:mt-8">
-                  <h5 className="text-lg sm:text-xl font-semibold text-gray-700 mb-4 sm:mb-6 border-l-4 border-blue-500 pl-3 sm:pl-4 flex items-center">
-                    <span className="mr-2 sm:mr-3">🗓️</span>
-                    Cronología del Mes
-                  </h5>
-
-                  <div className="space-y-4 sm:space-y-6">
-                    {Object.keys(recorridosMensuales)
-                      .filter(dia => !isNaN(parseInt(dia)))
-                      .sort((a, b) => parseInt(a) - parseInt(b))
-                      .map(dia => (
-                        <div key={dia} className="flex border-l-2 border-blue-200 ml-3 sm:ml-4 pl-4 sm:pl-6 relative">
-                          <div className="absolute -left-3 sm:-left-4 top-0 flex flex-col items-center justify-center w-6 h-6 sm:w-8 sm:h-8 bg-blue-500 text-white rounded-full shadow-sm">
-                            <span className="text-xs sm:text-sm font-bold leading-none">{dia}</span>
-                          </div>
-
-                          <div className="flex-grow bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200 w-full">
-                            <div className="font-bold text-gray-800 mb-3 sm:mb-4 text-base sm:text-lg">
-                              {recorridosMensuales[dia].length} recorrido{recorridosMensuales[dia].length > 1 ? 's' : ''} el día {dia}
-                            </div>
-
-                            <div className="space-y-2 sm:space-y-3">
-                              {recorridosMensuales[dia].map((recorrido, idx) => (
-                                <div key={idx} className="flex flex-col lg:flex-row justify-between items-start lg:items-center p-3 sm:p-4 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-all duration-200">
-                                  <div className="flex flex-col lg:flex-row items-start lg:items-center w-full lg:w-auto gap-2 sm:gap-4 mb-2 lg:mb-0">
-                                    <span className="font-semibold text-gray-700 bg-white px-2 sm:px-3 py-1 sm:py-2 rounded shadow-sm min-w-[60px] sm:min-w-[70px] text-center text-sm sm:text-base">
-                                      {formatearHora(recorrido.hora_inicio)}
-                                    </span>
-                                    <span className="text-gray-600 flex-grow text-sm sm:text-base">
-                                      {recorrido.vehiculo_descripcion || 'Sin Vehículo'}
-                                    </span>
-                                  </div>
-                                  <div className="flex items-center justify-between lg:justify-end w-full lg:w-auto gap-2 sm:gap-4">
-                                    <span className="font-bold text-green-600 text-base sm:text-lg">
-                                      {recorrido.costo ? `$${parseFloat(recorrido.costo).toFixed(2)}` : '$0.00'}
-                                    </span>
-                                    <Button
-                                      variant="secondary"
-                                      size="sm"
-                                      onClick={() => handleEdit(recorrido)}
-                                      className="bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200 px-3 sm:px-4 py-1 sm:py-2 rounded font-medium hover:bg-blue-100 transition-colors text-sm sm:text-base"
-                                    >
-                                      ✏️ <span className="hidden sm:inline">Editar</span>
-                                    </Button>
-                                  </div>
+                      <div className="space-y-3">
+                        {recorridosMensuales[dia].map((recorrido, idx) => (
+                          <div key={idx} className="bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow">
+                            <div className="flex flex-col sm:flex-row justify-between gap-3">
+                              {/* Info Principal */}
+                              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                                <span className="bg-white dark:bg-slate-800 text-gray-800 dark:text-slate-200 px-2 py-1 rounded border border-gray-200 dark:border-slate-600 text-sm font-mono">
+                                  {formatearHora(recorrido.hora_inicio)}
+                                </span>
+                                <div>
+                                  <p className="font-medium text-gray-900 dark:text-white">
+                                    {recorrido.vehiculo_descripcion || 'Vehículo no asignado'}
+                                  </p>
+                                  <p className="text-xs text-gray-500 dark:text-slate-400 capitalize">
+                                    {recorrido.tipo_recorrido} • {recorrido.ninos?.length || 0} niños
+                                  </p>
                                 </div>
-                              ))}
+                              </div>
+
+                              {/* Costo y Acciones */}
+                              <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4 border-t sm:border-t-0 border-gray-200 dark:border-slate-700 pt-2 sm:pt-0 mt-2 sm:mt-0">
+                                <span className="font-bold text-green-600 dark:text-green-400 text-lg">
+                                  ${parseFloat(recorrido.costo || 0).toFixed(2)}
+                                </span>
+                                <button
+                                  onClick={() => handleEdit(recorrido)}
+                                  className="text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 p-1.5 rounded transition-colors"
+                                  title="Editar"
+                                >
+                                  ✏️
+                                </button>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
-                  </div>
-                </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
               </div>
             )}
           </Card>
         </>
       )}
 
-      {/* Modal */}
+      {/* Modal Formulario */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => handleCloseModal(false)}
-        title={editando ? '✏️ Editar Recorrido' : '➕ Crear Recorrido'}
-        size="max-w-2xl lg:max-w-4xl"
+        title={editando ? 'Editar Recorrido' : 'Crear Recorrido'}
+        size="max-w-3xl"
       >
         {loadingForm ? (
-          <div className="min-h-48 sm:min-h-64 flex items-center justify-center bg-white p-6 sm:p-8 rounded-lg">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-blue-500 mx-auto mb-3 sm:mb-4"></div>
-              <p className="text-gray-600 font-medium text-base sm:text-lg">Cargando datos necesarios...</p>
-            </div>
+          <div className="p-12 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
+            <span className="text-gray-500 dark:text-slate-400">Cargando formulario...</span>
           </div>
         ) : (
-          <div className="bg-white p-4 sm:p-6 rounded-lg">
-            <div className="mb-6 sm:mb-8">
-              <h3 className="text-xl sm:text-2xl font-bold text-gray-900 text-center sm:text-left">
-                {editando ? '✏️ Editar Recorrido' : '➕ Crear Nuevo Recorrido'}
-              </h3>
-            </div>
-            
-            <form onSubmit={handleSubmit}>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-gray-700">Fecha *</label>
+          <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 transition-colors">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Grid de Inputs */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Fecha</label>
                   <Input
                     type="date"
                     name="fecha"
                     value={formData.fecha}
                     onChange={handleChange}
                     required
-                    className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm sm:text-base"
+                    className="w-full bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg p-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-gray-700">Hora *</label>
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Hora</label>
                   <Input
                     type="time"
                     name="hora_inicio"
                     value={formData.hora_inicio}
                     onChange={handleChange}
                     required
-                    className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm sm:text-base"
+                    className="w-full bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg p-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-gray-700">Vehículo *</label>
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Vehículo</label>
                   <select
                     name="vehiculo_id"
                     value={formData.vehiculo_id}
                     onChange={handleChange}
                     required
-                    className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white transition-all duration-200 text-sm sm:text-base"
+                    className="w-full bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg p-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none appearance-none"
                   >
-                    <option value="">Seleccionar vehículo...</option>
-                    {vehiculos.map((vehiculo) => (
-                      <option key={vehiculo.id} value={vehiculo.id}>
-                        {vehiculo.descripcion} (${parseFloat(vehiculo.costo_por_recorrido || 0).toFixed(2)})
+                    <option value="">-- Seleccionar --</option>
+                    {vehiculos.map((v) => (
+                      <option key={v.id} value={v.id}>
+                        {v.descripcion} (${parseFloat(v.costo_por_recorrido || 0).toFixed(2)})
                       </option>
                     ))}
                   </select>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-gray-700">Tipo de Recorrido *</label>
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Tipo</label>
                   <select
                     name="tipo_recorrido"
                     value={formData.tipo_recorrido}
                     onChange={handleChange}
                     required
-                    className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white transition-all duration-200 text-sm sm:text-base"
+                    className="w-full bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg p-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
                   >
-                    <option value="traer">Traer</option>
-                    <option value="llevar">Llevar</option>
+                    <option value="traer">Traer (Recogida)</option>
+                    <option value="llevar">Llevar (Retorno)</option>
                     <option value="ambos">Ambos</option>
                   </select>
                 </div>
 
-                <div className="space-y-2 lg:col-span-2">
-                  <label className="text-sm font-semibold text-gray-700">Notas Generales del Recorrido</label>
+                <div className="space-y-1 sm:col-span-2">
+                  <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Notas</label>
                   <Input
                     type="text"
                     name="notas"
                     value={formData.notas}
                     onChange={handleChange}
-                    placeholder="Observaciones del recorrido..."
-                    className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-sm sm:text-base"
+                    placeholder="Opcional: Notas sobre el viaje..."
+                    className="w-full bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg p-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
                   />
                 </div>
               </div>
 
-              {/* Sección de Niños */}
-              <div className="mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-gray-200">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6 gap-2 sm:gap-0">
-                  <h4 className="text-lg sm:text-xl font-semibold text-gray-800 flex items-center">
-                    <span className="mr-2 sm:mr-3">👦</span>
-                    Niños en el Recorrido
-                  </h4>
-                  <span className="bg-blue-100 text-blue-800 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold">
-                    {ninosSeleccionados.length} niño{ninosSeleccionados.length !== 1 ? 's' : ''}
+              {/* Sección Niños */}
+              <div className="border-t border-gray-200 dark:border-slate-700 pt-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h4 className="text-md font-bold text-gray-800 dark:text-white">Niños Asignados</h4>
+                  <span className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs px-2 py-1 rounded-full font-bold">
+                    {ninosSeleccionados.length}
                   </span>
                 </div>
 
-                <div className="mb-4 sm:mb-6">
-                  <label className="text-sm font-semibold text-gray-700 block mb-2 sm:mb-3">Agregar Niño</label>
+                <div className="mb-4">
                   <select
                     onChange={agregarNino}
                     value=""
-                    className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white transition-all duration-200 text-sm sm:text-base"
+                    className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg p-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
                   >
-                    <option value="">Seleccionar niño...</option>
+                    <option value="">+ Agregar un niño al recorrido...</option>
                     {ninos
-                      .filter(nino => !ninosSeleccionados.some(ns => ns.nino_id.toString() === nino.id.toString()))
-                      .map((nino) => (
-                        <option key={nino.id} value={nino.id}>
-                          {nino.nombre} {nino.apellidos}
+                      .filter(n => !ninosSeleccionados.some(ns => ns.nino_id.toString() === n.id.toString()))
+                      .map((n) => (
+                        <option key={n.id} value={n.id}>
+                          {n.nombre} {n.apellidos}
                         </option>
                       ))}
                   </select>
                 </div>
 
-                <div className="space-y-2 sm:space-y-3">
+                <div className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
                   {ninosSeleccionados.length === 0 ? (
-                    <div className="text-center py-6 sm:py-8 text-gray-500 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-                      <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">👶</div>
-                      <p className="text-base sm:text-lg font-medium">No hay niños agregados al recorrido</p>
-                    </div>
+                    <p className="text-center text-sm text-gray-500 dark:text-slate-500 italic py-4">
+                      No se han seleccionado niños aún.
+                    </p>
                   ) : (
-                    ninosSeleccionados.map((nino, index) => (
-                      <div key={nino.nino_id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between border border-blue-200 p-3 sm:p-4 rounded-lg bg-blue-50 shadow-sm hover:bg-blue-100 transition-all duration-200">
-                        <div className="flex items-center w-full sm:w-auto sm:flex-grow mb-2 sm:mb-0">
-                          <span className="font-semibold text-blue-800 text-base sm:text-lg">
-                            {nino.nombre} {nino.apellidos}
-                          </span>
-                        </div>
-
-                        <div className="flex items-center w-full sm:w-auto justify-between sm:justify-end">
-                          <button
-                            type="button"
-                            onClick={() => eliminarNino(index)}
-                            className="text-red-500 hover:text-red-700 p-1 sm:p-2 text-base sm:text-lg transition-all duration-200 bg-white rounded-full w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center shadow-sm hover:bg-red-50"
-                            title="Eliminar niño"
-                          >
-                            ✖
-                          </button>
-                        </div>
+                    ninosSeleccionados.map((nino, idx) => (
+                      <div key={nino.nino_id} className="flex items-center justify-between bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-lg p-3">
+                        <span className="text-sm font-medium text-gray-800 dark:text-slate-200">
+                          {nino.nombre} {nino.apellidos}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => eliminarNino(idx)}
+                          className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-1 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition-colors"
+                        >
+                          ✕
+                        </button>
                       </div>
                     ))
                   )}
                 </div>
               </div>
 
-              <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200 flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 sm:space-x-4">
+              {/* Botones Finales */}
+              <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4 border-t border-gray-200 dark:border-slate-700">
                 <Button
                   type="button"
                   variant="secondary"
                   onClick={() => handleCloseModal(false)}
-                  className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 transition-all duration-200 text-sm sm:text-base"
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-lg border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700"
                 >
-                  ❌ Cancelar
+                  Cancelar
                 </Button>
                 <Button
                   type="submit"
                   variant="primary"
-                  className="w-full sm:w-auto flex items-center justify-center gap-1 sm:gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-colors duration-200 text-sm sm:text-base"
+                  className="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-medium shadow-md"
                 >
-                  {editando ? (
-                    <>
-                      <span>💾</span>
-                      <span>Actualizar Recorrido</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>✅</span>
-                      <span>Crear Recorrido</span>
-                    </>
-                  )}
+                  {editando ? 'Guardar Cambios' : 'Crear Recorrido'}
                 </Button>
               </div>
             </form>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/layout/Layout';
-import Alert from './components/ui/Alert'; // ✅ CAMBIADO
+import Alert from './components/ui/Alert';
 import { AppProvider } from './context/AppContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { AlertProvider } from './context/AlertContext';
@@ -33,78 +33,86 @@ function AppContent() {
   return (
     <AppProvider>
       <Router>
-        <Layout>
-          <Alert />
+        <Routes>
+          {/* Login Route - Outside Layout */}
+          <Route
+            path="/login"
+            element={user ? <Navigate to="/dashboard" replace /> : <Login />}
+          />
 
-          <Routes>
-            <Route 
-              path="/login" 
-              element={user ? <Navigate to="/dashboard" replace /> : <Login />} 
-            />
+          {/* Main App Routes - Inside Layout */}
+          <Route
+            path="/*"
+            element={
+              <Layout>
+                <Alert />
+                <Routes>
+                  {/* Rutas protegidas */}
+                  <Route
+                    path="/"
+                    element={
+                      <ProtectedRoute>
+                        <Dashboard />
+                      </ProtectedRoute>
+                    }
+                  />
 
-            {/* Rutas protegidas */}
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
+                  <Route
+                    path="/dashboard"
+                    element={
+                      <ProtectedRoute>
+                        <Dashboard />
+                      </ProtectedRoute>
+                    }
+                  />
 
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
+                  <Route
+                    path="/ninos"
+                    element={
+                      <ProtectedRoute>
+                        <Ninos />
+                      </ProtectedRoute>
+                    }
+                  />
 
-            <Route
-              path="/ninos"
-              element={
-                <ProtectedRoute>
-                  <Ninos />
-                </ProtectedRoute>
-              }
-            />
+                  <Route
+                    path="/vehiculos"
+                    element={
+                      <ProtectedRoute>
+                        <Vehiculos />
+                      </ProtectedRoute>
+                    }
+                  />
 
-            <Route
-              path="/vehiculos"
-              element={
-                <ProtectedRoute>
-                  <Vehiculos />
-                </ProtectedRoute>
-              }
-            />
+                  <Route
+                    path="/recorridos"
+                    element={
+                      <ProtectedRoute>
+                        <Recorridos />
+                      </ProtectedRoute>
+                    }
+                  />
 
-            <Route
-              path="/recorridos"
-              element={
-                <ProtectedRoute>
-                  <Recorridos />
-                </ProtectedRoute>
-              }
-            />
+                  {/* Ruta de usuarios solo para admin */}
+                  <Route
+                    path="/users"
+                    element={
+                      <AdminRoute>
+                        <Users />
+                      </AdminRoute>
+                    }
+                  />
 
-            {/* Ruta de usuarios solo para admin */}
-            <Route
-              path="/users"
-              element={
-                <AdminRoute>
-                  <Users />
-                </AdminRoute>
-              }
-            />
-
-            {/* Ruta catch-all */}
-            <Route 
-              path="*" 
-              element={<Navigate to={user ? "/dashboard" : "/login"} replace />} 
-            />
-          </Routes>
-        </Layout>
+                  {/* Ruta catch-all */}
+                  <Route
+                    path="*"
+                    element={<Navigate to={user ? "/dashboard" : "/login"} replace />}
+                  />
+                </Routes>
+              </Layout>
+            }
+          />
+        </Routes>
       </Router>
     </AppProvider>
   );

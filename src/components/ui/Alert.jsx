@@ -1,86 +1,84 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAlert } from '../../context/AlertContext';
-
-const alertConfig = {
-  success: {
-    bg: "bg-medical-50",
-    border: "border-medical-200",
-    text: "text-medical-800",
-    icon: "✅",
-    iconBg: "bg-medical-100"
-  },
-  error: {
-    bg: "bg-red-50",
-    border: "border-red-200",
-    text: "text-red-800",
-    icon: "❌",
-    iconBg: "bg-red-100"
-  },
-  warning: {
-    bg: "bg-yellow-50",
-    border: "border-yellow-200",
-    text: "text-yellow-800",
-    icon: "⚠️",
-    iconBg: "bg-yellow-100"
-  },
-  info: {
-    bg: "bg-primary-50",
-    border: "border-primary-200",
-    text: "text-primary-800",
-    icon: "ℹ️",
-    iconBg: "bg-primary-100"
-  },
-};
+import { CheckCircle, AlertCircle, AlertTriangle, Info, X } from 'lucide-react';
 
 const Alert = () => {
   const { alert, hideAlert } = useAlert();
 
-  if (!alert.show) return null;
+  // Auto-cerrar alerta después de 4 segundos
+  useEffect(() => {
+    if (alert?.show) {
+      const timer = setTimeout(() => {
+        hideAlert();
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [alert, hideAlert]);
 
-  const config = alertConfig[alert.type] || alertConfig.info;
+  if (!alert?.show) return null;
+
+  // Configuración de estilos según el tipo
+  const config = {
+    success: {
+      icon: <CheckCircle className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />,
+      container: "bg-white dark:bg-slate-800 border-emerald-500 dark:border-emerald-500",
+      title: "text-emerald-800 dark:text-emerald-400",
+      text: "text-emerald-600 dark:text-slate-400"
+    },
+    error: {
+      icon: <AlertCircle className="w-5 h-5 text-red-500 dark:text-red-400" />,
+      container: "bg-white dark:bg-slate-800 border-red-500 dark:border-red-500",
+      title: "text-red-800 dark:text-red-400",
+      text: "text-red-600 dark:text-slate-400"
+    },
+    warning: {
+      icon: <AlertTriangle className="w-5 h-5 text-amber-500 dark:text-amber-400" />,
+      container: "bg-white dark:bg-slate-800 border-amber-500 dark:border-amber-500",
+      title: "text-amber-800 dark:text-amber-400",
+      text: "text-amber-600 dark:text-slate-400"
+    },
+    info: {
+      icon: <Info className="w-5 h-5 text-blue-500 dark:text-blue-400" />,
+      container: "bg-white dark:bg-slate-800 border-blue-500 dark:border-blue-500",
+      title: "text-blue-800 dark:text-blue-400",
+      text: "text-blue-600 dark:text-slate-400"
+    },
+  };
+
+  const style = config[alert.type] || config.info;
 
   return (
-    <div className="fixed z-50 w-full max-w-sm 
-                    bottom-4 right-4 
-                    sm:bottom-6 sm:right-6
-                    md:bottom-8 md:right-8
-                    px-4 sm:px-0">
-      
+    <div className="fixed z-[60] bottom-4 right-4 w-full max-w-sm px-4 sm:px-0 animate-in slide-in-from-bottom-5 fade-in duration-300">
       <div className={`
-        ${config.bg} ${config.border} ${config.text} 
-        rounded-xl shadow-lg border p-4 
-        animate-slide-in-right
-        w-full
+        relative flex items-start p-4 rounded-xl shadow-lg border-l-4
+        ${style.container} 
+        ring-1 ring-black/5 dark:ring-white/10
       `}>
-        
-        <div className="flex items-start space-x-3">
-          <div className={`
-            flex-shrink-0 
-            w-6 h-6 
-            sm:w-8 sm:h-8 
-            rounded-full ${config.iconBg} 
-            flex items-center justify-center
-          `}>
-            <span className="text-xs sm:text-sm">{config.icon}</span>
-          </div>
-          
-          <div className="flex-1 min-w-0">
-            <p className="text-xs sm:text-sm font-medium capitalize mb-1">
-              {alert.type}
-            </p>
-            <p className="text-xs sm:text-sm opacity-90 leading-relaxed">
-              {alert.message}
-            </p>
-          </div>
-          
+        {/* Icono */}
+        <div className="flex-shrink-0 mt-0.5">
+          {style.icon}
+        </div>
+
+        {/* Contenido */}
+        <div className="ml-3 w-0 flex-1">
+          <p className={`text-sm font-bold capitalize ${style.title}`}>
+            {alert.type === 'success' ? '¡Éxito!' : 
+             alert.type === 'error' ? 'Error' : 
+             alert.type === 'warning' ? 'Advertencia' : 'Información'}
+          </p>
+          <p className={`mt-1 text-sm ${style.text} leading-snug`}>
+            {alert.message}
+          </p>
+        </div>
+
+        {/* Botón Cerrar */}
+        <div className="ml-4 flex flex-shrink-0">
           <button
             onClick={hideAlert}
-            className="flex-shrink-0 rounded-lg p-1 hover:bg-black hover:bg-opacity-10 transition-colors"
-            aria-label="Cerrar alerta"
+            className="inline-flex rounded-md text-gray-400 hover:text-gray-500 dark:hover:text-white focus:outline-none transition-colors"
           >
-            <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <span className="sr-only">Cerrar</span>
+            <X className="h-5 w-5" />
           </button>
         </div>
       </div>
