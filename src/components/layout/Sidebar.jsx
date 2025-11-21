@@ -221,7 +221,7 @@ const Sidebar = ({ isOpen, onClose, isAdmin, isMobile }) => {
           {(!collapsed || isMobile) && (
             <div className="mt-4 text-center">
               <div className="text-xs text-gray-500 dark:text-slate-500 font-medium">
-                v3.1.2
+                v3.1.3
               </div>
               <div className="text-[10px] text-gray-400 dark:text-slate-600 mt-1">
                 Sistema de Transporte Escolar

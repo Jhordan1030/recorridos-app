@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // Importamos useNavigate
 import { useAuth } from '../../context/AuthContext';
 import { Menu, LogOut, User, X, ChevronDown, Settings } from 'lucide-react';
 
@@ -6,10 +7,9 @@ const Header = ({ onToggleSidebar, isSidebarOpen, isMobile }) => {
   const { user, isAdmin, logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const userMenuRef = useRef(null);
+  const navigate = useNavigate(); // Hook de navegación
 
   // --- LÓGICA INTELIGENTE DE NOMBRE (CACHE SEGURO) ---
-  
-  // 1. Función para extraer el nombre real de las diferentes estructuras posibles
   const extractName = (u) => {
     if (!u) return null;
     return u.nombre || 
@@ -19,34 +19,24 @@ const Header = ({ onToggleSidebar, isSidebarOpen, isMobile }) => {
   };
 
   const [displayName, setDisplayName] = useState(() => {
-    // A. Intentar obtener nombre directo del contexto
     const directName = extractName(user);
     if (directName) return directName;
 
-    // B. Si no hay nombre directo, buscar en caché PERO VALIDANDO EL EMAIL
     if (typeof window !== 'undefined' && user?.email) {
       try {
         const cachedData = JSON.parse(localStorage.getItem('authUserCache') || '{}');
-        // ¡AQUÍ ESTÁ LA SOLUCIÓN! Solo usamos el caché si el email coincide
         if (cachedData.email === user.email && cachedData.name) {
           return cachedData.name;
         }
-      } catch (e) {
-        // Si falla el parseo, ignoramos
-      }
+      } catch (e) {}
     }
-
-    // C. Fallback final si no hay nada
     return user?.email?.split('@')[0] || 'Usuario';
   });
 
-  // 2. Efecto: Actualizar nombre y caché cuando cambie el usuario
   useEffect(() => {
     const realName = extractName(user);
-    
     if (realName && user?.email) {
       setDisplayName(realName);
-      // Guardamos el par Nombre + Email para validar después
       localStorage.setItem('authUserCache', JSON.stringify({
         name: realName,
         email: user.email
@@ -56,7 +46,6 @@ const Header = ({ onToggleSidebar, isSidebarOpen, isMobile }) => {
 
   const initial = displayName ? displayName.charAt(0).toUpperCase() : 'U';
 
-  // Cerrar el menú al hacer clic fuera
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
@@ -68,16 +57,22 @@ const Header = ({ onToggleSidebar, isSidebarOpen, isMobile }) => {
   }, []);
 
   const handleLogout = () => {
-    // Limpiamos caché al salir para mayor seguridad
     localStorage.removeItem('authUserCache');
     logout();
     setShowUserMenu(false);
   };
 
+  // Función para navegar al perfil
+  const goToProfile = () => {
+    setShowUserMenu(false);
+    navigate('/perfil'); // Navega a la ruta del perfil
+  };
+
   return (
     <header className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-b border-gray-200/80 dark:border-slate-800 sticky top-0 z-40 shadow-sm shadow-black/5">
       <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
-        {/* Lado izquierdo - Navegación móvil */}
+        
+        {/* Lado Izquierdo */}
         <div className="flex items-center">
           <button
             onClick={onToggleSidebar}
@@ -99,9 +94,8 @@ const Header = ({ onToggleSidebar, isSidebarOpen, isMobile }) => {
           </div>
         </div>
 
-        {/* Lado derecho - Badges y Menú Usuario */}
+        {/* Lado Derecho */}
         <div className="flex items-center space-x-4">
-
           {isAdmin && (
             <div className="hidden sm:flex items-center space-x-2.5 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200/80 px-3.5 py-2 rounded-2xl shadow-sm ring-1 ring-yellow-200/50">
               <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse ring-2 ring-amber-200"></div>
@@ -109,6 +103,7 @@ const Header = ({ onToggleSidebar, isSidebarOpen, isMobile }) => {
             </div>
           )}
 
+          {/* Menú Usuario */}
           <div className="relative" ref={userMenuRef}>
             <button
               onClick={() => setShowUserMenu(!showUserMenu)}
@@ -130,14 +125,11 @@ const Header = ({ onToggleSidebar, isSidebarOpen, isMobile }) => {
                   </div>
                   <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full shadow-sm ring-1 ring-emerald-400"></div>
                 </div>
-
-                <ChevronDown
-                  size={16}
-                  className={`text-gray-500 dark:text-slate-400 transition-all duration-300 ease-out ${showUserMenu ? 'rotate-180 text-gray-700 dark:text-white' : 'group-hover:text-gray-700 dark:group-hover:text-white'}`}
-                />
+                <ChevronDown size={16} className={`text-gray-500 dark:text-slate-400 transition-all duration-300 ease-out ${showUserMenu ? 'rotate-180 text-gray-700 dark:text-white' : 'group-hover:text-gray-700 dark:group-hover:text-white'}`} />
               </div>
             </button>
 
+            {/* Dropdown */}
             {showUserMenu && (
               <div className="absolute right-0 top-full mt-2 w-72 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-200/80 dark:border-slate-800 py-2 z-50 ring-1 ring-black/5 animate-in fade-in-0 zoom-in-95">
                 <div className="px-5 py-4 border-b border-gray-200/60 dark:border-slate-800">
@@ -158,10 +150,7 @@ const Header = ({ onToggleSidebar, isSidebarOpen, isMobile }) => {
                         {user?.email}
                       </p>
                       <div className="mt-2">
-                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold tracking-wide ${isAdmin
-                            ? 'bg-amber-100 text-amber-800 border border-amber-200/60'
-                            : 'bg-primary-100 text-primary-800 border border-primary-200/60'
-                          }`}>
+                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold tracking-wide ${isAdmin ? 'bg-amber-100 text-amber-800 border border-amber-200/60' : 'bg-primary-100 text-primary-800 border border-primary-200/60'}`}>
                           {isAdmin ? 'Administrador' : 'Usuario'}
                         </span>
                       </div>
@@ -171,7 +160,7 @@ const Header = ({ onToggleSidebar, isSidebarOpen, isMobile }) => {
 
                 <div className="py-2">
                   <button
-                    onClick={() => setShowUserMenu(false)}
+                    onClick={goToProfile} // AHORA REDIRIGE AL PERFIL
                     className="flex items-center space-x-3 w-full px-5 py-3 text-sm text-gray-700 dark:text-slate-300 hover:bg-gray-50/80 dark:hover:bg-slate-800 transition-all duration-200 ease-out group"
                   >
                     <div className="p-1.5 bg-gray-100 dark:bg-slate-800 rounded-lg group-hover:bg-gray-200 dark:group-hover:bg-slate-700 transition-colors duration-200">
@@ -205,7 +194,7 @@ const Header = ({ onToggleSidebar, isSidebarOpen, isMobile }) => {
 
                 <div className="px-5 py-3 border-t border-gray-200/60 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-900/50 rounded-b-2xl">
                   <div className="text-xs text-gray-500 dark:text-slate-500 text-center font-medium tracking-wide">
-                    Recorridos App v2.0.0
+                    Recorridos App  v3.1.3
                   </div>
                 </div>
               </div>

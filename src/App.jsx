@@ -10,6 +10,7 @@ import Ninos from './pages/Ninos';
 import Vehiculos from './pages/Vehiculos';
 import Recorridos from './pages/Recorridos';
 import Users from './pages/Users';
+import Profile from './pages/Profile'; // ✅ Agregado
 import Login from './pages/Login';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
@@ -89,6 +90,16 @@ function AppContent() {
                     element={
                       <ProtectedRoute>
                         <Recorridos />
+                      </ProtectedRoute>
+                    }
+                  />
+
+                  {/* ✅ RUTA DE PERFIL AGREGADA */}
+                  <Route
+                    path="/perfil"
+                    element={
+                      <ProtectedRoute>
+                        <Profile />
                       </ProtectedRoute>
                     }
                   />
