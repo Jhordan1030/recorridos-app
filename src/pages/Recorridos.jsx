@@ -259,135 +259,177 @@ const Recorridos = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 py-4 px-3 sm:px-6 lg:px-8 transition-colors duration-300">
       <Alert />
       
-      {/* Header */}
-      <div className="max-w-7xl mx-auto mb-8">
-        <div className="md:flex md:items-center md:justify-between md:space-x-5">
-          <div className="flex items-start space-x-5">
-            <div className="pt-1.5">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl">Gestión de Recorridos</h1>
-              <p className="text-sm font-medium text-gray-500 dark:text-slate-400 mt-1">
-                Planificación y seguimiento de rutas escolares.
+      {/* Header - Mejorado para móvil */}
+      <div className="max-w-7xl mx-auto mb-6">
+        <div className="flex flex-col space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">Recorridos</h1>
+              <p className="text-xs font-medium text-gray-500 dark:text-slate-400 mt-1 sm:text-sm">
+                Gestión de rutas escolares
               </p>
+            </div>
+            {/* Botón flotante para móvil */}
+            <div className="sm:hidden">
+              <Button
+                variant="primary"
+                onClick={handleOpenModal}
+                icon="➕"
+                size="sm"
+                className="rounded-full w-10 h-10 p-0 flex items-center justify-center shadow-lg"
+              />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Controles y Stats */}
-      <div className="max-w-7xl mx-auto mb-8 space-y-6">
+      {/* Controles y Stats - Mejorado para móvil */}
+      <div className="max-w-7xl mx-auto mb-6 space-y-4">
         <Card className="shadow-sm border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-4 p-4 sm:p-6">
-            {/* Navegación Mes */}
-            <div className="flex items-center bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden">
-              <button onClick={() => cambiarMes(-1)} disabled={loading} className="px-4 py-2 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-600 dark:text-slate-200 transition-colors border-r border-gray-200 dark:border-slate-700">‹</button>
-              <div className="px-6 py-2 min-w-[140px] text-center">
-                <h3 className="text-base font-bold text-indigo-600 dark:text-indigo-400">{nombresMeses[mesSeleccionado - 1]}</h3>
-                <span className="text-xs text-gray-500 dark:text-slate-400">{añoSeleccionado}</span>
+          <div className="flex flex-col space-y-4 p-4 sm:p-6">
+            {/* Navegación Mes - Centrado en móvil */}
+            <div className="flex flex-col items-center space-y-4 sm:flex-row sm:justify-between sm:space-y-0">
+              <div className="flex items-center bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden w-full sm:w-auto">
+                <button 
+                  onClick={() => cambiarMes(-1)} 
+                  disabled={loading} 
+                  className="px-3 py-2 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-600 dark:text-slate-200 transition-colors border-r border-gray-200 dark:border-slate-700 sm:px-4"
+                >
+                  ‹
+                </button>
+                <div className="px-4 py-2 min-w-[120px] text-center sm:min-w-[140px]">
+                  <h3 className="text-sm font-bold text-indigo-600 dark:text-indigo-400 sm:text-base">
+                    {nombresMeses[mesSeleccionado - 1]}
+                  </h3>
+                  <span className="text-xs text-gray-500 dark:text-slate-400">{añoSeleccionado}</span>
+                </div>
+                <button 
+                  onClick={() => cambiarMes(1)} 
+                  disabled={loading} 
+                  className="px-3 py-2 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-600 dark:text-slate-200 transition-colors border-l border-gray-200 dark:border-slate-700 sm:px-4"
+                >
+                  ›
+                </button>
               </div>
-              <button onClick={() => cambiarMes(1)} disabled={loading} className="px-4 py-2 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-600 dark:text-slate-200 transition-colors border-l border-gray-200 dark:border-slate-700">›</button>
+
+              {/* Botones Acción - Ocultos en móvil (ya tenemos el botón flotante) */}
+              <div className='hidden sm:flex gap-3'>
+                <Button 
+                  variant="secondary" 
+                  onClick={loadRecorridos} 
+                  disabled={loading} 
+                  icon="🔄" 
+                  className="bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200 border border-gray-300 dark:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-700"
+                >
+                  Actualizar
+                </Button>
+                <Button variant="primary" onClick={handleOpenModal} icon="➕">
+                  Nuevo Recorrido
+                </Button>
+              </div>
             </div>
 
-            {/* Botones Acción */}
-            <div className='flex gap-3'>
-              <Button variant="secondary" onClick={loadRecorridos} disabled={loading} icon="🔄" className="bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200 border border-gray-300 dark:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-700">Actualizar</Button>
-              <Button variant="primary" onClick={handleOpenModal} icon="➕">Nuevo Recorrido</Button>
-            </div>
-          </div>
-
-          {/* Stats Bar */}
-          <div className="border-t border-gray-100 dark:border-slate-800 px-6 py-4 flex flex-wrap justify-between items-center gap-4">
-             <div>
+            {/* Stats Bar - Apilado en móvil */}
+            <div className="border-t border-gray-100 dark:border-slate-800 pt-4 flex flex-col space-y-4 sm:flex-row sm:justify-between sm:items-center sm:space-y-0">
+              <div className="text-center sm:text-left">
                 <p className="text-xs text-gray-500 dark:text-slate-500 uppercase tracking-wide font-semibold">Total del mes</p>
-                <p className="text-2xl font-bold text-green-600 dark:text-green-400">${estadisticas.totalMes.toFixed(2)}</p>
-             </div>
-             <div className="flex gap-8">
+                <p className="text-xl font-bold text-green-600 dark:text-green-400 sm:text-2xl">
+                  ${estadisticas.totalMes.toFixed(2)}
+                </p>
+              </div>
+              <div className="flex justify-around sm:gap-8">
                 <div className="text-center">
-                   <p className="text-xs text-gray-400 dark:text-slate-500 uppercase">Recorridos</p>
-                   <p className="text-xl font-semibold text-gray-900 dark:text-white">{estadisticas.totalRecorridos}</p>
+                  <p className="text-xs text-gray-400 dark:text-slate-500 uppercase">Recorridos</p>
+                  <p className="text-lg font-semibold text-gray-900 dark:text-white sm:text-xl">
+                    {estadisticas.totalRecorridos}
+                  </p>
                 </div>
                 <div className="text-center">
-                   <p className="text-xs text-gray-400 dark:text-slate-500 uppercase">Vehículos</p>
-                   <p className="text-xl font-semibold text-gray-900 dark:text-white">{estadisticas.vehiculosUsados}</p>
+                  <p className="text-xs text-gray-400 dark:text-slate-500 uppercase">Vehículos</p>
+                  <p className="text-lg font-semibold text-gray-900 dark:text-white sm:text-xl">
+                    {estadisticas.vehiculosUsados}
+                  </p>
                 </div>
-             </div>
+              </div>
+            </div>
           </div>
         </Card>
       </div>
 
-      {/* Grid de Tarjetas */}
+      {/* Grid de Tarjetas - Una columna en móvil */}
       <div className="max-w-7xl mx-auto">
         {!loading && recorridosFiltrados.length > 0 ? (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {recorridosFiltrados.map((recorrido) => (
               <div 
                 key={recorrido.id} 
-                className="group bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-blue-300 dark:hover:border-blue-700 transition-all duration-300 flex flex-col overflow-hidden"
+                className="group bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-blue-300 dark:hover:border-blue-700 transition-all duration-300 flex flex-col overflow-hidden"
               >
                 {/* Header de la Tarjeta */}
-                <div className="p-5 flex-1">
-                  <div className="flex justify-between items-start mb-4">
+                <div className="p-4 flex-1 sm:p-5">
+                  <div className="flex justify-between items-start mb-3 sm:mb-4">
                     <div className="flex flex-col">
                       <span className="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">Fecha</span>
-                      <span className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                      <span className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2 sm:text-lg">
                         📅 {recorrido.fecha.split('T')[0]}
                       </span>
                     </div>
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border capitalize ${getTipoBadge(recorrido.tipo_recorrido)}`}>
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border capitalize ${getTipoBadge(recorrido.tipo_recorrido)}`}>
                       {recorrido.tipo_recorrido}
                     </span>
                   </div>
 
                   {/* Info Cuerpo */}
-                  <div className="space-y-4">
-                     <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-500 dark:text-slate-400">Hora Salida</span>
-                        <span className="text-sm font-mono font-medium text-gray-700 dark:text-slate-300 bg-gray-50 dark:bg-slate-800 px-2 py-0.5 rounded">
-                           {formatearHora(recorrido.hora_inicio)}
+                  <div className="space-y-3 sm:space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-500 dark:text-slate-400 sm:text-sm">Hora Salida</span>
+                      <span className="text-xs font-mono font-medium text-gray-700 dark:text-slate-300 bg-gray-50 dark:bg-slate-800 px-2 py-0.5 rounded sm:text-sm">
+                        {formatearHora(recorrido.hora_inicio)}
+                      </span>
+                    </div>
+                    
+                    <div>
+                      <p className="text-xs text-gray-400 dark:text-slate-500 uppercase mb-1">Vehículo</p>
+                      <div className="flex items-center gap-2">
+                        <span className="text-base">🚗</span>
+                        <span className="text-xs font-medium text-gray-900 dark:text-white truncate sm:text-sm" title={recorrido.vehiculo_descripcion}>
+                          {recorrido.vehiculo_descripcion || 'Sin asignar'}
                         </span>
-                     </div>
-                     
-                     <div>
-                        <p className="text-xs text-gray-400 dark:text-slate-500 uppercase mb-1">Vehículo</p>
-                        <div className="flex items-center gap-2">
-                           <span className="text-lg">🚗</span>
-                           <span className="text-sm font-medium text-gray-900 dark:text-white truncate" title={recorrido.vehiculo_descripcion}>
-                              {recorrido.vehiculo_descripcion || 'Sin asignar'}
-                           </span>
-                        </div>
-                     </div>
+                      </div>
+                    </div>
 
-                     {recorrido.ninos?.length > 0 && (
-                        <div>
-                           <p className="text-xs text-gray-400 dark:text-slate-500 uppercase mb-1">Niños ({recorrido.ninos.length})</p>
-                           <div className="flex -space-x-2 overflow-hidden">
-                              {recorrido.ninos.slice(0, 5).map((n, i) => (
-                                 <div key={i} className="inline-block h-6 w-6 rounded-full ring-2 ring-white dark:ring-slate-900 bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-300" title={n.nombre}>
-                                    {n.nombre.charAt(0)}
-                                 </div>
-                              ))}
-                              {recorrido.ninos.length > 5 && (
-                                 <div className="inline-block h-6 w-6 rounded-full ring-2 ring-white dark:ring-slate-900 bg-gray-100 dark:bg-slate-800 flex items-center justify-center text-xs font-medium text-gray-500">
-                                    +{recorrido.ninos.length - 5}
-                                 </div>
-                              )}
-                           </div>
+                    {recorrido.ninos?.length > 0 && (
+                      <div>
+                        <p className="text-xs text-gray-400 dark:text-slate-500 uppercase mb-1">Niños ({recorrido.ninos.length})</p>
+                        <div className="flex -space-x-2 overflow-hidden">
+                          {recorrido.ninos.slice(0, 5).map((n, i) => (
+                            <div key={i} className="inline-block h-6 w-6 rounded-full ring-2 ring-white dark:ring-slate-900 bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-300" title={n.nombre}>
+                              {n.nombre.charAt(0)}
+                            </div>
+                          ))}
+                          {recorrido.ninos.length > 5 && (
+                            <div className="inline-block h-6 w-6 rounded-full ring-2 ring-white dark:ring-slate-900 bg-gray-100 dark:bg-slate-800 flex items-center justify-center text-xs font-medium text-gray-500">
+                              +{recorrido.ninos.length - 5}
+                            </div>
+                          )}
                         </div>
-                     )}
-                     
-                     <div className="pt-3 mt-3 border-t border-gray-100 dark:border-slate-800 flex justify-between items-center">
-                        <span className="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase">Costo</span>
-                        <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
-                           ${parseFloat(recorrido.costo || 0).toFixed(2)}
-                        </span>
-                     </div>
+                      </div>
+                    )}
+                    
+                    <div className="pt-2 mt-2 border-t border-gray-100 dark:border-slate-800 flex justify-between items-center sm:pt-3 sm:mt-3">
+                      <span className="text-xs font-bold text-gray-400 dark:text-slate-500 uppercase">Costo</span>
+                      <span className="text-base font-bold text-emerald-600 dark:text-emerald-400 sm:text-lg">
+                        ${parseFloat(recorrido.costo || 0).toFixed(2)}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Footer Actions (Oculto hasta hover) */}
-                <div className="bg-gray-50 dark:bg-slate-800/50 px-5 py-3 border-t border-gray-100 dark:border-slate-800 flex gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
+                {/* Footer Actions - Siempre visible en móvil */}
+                <div className="bg-gray-50 dark:bg-slate-800/50 px-4 py-3 border-t border-gray-100 dark:border-slate-800 flex gap-2 opacity-100 transition-opacity duration-200">
                   <Button
                     variant="secondary"
                     size="sm"
@@ -413,16 +455,31 @@ const Recorridos = () => {
         ) : (
           /* Empty State */
           !loading && (
-            <div className="text-center py-16 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 border-dashed">
-              <div className="mx-auto h-12 w-12 text-gray-400 dark:text-slate-500 text-4xl">📍</div>
-              <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">No hay recorridos</h3>
-              <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">No se encontraron registros para este mes.</p>
-              <div className="mt-6">
-                <Button variant="primary" onClick={handleOpenModal} icon="➕">Crear Recorrido</Button>
+            <div className="text-center py-12 bg-white dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-800 border-dashed mx-2 sm:mx-0">
+              <div className="mx-auto h-10 w-10 text-gray-400 dark:text-slate-500 text-3xl sm:h-12 sm:w-12 sm:text-4xl">📍</div>
+              <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white sm:text-base">No hay recorridos</h3>
+              <p className="mt-1 text-xs text-gray-500 dark:text-slate-400 sm:text-sm">No se encontraron registros para este mes.</p>
+              <div className="mt-4">
+                <Button variant="primary" onClick={handleOpenModal} icon="➕" className="hidden sm:inline-flex">
+                  Crear Recorrido
+                </Button>
+                <Button variant="primary" onClick={handleOpenModal} icon="➕" size="sm" className="sm:hidden">
+                  Crear Recorrido
+                </Button>
               </div>
             </div>
           )
         )}
+      </div>
+
+      {/* Botón flotante para móvil */}
+      <div className="fixed bottom-6 right-6 z-10 sm:hidden">
+        <Button
+          variant="primary"
+          onClick={handleOpenModal}
+          icon="➕"
+          className="rounded-full w-14 h-14 p-0 flex items-center justify-center shadow-lg text-xl"
+        />
       </div>
 
       {/* Modals */}
@@ -443,28 +500,54 @@ const Recorridos = () => {
         title={editando ? 'Editar Recorrido' : 'Nuevo Recorrido'}
         size="max-w-3xl"
       >
-        <div className="p-6 bg-white dark:bg-slate-900">
+        <div className="p-4 bg-white dark:bg-slate-900 sm:p-6">
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Grid de Inputs (Igual que Dashboard) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+              {/* Grid de Inputs - Una columna en móvil */}
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
                 <div className="space-y-1">
                   <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Fecha</label>
-                  <Input type="date" name="fecha" value={formData.fecha} onChange={handleChange} required className="w-full bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 text-gray-900 dark:text-white" />
+                  <Input 
+                    type="date" 
+                    name="fecha" 
+                    value={formData.fecha} 
+                    onChange={handleChange} 
+                    required 
+                    className="w-full bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 text-gray-900 dark:text-white text-sm sm:text-base" 
+                  />
                 </div>
                 <div className="space-y-1">
                   <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Hora</label>
-                  <Input type="time" name="hora_inicio" value={formData.hora_inicio} onChange={handleChange} required className="w-full bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 text-gray-900 dark:text-white" />
+                  <Input 
+                    type="time" 
+                    name="hora_inicio" 
+                    value={formData.hora_inicio} 
+                    onChange={handleChange} 
+                    required 
+                    className="w-full bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 text-gray-900 dark:text-white text-sm sm:text-base" 
+                  />
                 </div>
                 <div className="space-y-1">
                   <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Vehículo</label>
-                  <select name="vehiculo_id" value={formData.vehiculo_id} onChange={handleChange} required className="w-full bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg p-2.5 text-gray-900 dark:text-white">
+                  <select 
+                    name="vehiculo_id" 
+                    value={formData.vehiculo_id} 
+                    onChange={handleChange} 
+                    required 
+                    className="w-full bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg p-2.5 text-gray-900 dark:text-white text-sm sm:text-base"
+                  >
                     <option value="">Seleccionar...</option>
                     {vehiculos.map(v => <option key={v.id} value={v.id}>{v.descripcion}</option>)}
                   </select>
                 </div>
                 <div className="space-y-1">
                   <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Tipo</label>
-                  <select name="tipo_recorrido" value={formData.tipo_recorrido} onChange={handleChange} required className="w-full bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg p-2.5 text-gray-900 dark:text-white">
+                  <select 
+                    name="tipo_recorrido" 
+                    value={formData.tipo_recorrido} 
+                    onChange={handleChange} 
+                    required 
+                    className="w-full bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg p-2.5 text-gray-900 dark:text-white text-sm sm:text-base"
+                  >
                     <option value="traer">Traer</option>
                     <option value="llevar">Llevar</option>
                     <option value="ambos">Ambos</option>
@@ -472,37 +555,61 @@ const Recorridos = () => {
                 </div>
                 <div className="space-y-1 sm:col-span-2">
                   <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Notas</label>
-                  <Input type="text" name="notas" value={formData.notas} onChange={handleChange} placeholder="Opcional..." className="w-full bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 text-gray-900 dark:text-white" />
+                  <Input 
+                    type="text" 
+                    name="notas" 
+                    value={formData.notas} 
+                    onChange={handleChange} 
+                    placeholder="Opcional..." 
+                    className="w-full bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 text-gray-900 dark:text-white text-sm sm:text-base" 
+                  />
                 </div>
               </div>
 
               {/* Sección Niños */}
-              <div className="border-t border-gray-200 dark:border-slate-700 pt-6">
-                 <div className="flex justify-between items-center mb-4">
+              <div className="border-t border-gray-200 dark:border-slate-700 pt-4 sm:pt-6">
+                 <div className="flex justify-between items-center mb-3 sm:mb-4">
                     <h4 className="text-sm font-bold text-gray-800 dark:text-white">Niños ({ninosSeleccionados.length})</h4>
                  </div>
-                 <div className="mb-4">
-                    <select onChange={agregarNino} value="" className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg p-2.5 text-gray-900 dark:text-white">
+                 <div className="mb-3 sm:mb-4">
+                    <select 
+                      onChange={agregarNino} 
+                      value="" 
+                      className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg p-2.5 text-gray-900 dark:text-white text-sm sm:text-base"
+                    >
                        <option value="">+ Agregar niño...</option>
                        {ninos.filter(n => !ninosSeleccionados.some(sel => sel.nino_id.toString() === n.id.toString())).map(n => (
                           <option key={n.id} value={n.id}>{n.nombre} {n.apellidos}</option>
                        ))}
                     </select>
                  </div>
-                 <div className="space-y-2 max-h-40 overflow-y-auto custom-scrollbar">
+                 <div className="space-y-2 max-h-32 overflow-y-auto custom-scrollbar sm:max-h-40">
                     {ninosSeleccionados.map((n, idx) => (
                        <div key={n.nino_id} className="flex items-center justify-between bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-lg p-2">
-                          <span className="text-sm text-gray-800 dark:text-slate-200">{n.nombre} {n.apellidos}</span>
-                          <button type="button" onClick={() => eliminarNino(idx)} className="text-red-500 hover:text-red-700 p-1">✕</button>
+                          <span className="text-xs text-gray-800 dark:text-slate-200 sm:text-sm">{n.nombre} {n.apellidos}</span>
+                          <button type="button" onClick={() => eliminarNino(idx)} className="text-red-500 hover:text-red-700 p-1 text-sm">✕</button>
                        </div>
                     ))}
                  </div>
               </div>
 
-              {/* Footer Formulario */}
-              <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4 border-t border-gray-100 dark:border-slate-700">
-                <Button type="button" variant="secondary" onClick={handleCloseModal} className="w-full sm:w-auto justify-center bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200 border-gray-300 dark:border-slate-600">Cancelar</Button>
-                <Button type="submit" variant="primary" className="w-full sm:w-auto justify-center">{editando ? 'Guardar Cambios' : 'Crear Recorrido'}</Button>
+              {/* Footer Formulario - Apilado en móvil */}
+              <div className="flex flex-col-reverse gap-3 pt-4 border-t border-gray-100 dark:border-slate-700 sm:flex-row sm:justify-end">
+                <Button 
+                  type="button" 
+                  variant="secondary" 
+                  onClick={handleCloseModal} 
+                  className="w-full justify-center bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200 border-gray-300 dark:border-slate-600 text-sm sm:text-base sm:w-auto"
+                >
+                  Cancelar
+                </Button>
+                <Button 
+                  type="submit" 
+                  variant="primary" 
+                  className="w-full justify-center text-sm sm:text-base sm:w-auto"
+                >
+                  {editando ? 'Guardar Cambios' : 'Crear Recorrido'}
+                </Button>
               </div>
             </form>
         </div>

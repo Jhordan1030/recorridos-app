@@ -362,59 +362,130 @@ const Dashboard = () => {
     }
   };
 
-  // --- FUNCIÓN EXPORTAR PDF ---
+  // --- NUEVA FUNCIÓN EXPORTAR PDF (ESTILO MODERNO) ---
   const exportarPDF = () => {
     try {
       const doc = new jsPDF();
-      doc.setFontSize(20);
-      doc.setTextColor(55, 65, 81);
-      doc.text('Reporte de Recorridos', doc.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
+      const pageWidth = doc.internal.pageSize.width;
+      
+      // --- 1. ENCABEZADO ---
+      // Banda Superior Color Indigo
+      doc.setFillColor(79, 70, 229); // Indigo 600
+      doc.rect(0, 0, pageWidth, 24, 'F');
 
+      // Título App (Izquierda)
+      doc.setFontSize(18);
+      doc.setTextColor(255, 255, 255);
+      doc.setFont("helvetica", "bold");
+      doc.text('Recorridos App', 14, 16);
+
+      // Info Mes/Año (Derecha)
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "normal");
+      doc.text(`${nombresMeses[mesActual - 1]} ${añoActual}`.toUpperCase(), pageWidth - 14, 16, { align: 'right' });
+
+      // Subtítulo y Fecha de generación
+      doc.setTextColor(70, 70, 70); // Gris oscuro
       doc.setFontSize(14);
-      doc.setTextColor(107, 114, 128);
-      doc.text(`${nombresMeses[mesActual - 1]} ${añoActual}`, doc.internal.pageSize.getWidth() / 2, 30, { align: 'center' });
+      doc.setFont("helvetica", "bold");
+      doc.text('Reporte Mensual de Actividad', 14, 35);
+      
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(120, 120, 120);
+      doc.text(`Generado el: ${new Date().toLocaleDateString('es-EC')}`, 14, 40);
 
-      const datosTabla = [];
+      // --- 2. PROCESAMIENTO DE DATOS ---
+      const bodyData = [];
       let totalCosto = 0;
 
       Object.keys(recorridosMensuales)
         .filter(dia => !isNaN(parseInt(dia)))
         .sort((a, b) => parseInt(a) - parseInt(b))
         .forEach(dia => {
-          recorridosMensuales[dia].forEach((recorrido, idx) => {
+          recorridosMensuales[dia].forEach((recorrido) => {
             const costoNum = parseFloat(recorrido.costo || '0') || 0;
             totalCosto += costoNum;
 
-            datosTabla.push([
-              idx === 0 ? `${dia} ${nombresMeses[mesActual - 1]}` : '',
-              formatearHora(recorrido.hora_inicio),
-              recorrido.vehiculo_descripcion || 'Sin Vehículo',
-              `$${costoNum.toFixed(2)}`
+            // Construcción de detalles en una sola celda rica
+            let detalleTexto = `${recorrido.vehiculo_descripcion || 'Sin Vehículo'} (${recorrido.tipo_recorrido.toUpperCase()})\n`;
+            
+            if (recorrido.ninos && recorrido.ninos.length > 0) {
+               const nombresNinos = recorrido.ninos.map(n => n.nombre + ' ' + n.apellidos).join(', ');
+               detalleTexto += `Pasajeros (${recorrido.ninos.length}): ${nombresNinos}\n`;
+            }
+            
+            if (recorrido.notas) {
+              detalleTexto += `Nota: ${recorrido.notas}`;
+            }
+
+            bodyData.push([
+              `${dia}/${mesActual}/${añoActual}`, // Fecha
+              formatearHora(recorrido.hora_inicio), // Hora
+              detalleTexto, // Detalles completos
+              `$${costoNum.toFixed(2)}` // Costo
             ]);
           });
         });
 
-      datosTabla.push([
-        { content: 'TOTAL', colSpan: 3, styles: { halign: 'right', fontStyle: 'bold', fillColor: [229, 231, 235] } },
-        { content: `$${totalCosto.toFixed(2)}`, styles: { halign: 'right', fontStyle: 'bold', fillColor: [229, 231, 235] } }
-      ]);
-
+      // --- 3. TABLA ---
       autoTable(doc, {
-        startY: 50,
-        head: [['Fecha', 'Hora', 'Vehículo', 'Costo']],
-        body: datosTabla,
-        theme: 'striped',
+        startY: 45,
+        head: [['FECHA', 'HORA', 'DETALLES DEL SERVICIO', 'COSTO']],
+        body: bodyData,
+        theme: 'striped', // Rayado para fácil lectura
+        styles: {
+          fontSize: 9,
+          cellPadding: 4,
+          valign: 'top', // Alinear arriba para que el texto largo se vea bien
+          overflow: 'linebreak',
+          lineColor: [230, 230, 230],
+          lineWidth: 0.1,
+        },
         headStyles: {
-          fillColor: [99, 102, 241],
+          fillColor: [79, 70, 229], // Indigo 600 para el header de tabla
           textColor: [255, 255, 255],
           fontStyle: 'bold',
-          halign: 'center'
+          halign: 'left'
+        },
+        columnStyles: {
+          0: { cellWidth: 25, fontStyle: 'bold' }, // Fecha
+          1: { cellWidth: 20 }, // Hora
+          2: { cellWidth: 'auto' }, // Detalles (Autoexpandible)
+          3: { cellWidth: 25, halign: 'right', fontStyle: 'bold' } // Costo
         }
       });
 
-      doc.save(`Recorridos_${nombresMeses[mesActual - 1]}_${añoActual}.pdf`);
+      // --- 4. TOTAL FINAL ---
+      const finalY = doc.lastAutoTable.finalY + 10;
+      
+      // Caja de Total destacada
+      doc.setFillColor(240, 245, 255); // Fondo azul muy claro
+      doc.setDrawColor(79, 70, 229); // Borde índigo
+      doc.roundedRect(pageWidth - 70, finalY, 56, 20, 2, 2, 'FD'); // Caja redondeada rellena
+
+      doc.setFontSize(10);
+      doc.setTextColor(79, 70, 229);
+      doc.text("TOTAL A PAGAR", pageWidth - 42, finalY + 7, { align: 'center' });
+
+      doc.setFontSize(16);
+      doc.setTextColor(15, 23, 42); // Texto oscuro
+      doc.setFont("helvetica", "bold");
+      doc.text(`$${totalCosto.toFixed(2)}`, pageWidth - 42, finalY + 16, { align: 'center' });
+
+      // Numeración de página
+      const pageCount = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(150);
+        doc.text(`Página ${i} de ${pageCount}`, pageWidth / 2, doc.internal.pageSize.height - 10, { align: 'center' });
+      }
+
+      doc.save(`Reporte_${nombresMeses[mesActual - 1]}_${añoActual}.pdf`);
       showAlert('success', 'PDF generado exitosamente');
     } catch (error) {
+      console.error(error);
       showAlert('error', 'Error al generar el PDF');
     }
   };
@@ -435,7 +506,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Controles del Calendario - CORREGIDO */}
+      {/* Controles del Calendario */}
       <Card className="mb-6 shadow-sm border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors duration-300">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-4 p-4 sm:p-6">
           
@@ -446,7 +517,7 @@ const Dashboard = () => {
               {/* Botón Anterior */}
               <button
                 onClick={() => cambiarMes(-1)}
-                className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-600 dark:text-slate-200 transition-colors border-r border-gray-200 dark:border-slate-700 flex items-center focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+                className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-600 dark:text-slate-200 transition-colors border-r border-gray-200 dark:border-slate-700 flex items-center focus:outline-none"
                 title="Mes anterior"
               >
                 <span className="hidden xs:inline text-sm font-medium mr-1">Anterior</span>
@@ -466,7 +537,7 @@ const Dashboard = () => {
               {/* Botón Siguiente */}
               <button
                 onClick={() => cambiarMes(1)}
-                className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-600 dark:text-slate-200 transition-colors border-l border-gray-200 dark:border-slate-700 flex items-center focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+                className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-600 dark:text-slate-200 transition-colors border-l border-gray-200 dark:border-slate-700 flex items-center focus:outline-none"
                 title="Mes siguiente"
               >
                 <span className="text-xl font-bold leading-none">›</span>
@@ -697,7 +768,7 @@ const Dashboard = () => {
         </>
       )}
 
-      {/* Modal Formulario - AQUI ESTA LA CORRECCION DE ESTILO */}
+      {/* Modal Formulario */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => handleCloseModal(false)}
@@ -834,20 +905,20 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              {/* Botones Finales - ESTILOS CORREGIDOS */}
+              {/* Botones Finales */}
               <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4 border-t border-gray-200 dark:border-slate-700">
                 <Button
                   type="button"
                   variant="secondary"
                   onClick={() => handleCloseModal(false)}
-                  className="w-full sm:w-auto justify-center bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200 border border-gray-300 dark:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-700"
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
                 >
                   Cancelar
                 </Button>
                 <Button
                   type="submit"
                   variant="primary"
-                  className="w-full sm:w-auto justify-center"
+                  className="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-medium shadow-md"
                 >
                   {editando ? 'Guardar Cambios' : 'Crear Recorrido'}
                 </Button>

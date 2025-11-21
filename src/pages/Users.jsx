@@ -7,6 +7,7 @@ import Alert from '../components/ui/Alert';
 import Modal from '../components/ui/Modal';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
+import Card from '../components/ui/Card'; // Asumiendo que tienes este componente, si no, usamos div con clases
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -191,14 +192,14 @@ const Users = () => {
 
   const usersArray = Array.isArray(users) ? users : [];
 
-  // UI Helper: Role Badge Styles (Dark Mode Compatible)
+  // UI Helper: Role Badge Styles
   const getRoleBadge = (rol) => {
     const styles = rol === 'admin' 
       ? 'bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 ring-purple-600/20 dark:ring-purple-500/30'
       : 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 ring-emerald-600/20 dark:ring-emerald-500/30';
       
     return (
-      <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${styles} capitalize`}>
+      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${styles} capitalize`}>
         {rol}
       </span>
     );
@@ -231,7 +232,7 @@ const Users = () => {
           </div>
           <div className="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-y-0 sm:space-x-3 sm:space-x-reverse md:mt-0 md:flex-row md:space-x-3">
             <Button
-              variant="white" // Asegúrate de que este variant soporte dark mode, o usa clases manuales como abajo
+              variant="white"
               onClick={loadUsers}
               disabled={loading}
               icon="🔄"
@@ -269,7 +270,7 @@ const Users = () => {
         </div>
 
         {/* Loading Spinner */}
-        {loading && (
+        {loading && usersArray.length === 0 && (
           <div className="flex flex-col justify-center items-center py-20 bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800 border-dashed">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto mb-4"></div>
             <p className="text-gray-500 dark:text-slate-400 text-sm">Sincronizando datos...</p>
@@ -285,7 +286,7 @@ const Users = () => {
           </div>
         )}
 
-        {/* Users Grid */}
+        {/* Users Grid - ESTANDARIZADO */}
         {!loading && usersArray.length > 0 && (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {usersArray.map((user) => (
@@ -297,7 +298,7 @@ const Users = () => {
                 <div className="p-6 flex-1">
                   <div className="flex items-start justify-between mb-4">
                     {/* Avatar */}
-                    <div className="h-12 w-12 rounded-full bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-300 flex items-center justify-center font-bold text-sm border border-gray-200 dark:border-slate-700">
+                    <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 text-white flex items-center justify-center font-bold text-sm shadow-sm ring-2 ring-white dark:ring-slate-800">
                       {getInitials(user.nombre)}
                     </div>
                     {/* Role Badge */}
@@ -305,10 +306,10 @@ const Users = () => {
                   </div>
 
                   <div>
-                    <h3 className="text-base font-semibold leading-6 text-gray-900 dark:text-white truncate" title={user.nombre}>
+                    <h3 className="text-lg font-bold leading-6 text-gray-900 dark:text-white truncate mb-1" title={user.nombre}>
                       {user.nombre}
                     </h3>
-                    <div className="flex items-center gap-2 mt-1">
+                    <div className="flex items-center gap-2">
                       <p className="text-sm text-gray-500 dark:text-slate-400 truncate" title={user.email}>
                         {user.email}
                       </p>
@@ -316,45 +317,47 @@ const Users = () => {
                     
                     {/* Metadata extra */}
                     <div className="mt-4 pt-4 border-t border-gray-50 dark:border-slate-800 flex items-center justify-between text-xs text-gray-400 dark:text-slate-500">
-                      <span>ID: {user.id}</span>
-                      <span>Activo</span>
+                      <span className="font-mono">ID: {user.id}</span>
+                      <span className="text-emerald-600 dark:text-emerald-500 font-medium">Activo</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Card Actions Footer */}
-                <div className="bg-gray-50/80 dark:bg-slate-800/50 px-4 py-3 border-t border-gray-100 dark:border-slate-800 grid grid-cols-3 gap-2">
-                  {/* Editar */}
-                  <button
+                {/* Card Actions Footer - IDÉNTICO A VEHICULOS */}
+                <div className="bg-gray-50 dark:bg-slate-800/50 px-4 py-3 border-t border-gray-100 dark:border-slate-800 flex gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
+                  <Button
+                    variant="white"
+                    size="sm"
+                    className="flex-1 justify-center text-xs bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-600"
                     onClick={() => openEditForm(user)}
-                    className="flex items-center justify-center w-full rounded-md py-1.5 text-sm text-gray-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700 hover:text-blue-600 dark:hover:text-blue-400 hover:shadow-sm transition-all border border-transparent hover:border-gray-200 dark:hover:border-slate-600"
-                    title="Editar Información"
+                    icon="✏️"
+                    title="Editar"
                   >
-                    ✏️
-                  </button>
-
-                  {/* Contraseña */}
-                  <button
+                    Editar
+                  </Button>
+                  
+                  <Button
+                    variant="white"
+                    size="sm"
+                    className="flex-shrink-0 justify-center text-xs bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-amber-600 dark:text-amber-500 hover:bg-amber-50 dark:hover:bg-slate-600"
                     onClick={() => openPasswordModal(user)}
-                    className="flex items-center justify-center w-full rounded-md py-1.5 text-sm text-gray-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700 hover:text-amber-600 dark:hover:text-amber-400 hover:shadow-sm transition-all border border-transparent hover:border-gray-200 dark:hover:border-slate-600"
-                    title="Restablecer Contraseña"
+                    icon="🔑"
+                    title="Cambiar Contraseña"
                   >
-                    🔑
-                  </button>
+                    
+                  </Button>
 
-                  {/* Eliminar */}
-                  <button
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    className="flex-1 justify-center text-xs"
                     onClick={() => handleDeleteUser(user.id)}
                     disabled={user.rol === 'admin' || user.id === currentUser?.userId}
-                    className={`flex items-center justify-center w-full rounded-md py-1.5 text-sm transition-all border border-transparent hover:border-gray-200 dark:hover:border-slate-600 hover:shadow-sm ${
-                      (user.rol === 'admin' || user.id === currentUser?.userId) 
-                        ? 'text-gray-300 dark:text-slate-600 cursor-not-allowed' 
-                        : 'text-gray-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700 hover:text-red-600 dark:hover:text-red-400'
-                    }`}
-                    title="Eliminar Usuario"
+                    icon="🗑️"
+                    title="Eliminar"
                   >
-                    🗑️
-                  </button>
+                    Eliminar
+                  </Button>
                 </div>
               </div>
             ))}
@@ -371,7 +374,7 @@ const Users = () => {
         onConfirm={confirmDelete}
         title="Desactivar Acceso"
         message={`¿Estás seguro de que quieres eliminar al usuario ${selectedUser?.nombre}? Esta acción es irreversible.`}
-        confirmText="Sí, eliminar usuario"
+        confirmText="Sí, eliminar"
         cancelText="Cancelar"
         type="danger"
       />
@@ -422,7 +425,7 @@ const Users = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Rol</label>
                 <select 
-                  className="block w-full rounded-lg border-gray-300 dark:border-slate-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2.5 px-3 border bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
+                  className="block w-full rounded-lg border-gray-300 dark:border-slate-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2.5 px-3 border bg-white dark:bg-slate-800 text-gray-900 dark:text-white outline-none"
                   value={createFormData.rol} 
                   onChange={e => setCreateFormData({...createFormData, rol: e.target.value})}
                 >
@@ -431,9 +434,9 @@ const Users = () => {
                 </select>
               </div>
             </div>
-            <div className="mt-6 pt-4 border-t border-gray-100 dark:border-slate-800 flex justify-end gap-3">
-              <Button type="button" onClick={() => setShowCreateForm(false)} variant="secondary" className="bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700">Cancelar</Button>
-              <Button type="submit" variant="primary" loading={creating}>Crear Usuario</Button>
+            <div className="mt-6 pt-4 border-t border-gray-100 dark:border-slate-800 flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-3 gap-3 sm:gap-0">
+              <Button type="button" onClick={() => setShowCreateForm(false)} variant="secondary" className="w-full sm:w-auto justify-center bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700">Cancelar</Button>
+              <Button type="submit" variant="primary" loading={creating} className="w-full sm:w-auto justify-center">Crear Usuario</Button>
             </div>
           </form>
         </div>
@@ -469,7 +472,7 @@ const Users = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Rol</label>
               <select 
-                className="block w-full rounded-lg border-gray-300 dark:border-slate-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2.5 px-3 border bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
+                className="block w-full rounded-lg border-gray-300 dark:border-slate-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2.5 px-3 border bg-white dark:bg-slate-800 text-gray-900 dark:text-white outline-none"
                 value={editFormData.rol} 
                 onChange={e => setEditFormData({...editFormData, rol: e.target.value})}
               >
@@ -477,9 +480,9 @@ const Users = () => {
                 <option value="admin">Administrador</option>
               </select>
             </div>
-            <div className="mt-6 pt-4 border-t border-gray-100 dark:border-slate-800 flex justify-end gap-3">
-              <Button type="button" onClick={() => setShowEditForm(false)} variant="secondary" className="bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700">Cancelar</Button>
-              <Button type="submit" variant="primary" loading={editing}>Guardar Cambios</Button>
+            <div className="mt-6 pt-4 border-t border-gray-100 dark:border-slate-800 flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-3 gap-3 sm:gap-0">
+              <Button type="button" onClick={() => setShowEditForm(false)} variant="secondary" className="w-full sm:w-auto justify-center bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700">Cancelar</Button>
+              <Button type="submit" variant="primary" loading={editing} className="w-full sm:w-auto justify-center">Guardar Cambios</Button>
             </div>
           </form>
         </div>
@@ -524,13 +527,13 @@ const Users = () => {
               />
             </div>
 
-            <div className="mt-6 pt-4 border-t border-gray-100 dark:border-slate-800 flex justify-end gap-3">
-              <Button type="button" onClick={() => setShowPasswordModal(false)} variant="secondary" className="bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700">Cancelar</Button>
+            <div className="mt-6 pt-4 border-t border-gray-100 dark:border-slate-800 flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-3 gap-3 sm:gap-0">
+              <Button type="button" onClick={() => setShowPasswordModal(false)} variant="secondary" className="w-full sm:w-auto justify-center bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700">Cancelar</Button>
               <Button 
                 type="submit" 
                 variant="primary" 
                 loading={editing}
-                className="bg-amber-500 hover:bg-amber-600 border-amber-600 focus:ring-amber-500"
+                className="w-full sm:w-auto justify-center bg-amber-500 hover:bg-amber-600 border-amber-600 focus:ring-amber-500"
               >
                 Actualizar Contraseña
               </Button>
