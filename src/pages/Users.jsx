@@ -12,17 +12,17 @@ import Card from '../components/ui/Card'; // Asumiendo que tienes este component
 const Users = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   // Modals State
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  
+
   // Loading States
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState(false);
-  
+
   const [selectedUser, setSelectedUser] = useState(null);
   const { isAdmin, user: currentUser } = useAuth();
   const { showAlert } = useAlert();
@@ -156,10 +156,10 @@ const Users = () => {
 
     try {
       setEditing(true);
-      const response = await updateUser(selectedUser.id, { 
-        password: passwordFormData.newPassword 
+      const response = await updateUser(selectedUser.id, {
+        password: passwordFormData.newPassword
       });
-      
+
       if (response.data.success) {
         setShowPasswordModal(false);
         setPasswordFormData({ newPassword: '' });
@@ -194,12 +194,13 @@ const Users = () => {
 
   // UI Helper: Role Badge Styles
   const getRoleBadge = (rol) => {
-    const styles = rol === 'admin' 
-      ? 'bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 ring-purple-600/20 dark:ring-purple-500/30'
-      : 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 ring-emerald-600/20 dark:ring-emerald-500/30';
-      
+    const isPrimary = rol === 'admin';
+    const styles = isPrimary
+      ? 'bg-amber-400/20 text-amber-400 border-amber-400/20'
+      : 'bg-primary-400/20 text-primary-400 border-primary-400/20';
+
     return (
-      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${styles} capitalize`}>
+      <span className={`inline-flex items-center rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest border ${styles}`}>
         {rol}
       </span>
     );
@@ -207,8 +208,10 @@ const Users = () => {
 
   // UI Helper: Get Initials
   const getInitials = (name) => {
+    if (!name) return '??';
     return name
       .split(' ')
+      .filter(n => n)
       .map((n) => n[0])
       .join('')
       .substring(0, 2)
@@ -218,33 +221,31 @@ const Users = () => {
   if (!isAdmin) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
+    <div className="min-h-screen bg-transparent py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
       <Alert />
-      
+
       {/* --- Page Header --- */}
-      <div className="max-w-7xl mx-auto mb-8">
-        <div className="md:flex md:items-center md:justify-between md:space-x-5">
-          <div className="flex items-start space-x-5">
+      <div className="max-w-7xl mx-auto mb-10">
+        <div className="md:flex md:items-center md:justify-between md:space-x-8">
+          <div className="flex items-start">
             <div className="pt-1.5">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl tracking-tight">Gestión de Usuarios</h1>
-              <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">Administra el acceso y los roles de los miembros del equipo.</p>
+              <h1 className="text-4xl font-black text-white sm:text-5xl tracking-tighter">Usuarios</h1>
+              <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mt-3">Administración de accesos y roles</p>
             </div>
           </div>
-          <div className="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-y-0 sm:space-x-3 sm:space-x-reverse md:mt-0 md:flex-row md:space-x-3">
+          <div className="mt-8 flex flex-col-reverse justify-stretch gap-4 md:mt-0 md:flex-row md:items-center">
             <Button
-              variant="white"
+              variant="secondary"
               onClick={loadUsers}
               disabled={loading}
-              icon="🔄"
-              className="w-full md:w-auto justify-center shadow-sm bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200 border border-gray-300 dark:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-700"
+              className="w-full md:w-auto"
             >
               Refrescar
             </Button>
             <Button
               variant="primary"
               onClick={() => setShowCreateForm(true)}
-              icon="➕"
-              className="w-full md:w-auto justify-center shadow-md hover:shadow-lg transition-all"
+              className="w-full md:w-auto shadow-2xl shadow-primary-500/20"
             >
               Nuevo Usuario
             </Button>
@@ -254,109 +255,99 @@ const Users = () => {
 
       {/* --- Main Content --- */}
       <div className="max-w-7xl mx-auto">
-        
-        {/* KPI Stats */}
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-3 mb-8">
-          <div className="overflow-hidden rounded-xl bg-white dark:bg-slate-900 px-4 py-5 shadow-sm border border-gray-100 dark:border-slate-800 sm:p-6 transition-colors">
-            <dt className="truncate text-sm font-medium text-gray-500 dark:text-slate-400">Total Usuarios</dt>
-            <dd className="mt-1 text-3xl font-semibold tracking-tight text-gray-900 dark:text-white">{usersArray.length}</dd>
-          </div>
-          <div className="overflow-hidden rounded-xl bg-white dark:bg-slate-900 px-4 py-5 shadow-sm border border-gray-100 dark:border-slate-800 sm:p-6 transition-colors">
-            <dt className="truncate text-sm font-medium text-gray-500 dark:text-slate-400">Administradores</dt>
-            <dd className="mt-1 text-3xl font-semibold tracking-tight text-purple-600 dark:text-purple-400">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 mb-10">
+          <Card className="p-8">
+            <dt className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">Total Usuarios</dt>
+            <dd className="text-4xl font-black text-white tracking-tighter">{usersArray.length}</dd>
+          </Card>
+          <Card className="p-8 border-purple-500/20">
+            <dt className="text-[10px] font-black text-purple-400/50 uppercase tracking-[0.2em] mb-2">Administradores</dt>
+            <dd className="text-4xl font-black text-purple-400 tracking-tighter">
               {usersArray.filter(u => u.rol === 'admin').length}
             </dd>
-          </div>
+          </Card>
         </div>
 
-        {/* Loading Spinner */}
         {loading && usersArray.length === 0 && (
-          <div className="flex flex-col justify-center items-center py-20 bg-white dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800 border-dashed">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-500 dark:text-slate-400 text-sm">Sincronizando datos...</p>
+          <div className="flex flex-col justify-center items-center py-24 bg-white/5 rounded-[2.5rem] border border-white/5 border-dashed">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-6"></div>
+            <p className="text-white/20 text-[10px] font-black uppercase tracking-[0.3em]">Sincronizando miembros...</p>
           </div>
         )}
 
-        {/* Empty State */}
         {!loading && usersArray.length === 0 && (
-          <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 border-dashed">
-            <div className="mx-auto h-12 w-12 text-gray-300 dark:text-slate-600 text-4xl mb-3">👥</div>
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">No hay usuarios</h3>
-            <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">Comienza agregando miembros al sistema.</p>
+          <div className="text-center py-24 bg-white/5 rounded-[2.5rem] border border-white/5 border-dashed">
+            <div className="text-5xl mb-6 opacity-30">👥</div>
+            <h3 className="text-xl font-black text-white mb-2">Sin usuarios</h3>
+            <p className="text-white/20 text-[10px] font-black uppercase tracking-widest">Registra nuevos miembros para comenzar</p>
           </div>
         )}
 
-        {/* Users Grid - ESTANDARIZADO */}
+        {/* Users Grid */}
         {!loading && usersArray.length > 0 && (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {usersArray.map((user) => (
-              <div 
-                key={user.id} 
-                className="group bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-blue-300 dark:hover:border-blue-700 transition-all duration-300 flex flex-col overflow-hidden"
+              <div
+                key={user.id}
+                className="group relative bg-white/5 backdrop-blur-md rounded-[2rem] border border-white/10 p-7 hover:bg-white/10 transition-all duration-500 hover:shadow-2xl flex flex-col"
               >
-                {/* Card Body */}
-                <div className="p-6 flex-1">
-                  <div className="flex items-start justify-between mb-4">
-                    {/* Avatar */}
-                    <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 text-white flex items-center justify-center font-bold text-sm shadow-sm ring-2 ring-white dark:ring-slate-800">
-                      {getInitials(user.nombre)}
-                    </div>
-                    {/* Role Badge */}
-                    {getRoleBadge(user.rol)}
+                <div className="flex items-start justify-between mb-6">
+                  {/* Avatar */}
+                  <div className="h-14 w-14 rounded-2xl bg-white/10 text-white flex items-center justify-center font-black text-xs shadow-2xl border border-white/20 ring-4 ring-white/5">
+                    {getInitials(user.nombre)}
                   </div>
+                  {/* Role Badge */}
+                  {getRoleBadge(user.rol)}
+                </div>
 
-                  <div>
-                    <h3 className="text-lg font-bold leading-6 text-gray-900 dark:text-white truncate mb-1" title={user.nombre}>
-                      {user.nombre}
-                    </h3>
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm text-gray-500 dark:text-slate-400 truncate" title={user.email}>
-                        {user.email}
-                      </p>
-                    </div>
-                    
-                    {/* Metadata extra */}
-                    <div className="mt-4 pt-4 border-t border-gray-50 dark:border-slate-800 flex items-center justify-between text-xs text-gray-400 dark:text-slate-500">
-                      <span className="font-mono">ID: {user.id}</span>
-                      <span className="text-emerald-600 dark:text-emerald-500 font-medium">Activo</span>
-                    </div>
+                <div className="mb-8">
+                  <h3 className="text-xl font-black text-white truncate tracking-tighter" title={user.nombre}>
+                    {user.nombre}
+                  </h3>
+                  <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mt-1 truncate" title={user.email}>
+                    {user.email}
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between pt-6 border-t border-white/5">
+                  <span className="text-[9px] font-black text-white/10 uppercase tracking-widest">ID: {user.id}</span>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full shadow-[0_0_8px_rgba(52,211,153,0.5)]"></div>
+                    <span className="text-[9px] font-black text-emerald-400/70 uppercase tracking-widest">En línea</span>
                   </div>
                 </div>
 
-                {/* Card Actions Footer - IDÉNTICO A VEHICULOS */}
-                <div className="bg-gray-50 dark:bg-slate-800/50 px-4 py-3 border-t border-gray-100 dark:border-slate-800 flex gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
+                {/* Card Actions Footer */}
+                <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-xl rounded-[2rem] flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-500 scale-95 group-hover:scale-100 z-10 pointer-events-none group-hover:pointer-events-auto">
                   <Button
-                    variant="white"
+                    variant="secondary"
                     size="sm"
-                    className="flex-1 justify-center text-xs bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-600"
+                    className="shadow-2xl"
                     onClick={() => openEditForm(user)}
-                    icon="✏️"
                     title="Editar"
                   >
-                    Editar
+                    ✏️
                   </Button>
-                  
+
                   <Button
-                    variant="white"
+                    variant="warning"
                     size="sm"
-                    className="flex-shrink-0 justify-center text-xs bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-amber-600 dark:text-amber-500 hover:bg-amber-50 dark:hover:bg-slate-600"
+                    className="shadow-2xl"
                     onClick={() => openPasswordModal(user)}
-                    icon="🔑"
-                    title="Cambiar Contraseña"
+                    title="Password"
                   >
-                    
+                    🔑
                   </Button>
 
                   <Button
                     variant="danger"
                     size="sm"
-                    className="flex-1 justify-center text-xs"
+                    className="shadow-2xl"
                     onClick={() => handleDeleteUser(user.id)}
                     disabled={user.rol === 'admin' || user.id === currentUser?.userId}
-                    icon="🗑️"
                     title="Eliminar"
                   >
-                    Eliminar
+                    🗑️
                   </Button>
                 </div>
               </div>
@@ -380,109 +371,93 @@ const Users = () => {
       />
 
       {/* 2. Create User Modal */}
-      <Modal 
-        isOpen={showCreateForm} 
-        onClose={() => setShowCreateForm(false)} 
-        title="Registrar Nuevo Usuario"
+      <Modal
+        isOpen={showCreateForm}
+        onClose={() => setShowCreateForm(false)}
+        title="Nuevo Usuario"
         size="max-w-lg"
       >
-        <div className="p-6 bg-white dark:bg-slate-900">
+        <div className="p-0 bg-transparent">
           <form onSubmit={handleCreateUser} className="space-y-5">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Nombre Completo</label>
-              <Input 
-                placeholder="Ej: Ana García" 
-                value={createFormData.nombre} 
-                onChange={e => setCreateFormData({...createFormData, nombre: e.target.value})} 
-                required 
-                className="bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600 text-gray-900 dark:text-white"
+            <Input
+              label="Nombre Completo"
+              placeholder="Ej: Ana García"
+              value={createFormData.nombre}
+              onChange={e => setCreateFormData({ ...createFormData, nombre: e.target.value })}
+              required
+            />
+            <Input
+              label="Correo Electrónico"
+              placeholder="correo@empresa.com"
+              type="email"
+              value={createFormData.email}
+              onChange={e => setCreateFormData({ ...createFormData, email: e.target.value })}
+              required
+            />
+            <div className="grid grid-cols-2 gap-6">
+              <Input
+                label="Contraseña"
+                placeholder="••••••"
+                type="password"
+                value={createFormData.password}
+                onChange={e => setCreateFormData({ ...createFormData, password: e.target.value })}
+                required
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Correo Electrónico</label>
-              <Input 
-                placeholder="correo@empresa.com" 
-                type="email" 
-                value={createFormData.email} 
-                onChange={e => setCreateFormData({...createFormData, email: e.target.value})} 
-                required 
-                className="bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600 text-gray-900 dark:text-white"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Contraseña</label>
-                <Input 
-                  placeholder="••••••" 
-                  type="password" 
-                  value={createFormData.password} 
-                  onChange={e => setCreateFormData({...createFormData, password: e.target.value})} 
-                  required 
-                  minLength="6"
-                  className="bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600 text-gray-900 dark:text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Rol</label>
-                <select 
-                  className="block w-full rounded-lg border-gray-300 dark:border-slate-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2.5 px-3 border bg-white dark:bg-slate-800 text-gray-900 dark:text-white outline-none"
-                  value={createFormData.rol} 
-                  onChange={e => setCreateFormData({...createFormData, rol: e.target.value})}
+                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest block mb-2 pl-1">Rol</label>
+                <select
+                  className="px-4 py-3 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary-500/50 focus:border-white/20 block w-full transition-all duration-300 bg-white/5 text-white outline-none backdrop-blur-sm"
+                  value={createFormData.rol}
+                  onChange={e => setCreateFormData({ ...createFormData, rol: e.target.value })}
                 >
                   <option value="usuario">Usuario</option>
                   <option value="admin">Administrador</option>
                 </select>
               </div>
             </div>
-            <div className="mt-6 pt-4 border-t border-gray-100 dark:border-slate-800 flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-3 gap-3 sm:gap-0">
-              <Button type="button" onClick={() => setShowCreateForm(false)} variant="secondary" className="w-full sm:w-auto justify-center bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700">Cancelar</Button>
-              <Button type="submit" variant="primary" loading={creating} className="w-full sm:w-auto justify-center">Crear Usuario</Button>
+            <div className="mt-10 pt-8 border-t border-white/5 flex flex-col-reverse sm:flex-row sm:justify-end gap-4">
+              <Button type="button" onClick={() => setShowCreateForm(false)} variant="secondary" className="w-full sm:w-auto">Cancelar</Button>
+              <Button type="submit" variant="primary" loading={creating} className="w-full sm:w-auto">Crear Usuario</Button>
             </div>
           </form>
         </div>
       </Modal>
 
       {/* 3. Edit User Modal */}
-      <Modal 
-        isOpen={showEditForm} 
-        onClose={() => setShowEditForm(false)} 
-        title="Editar Información"
+      <Modal
+        isOpen={showEditForm}
+        onClose={() => setShowEditForm(false)}
+        title="Editar Usuario"
         size="max-w-lg"
       >
-        <div className="p-6 bg-white dark:bg-slate-900">
-          <form onSubmit={handleEditUser} className="space-y-5">
+        <div className="p-0 bg-transparent">
+          <form onSubmit={handleEditUser} className="space-y-6">
+            <Input
+              label="Nombre Completo"
+              value={editFormData.nombre}
+              onChange={e => setEditFormData({ ...editFormData, nombre: e.target.value })}
+              required
+            />
+            <Input
+              label="Correo Electrónico"
+              value={editFormData.email}
+              onChange={e => setEditFormData({ ...editFormData, email: e.target.value })}
+              required
+            />
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Nombre</label>
-              <Input 
-                value={editFormData.nombre} 
-                onChange={e => setEditFormData({...editFormData, nombre: e.target.value})} 
-                required 
-                className="bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600 text-gray-900 dark:text-white"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Correo</label>
-              <Input 
-                value={editFormData.email} 
-                onChange={e => setEditFormData({...editFormData, email: e.target.value})} 
-                required 
-                className="bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600 text-gray-900 dark:text-white"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Rol</label>
-              <select 
-                className="block w-full rounded-lg border-gray-300 dark:border-slate-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm py-2.5 px-3 border bg-white dark:bg-slate-800 text-gray-900 dark:text-white outline-none"
-                value={editFormData.rol} 
-                onChange={e => setEditFormData({...editFormData, rol: e.target.value})}
+              <label className="text-[10px] font-black text-white/40 uppercase tracking-widest block mb-2 pl-1">Rol</label>
+              <select
+                className="px-4 py-3 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary-500/50 focus:border-white/20 block w-full transition-all duration-300 bg-white/5 text-white outline-none backdrop-blur-sm"
+                value={editFormData.rol}
+                onChange={e => setEditFormData({ ...editFormData, rol: e.target.value })}
               >
                 <option value="usuario">Usuario</option>
                 <option value="admin">Administrador</option>
               </select>
             </div>
-            <div className="mt-6 pt-4 border-t border-gray-100 dark:border-slate-800 flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-3 gap-3 sm:gap-0">
-              <Button type="button" onClick={() => setShowEditForm(false)} variant="secondary" className="w-full sm:w-auto justify-center bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700">Cancelar</Button>
-              <Button type="submit" variant="primary" loading={editing} className="w-full sm:w-auto justify-center">Guardar Cambios</Button>
+            <div className="mt-10 pt-8 border-t border-white/5 flex flex-col-reverse sm:flex-row sm:justify-end gap-4">
+              <Button type="button" onClick={() => setShowEditForm(false)} variant="secondary" className="w-full sm:w-auto">Cancelar</Button>
+              <Button type="submit" variant="primary" loading={editing} className="w-full sm:w-auto">Guardar Cambios</Button>
             </div>
           </form>
         </div>
@@ -495,47 +470,44 @@ const Users = () => {
           setShowPasswordModal(false);
           setSelectedUser(null);
         }}
-        title="Restablecer Contraseña"
+        title="Seguridad"
         size="max-w-md"
       >
-        <div className="p-6 bg-white dark:bg-slate-900">
-          <form onSubmit={handlePasswordReset} className="space-y-5">
-            
+        <div className="p-0 bg-transparent">
+          <form onSubmit={handlePasswordReset} className="space-y-8">
+
             {/* Warning Box */}
-            <div className="rounded-md bg-amber-50 dark:bg-amber-900/20 p-4 border border-amber-200 dark:border-amber-800">
-              <div className="flex">
-                <div className="flex-shrink-0 text-amber-400">⚠️</div>
-                <div className="ml-3">
-                  <h3 className="text-sm font-medium text-amber-800 dark:text-amber-400">Acción de Seguridad</h3>
-                  <div className="mt-2 text-sm text-amber-700 dark:text-amber-300">
-                    <p>Estás cambiando la contraseña de <strong>{selectedUser?.nombre}</strong>. Deberás notificar al usuario sus nuevas credenciales.</p>
-                  </div>
+            <div className="rounded-3xl bg-amber-400/5 p-6 border border-amber-400/10">
+              <div className="flex gap-4">
+                <div className="flex-shrink-0 text-amber-400 text-xl">⚠️</div>
+                <div>
+                  <h3 className="text-[10px] font-black text-amber-400 uppercase tracking-widest mb-2">Acción de Seguridad</h3>
+                  <p className="text-xs text-amber-400/50 leading-relaxed">
+                    Estás restableciendo la contraseña de <strong>{selectedUser?.nombre}</strong>. Asegúrate de notificar al usuario.
+                  </p>
                 </div>
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">Nueva Contraseña</label>
-              <Input
-                type="password"
-                value={passwordFormData.newPassword}
-                onChange={(e) => setPasswordFormData({ newPassword: e.target.value })}
-                placeholder="Mínimo 6 caracteres"
-                minLength="6"
-                required
-                className="bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600 text-gray-900 dark:text-white focus:ring-amber-500 focus:border-amber-500"
-              />
-            </div>
+            <Input
+              label="Nueva Contraseña"
+              type="password"
+              value={passwordFormData.newPassword}
+              onChange={(e) => setPasswordFormData({ newPassword: e.target.value })}
+              placeholder="Mínimo 6 caracteres"
+              minLength="6"
+              required
+            />
 
-            <div className="mt-6 pt-4 border-t border-gray-100 dark:border-slate-800 flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-3 gap-3 sm:gap-0">
-              <Button type="button" onClick={() => setShowPasswordModal(false)} variant="secondary" className="w-full sm:w-auto justify-center bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600 text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-700">Cancelar</Button>
-              <Button 
-                type="submit" 
-                variant="primary" 
+            <div className="mt-10 pt-8 border-t border-white/5 flex flex-col-reverse sm:flex-row sm:justify-end gap-4">
+              <Button type="button" onClick={() => setShowPasswordModal(false)} variant="secondary" className="w-full sm:w-auto">Cancelar</Button>
+              <Button
+                type="submit"
+                variant="warning"
                 loading={editing}
-                className="w-full sm:w-auto justify-center bg-amber-500 hover:bg-amber-600 border-amber-600 focus:ring-amber-500"
+                className="w-full sm:w-auto"
               >
-                Actualizar Contraseña
+                Actualizar
               </Button>
             </div>
           </form>

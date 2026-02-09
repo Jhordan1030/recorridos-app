@@ -4,7 +4,6 @@ import Sidebar from './Sidebar';
 import Header from './Header';
 // 1. IMPORTAR EL BOTÓN AQUÍ
 // Asumiendo que FloatingThemeToggle.jsx está en src/components/ui/
-import FloatingThemeToggle from '../ui/FloatingThemeToggle';
 
 const Layout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -23,9 +22,9 @@ const Layout = ({ children }) => {
 
       // En desktop, siempre mostrar sidebar abierto
       if (!mobile) {
-        setIsSidebarOpen(false); 
+        setIsSidebarOpen(false);
       } else {
-        setIsSidebarOpen(false); 
+        setIsSidebarOpen(false);
       }
     };
 
@@ -69,7 +68,7 @@ const Layout = ({ children }) => {
   }, [isMobile, isSidebarOpen]);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex transition-colors duration-300">
+    <div className="min-h-screen flex transition-colors duration-300">
       {/* Sidebar */}
       {user && (
         <div ref={sidebarRef}>
@@ -95,16 +94,14 @@ const Layout = ({ children }) => {
         )}
 
         {/* Contenido de la página */}
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-slate-950">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto">
           <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-4 lg:py-6">
             {children}
           </div>
         </main>
       </div>
 
-      {/* 2. AGREGAR EL COMPONENTE AQUÍ AL FINAL */}
-      <FloatingThemeToggle />
-      
+
     </div>
   );
 };

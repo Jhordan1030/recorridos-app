@@ -1,26 +1,26 @@
 import React from 'react';
 
-const Input = ({ 
+const Input = ({
   label,
   error,
   className = '',
-  ...props 
+  ...props
 }) => {
-  const baseClasses = 'p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 block w-full transition-all duration-200 shadow-sm bg-white text-gray-900 placeholder-gray-500';
-  const errorClasses = error ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : '';
-  
+  const baseClasses = 'px-4 py-3 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary-500/50 focus:border-white/20 block w-full transition-all duration-300 bg-white/5 text-white placeholder-white/20 outline-none backdrop-blur-sm';
+  const errorClasses = error ? 'border-red-500/50 focus:ring-red-500/30' : '';
+
   const inputClasses = `${baseClasses} ${errorClasses} ${className}`;
 
   return (
     <div className="flex flex-col space-y-2">
       {label && (
-        <label className="text-sm font-medium text-gray-700">
+        <label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-1">
           {label}
         </label>
       )}
       <input className={inputClasses} {...props} />
       {error && (
-        <p className="text-red-600 text-sm">{error}</p>
+        <p className="text-red-400 text-[10px] font-black uppercase tracking-widest pl-1">{error}</p>
       )}
     </div>
   );
