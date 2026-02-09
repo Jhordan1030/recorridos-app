@@ -79,17 +79,18 @@ const Sidebar = ({ isOpen, onClose, isAdmin, isMobile }) => {
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar - FLOATING MODE */}
       <aside className={`
-        fixed lg:sticky inset-y-0 left-0 z-50 lg:z-30
+        fixed inset-y-0 left-0 z-50 lg:z-30
+        lg:m-4 lg:rounded-[2.5rem]
         glass-sidebar
-        transform transition-all duration-300 ease-in-out
+        transform transition-all duration-500 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-        ${collapsed && !isMobile ? 'w-20' : 'w-80'}
-        ${isMobile ? 'w-80 shadow-2xl' : ''}
+        ${collapsed && !isMobile ? 'lg:w-24' : 'lg:w-80'}
+        ${isMobile ? 'w-full h-full rounded-none inset-0 p-4' : 'h-[calc(100vh-2rem)]'}
         flex flex-col
-        h-screen
         overflow-hidden
+        border border-white/10
       `}>
 
         {/* Header */}
