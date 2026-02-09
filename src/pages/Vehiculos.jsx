@@ -8,6 +8,7 @@ import Alert from '../components/ui/Alert';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import Card from '../components/ui/Card';
+import Skeleton from '../components/ui/Skeleton';
 
 const Vehiculos = () => {
   const { vehiculos, setVehiculos } = useApp();
@@ -225,24 +226,19 @@ const Vehiculos = () => {
           </Card>
         </div>
 
-        {loading && vehiculos.length === 0 && (
-          <div className="flex flex-col justify-center items-center py-24 bg-white/5 rounded-[2.5rem] border border-white/5 border-dashed">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-6"></div>
-            <p className="text-white/20 text-[10px] font-black uppercase tracking-[0.3em]">Sincronizando flota...</p>
+        {loading ? (
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {[...Array(8)].map((_, i) => (
+              <Skeleton key={i} variant="card" className="h-[280px]" />
+            ))}
           </div>
-        )}
-
-        {/* Empty State */}
-        {!loading && vehiculos.length === 0 && (
+        ) : vehiculos.length === 0 ? (
           <div className="text-center py-24 bg-white/5 rounded-[2.5rem] border border-white/5 border-dashed">
             <div className="text-5xl mb-6 opacity-30">🚗</div>
             <h3 className="text-xl font-black text-white mb-2">Sin vehículos</h3>
             <p className="text-white/20 text-[10px] font-black uppercase tracking-widest">Registra tu primer transporte para comenzar</p>
           </div>
-        )}
-
-        {/* Grid de Vehículos */}
-        {!loading && vehiculos.length > 0 && (
+        ) : (
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {(vehiculos || []).map((vehiculo) => {
               const styleInfo = getTipoInfo(vehiculo.tipo);

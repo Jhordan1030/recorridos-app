@@ -1,13 +1,15 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useAlert } from '../context/AlertContext';
-import { getRecorridos, getNinos, getVehiculos, createRecorrido, updateRecorrido } from '../services/api';
+import { getRecorridos, getNinos, getVehiculos, createRecorrido, updateRecorrido, deleteRecorrido } from '../services/api';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import Modal from '../components/ui/Modal';
+import ConfirmModal from '../components/ui/ConfirmModal';
 import Alert from '../components/ui/Alert';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import Input from '../components/ui/Input';
+import Skeleton from '../components/ui/Skeleton';
 
 const Dashboard = () => {
   const { showAlert } = useAlert();
@@ -24,6 +26,8 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [mesActual, setMesActual] = useState(new Date().getMonth() + 1);
   const [añoActual, setAñoActual] = useState(new Date().getFullYear());
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [recorridoAEliminar, setRecorridoAEliminar] = useState(null);
 
   const nombresMeses = [
     "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -362,6 +366,32 @@ const Dashboard = () => {
     }
   };
 
+  const handleDelete = (id) => {
+    console.log('🗑️ Intentando eliminar recorrido con ID:', id);
+    if (!id) {
+      showAlert('error', 'ID de recorrido no válido');
+      return;
+    }
+    setRecorridoAEliminar(id);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!recorridoAEliminar) return;
+    try {
+      const response = await deleteRecorrido(recorridoAEliminar);
+      if (response.data.success) {
+        showAlert('success', 'Recorrido eliminado correctamente');
+        loadRecorridosData();
+      }
+    } catch (error) {
+      showAlert('error', 'No se pudo eliminar el recorrido');
+    } finally {
+      setShowDeleteModal(false);
+      setRecorridoAEliminar(null);
+    }
+  };
+
   // --- NUEVA FUNCIÓN EXPORTAR PDF (ESTILO MODERNO) ---
   const exportarPDF = () => {
     try {
@@ -573,12 +603,21 @@ const Dashboard = () => {
       </div>
 
       {loading ? (
-        <Card className="flex justify-center items-center h-48 sm:h-64 bg-white/5 border-white/10 backdrop-blur-md">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-500 mx-auto mb-4"></div>
-            <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">Sincronizando registros...</p>
+        <div className="max-w-7xl mx-auto mb-10 space-y-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Skeleton variant="stat" />
+            <Skeleton variant="stat" />
+            <Skeleton variant="stat" className="sm:col-span-2 lg:col-span-1" />
           </div>
-        </Card>
+          <Skeleton variant="card" className="h-[400px]" />
+          <div className="space-y-4">
+            <Skeleton variant="title" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Skeleton variant="card" />
+              <Skeleton variant="card" />
+            </div>
+          </div>
+        </div>
       ) : (
         <>
           {/* --- Main Calendar Interface --- */}
@@ -712,13 +751,22 @@ const Dashboard = () => {
                                   {recorrido.ninos?.length || 0} Estudiantes
                                 </span>
                               </div>
-                              <button
-                                onClick={() => handleEdit(recorrido)}
-                                className="opacity-0 group-hover:opacity-100 bg-white/10 hover:bg-white/20 text-white/60 hover:text-white p-2 rounded-xl transition-all border border-white/10"
-                                title="Gestionar"
-                              >
-                                ⚙️
-                              </button>
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => handleEdit(recorrido)}
+                                  className="lg:opacity-0 group-hover:opacity-100 bg-white/10 hover:bg-white/20 text-white/60 hover:text-white p-2.5 rounded-xl transition-all border border-white/10"
+                                  title="Gestionar"
+                                >
+                                  ⚙️
+                                </button>
+                                <button
+                                  onClick={() => handleDelete(recorrido.id)}
+                                  className="lg:opacity-0 group-hover:opacity-100 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 p-2.5 rounded-xl transition-all border border-red-500/10"
+                                  title="Eliminar"
+                                >
+                                  🗑️
+                                </button>
+                              </div>
                             </div>
                           </div>
                         ))}
@@ -862,6 +910,17 @@ const Dashboard = () => {
           )}
         </div>
       </Modal>
+
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={confirmDelete}
+        title="Eliminar Recorrido"
+        message="¿Estás seguro de que quieres eliminar este registro? Esta acción no se puede deshacer."
+        confirmText="Sí, eliminar"
+        cancelText="Cancelar"
+        type="danger"
+      />
     </div>
   );
 };
