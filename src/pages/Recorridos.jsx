@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useAlert } from '../context/AlertContext';
+import { useApp } from '../context/AppContext';
 import { getRecorridos, deleteRecorrido, getNinos, getVehiculos, createRecorrido, updateRecorrido } from '../services/api';
 import Modal from '../components/ui/Modal';
 import ConfirmModal from '../components/ui/ConfirmModal';
@@ -11,6 +12,7 @@ import Skeleton from '../components/ui/Skeleton';
 
 const Recorridos = () => {
   const { showAlert } = useAlert();
+  const { isMobile } = useApp();
   const [recorridos, setRecorridos] = useState([]);
 
   // --- Estados ---
@@ -417,25 +419,21 @@ const Recorridos = () => {
                 </div>
 
                 {/* Card Actions Footer */}
-                <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-xl rounded-[2rem] flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-500 scale-95 group-hover:scale-100 z-10 pointer-events-none group-hover:pointer-events-auto">
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="shadow-2xl"
-                    onClick={() => handleEdit(recorrido)}
-                    title="Editar"
-                  >
-                    ✏️
-                  </Button>
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    className="shadow-2xl translate-y-4 group-hover:translate-y-0 transition-all duration-500 delay-75"
-                    onClick={() => handleDelete(recorrido.id)}
-                    title="Eliminar"
-                  >
-                    🗑️
-                  </Button>
+                <div className={`
+                  absolute inset-0 bg-slate-950/80 backdrop-blur-xl rounded-[2rem] flex items-center justify-center gap-3 transition-all duration-500
+                  ${isMobile
+                    ? 'opacity-0 scale-95 pointer-events-none'
+                    : 'opacity-0 lg:group-hover:opacity-100 scale-95 lg:group-hover:scale-100 z-10 pointer-events-none lg:group-hover:pointer-events-auto'
+                  }
+                `}>
+                  <Button variant="secondary" size="sm" onClick={() => handleEdit(recorrido)}>✏️</Button>
+                  <Button variant="danger" size="sm" onClick={() => handleDelete(recorrido.id)}>🗑️</Button>
+                </div>
+
+                {/* Mobile Actions (Visible) */}
+                <div className="mt-auto pt-6 border-t border-white/5 flex gap-2 lg:hidden">
+                  <Button variant="secondary" size="sm" className="flex-1" onClick={() => handleEdit(recorrido)}>Editar</Button>
+                  <Button variant="danger" size="sm" className="flex-1" onClick={() => handleDelete(recorrido.id)}>Eliminar</Button>
                 </div>
               </div>
             ))}

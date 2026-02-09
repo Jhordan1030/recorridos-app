@@ -2,38 +2,25 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import { useApp } from '../../context/AppContext';
 // 1. IMPORTAR EL BOTÓN AQUÍ
 // Asumiendo que FloatingThemeToggle.jsx está en src/components/ui/
 
 const Layout = ({ children }) => {
+  const { isMobile, setIsMobile } = useApp();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
   const { user, isAdmin } = useAuth();
   const sidebarRef = useRef(null);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const closeSidebar = () => setIsSidebarOpen(false);
 
-  // Detectar dispositivo y manejar responsive
+  // No local resize needed, AppContext handles it. 
+  // We just sync sidebar state if isMobile changes.
   useEffect(() => {
-    const checkDevice = () => {
-      const mobile = window.innerWidth < 1024;
-      setIsMobile(mobile);
-
-      // En desktop, siempre mostrar sidebar abierto
-      if (!mobile) {
-        setIsSidebarOpen(false);
-      } else {
-        setIsSidebarOpen(false);
-      }
-    };
-
-    checkDevice();
-    window.addEventListener('resize', checkDevice);
-
-    return () => window.removeEventListener('resize', checkDevice);
-  }, []);
+    if (!isMobile) setIsSidebarOpen(false);
+  }, [isMobile]);
 
   // Cerrar sidebar al hacer clic fuera en móvil
   useEffect(() => {

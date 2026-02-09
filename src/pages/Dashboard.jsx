@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useAlert } from '../context/AlertContext';
+import { useApp } from '../context/AppContext';
 import { getRecorridos, getNinos, getVehiculos, createRecorrido, updateRecorrido, deleteRecorrido } from '../services/api';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -13,6 +14,7 @@ import Skeleton from '../components/ui/Skeleton';
 
 const Dashboard = () => {
   const { showAlert } = useAlert();
+  const { isMobile } = useApp();
 
   // --- ESTADOS ---
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -529,8 +531,8 @@ const Dashboard = () => {
         <div className="md:flex md:items-center md:justify-between md:space-x-8">
           <div className="flex items-start">
             <div className="pt-1.5">
-              <h1 className="text-4xl font-black text-white sm:text-5xl tracking-tighter">Dashboard</h1>
-              <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mt-3">Panel central de operaciones logísticas</p>
+              <h1 className="text-3xl font-black text-white sm:text-5xl tracking-tighter">Dashboard</h1>
+              <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mt-2">Panel central de operaciones</p>
             </div>
           </div>
           <div className="mt-8 flex flex-col-reverse justify-stretch gap-4 md:mt-0 md:flex-row md:items-center">
@@ -565,11 +567,11 @@ const Dashboard = () => {
               >
                 ‹
               </button>
-              <div className="flex-1 px-8 py-4 text-center">
-                <h3 className="text-sm font-black text-primary-400 uppercase tracking-[0.2em]">
+              <div className="flex-1 px-4 py-4 text-center">
+                <h3 className="text-xs font-black text-primary-400 uppercase tracking-[0.2em]">
                   {nombresMeses[mesActual - 1]}
                 </h3>
-                <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">{añoActual}</span>
+                <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">{añoActual}</span>
               </div>
               <button
                 onClick={() => cambiarMes(1)}
@@ -580,21 +582,20 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Key Summary Stats */}
           <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <Card className="p-6 sm:p-8 border-white/5">
-              <dt className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">Presupuesto Mes</dt>
-              <dd className="text-3xl sm:text-4xl font-black text-white tracking-tighter">
+            <Card className="p-5 sm:p-8 border-white/5">
+              <dt className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">Presupuesto</dt>
+              <dd className="text-2xl sm:text-4xl font-black text-white tracking-tighter">
                 ${costoTotalMes.toFixed(2)}
               </dd>
             </Card>
-            <Card className="p-6 sm:p-8">
+            <Card className="p-5 sm:p-8">
               <dt className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">Operación</dt>
-              <dd className="text-3xl sm:text-4xl font-black text-white tracking-tighter">{totalRecorridosMes} <span className="text-xs text-white/20 ml-1">Rutas</span></dd>
+              <dd className="text-2xl sm:text-4xl font-black text-white tracking-tighter">{totalRecorridosMes} <span className="text-xs text-white/20 ml-1">Rutas</span></dd>
             </Card>
-            <Card className="p-6 sm:p-8 border-emerald-500/20">
+            <Card className="p-5 sm:p-8 border-emerald-500/20">
               <dt className="text-[10px] font-black text-emerald-400/50 uppercase tracking-[0.2em] mb-2">Consistencia</dt>
-              <dd className="text-3xl sm:text-4xl font-black text-emerald-400 tracking-tighter">
+              <dd className="text-2xl sm:text-4xl font-black text-emerald-400 tracking-tighter">
                 {diasConRecorridos} <span className="text-xs text-emerald-400/30 ml-1">Días</span>
               </dd>
             </Card>
@@ -624,9 +625,9 @@ const Dashboard = () => {
           <div className="max-w-7xl mx-auto mb-10">
             <Card className="p-0 overflow-hidden border-none bg-white/5 backdrop-blur-xl rounded-[2.5rem] border border-white/10 shadow-2xl">
               {/* Day Headers */}
-              <div className="grid grid-cols-7 text-center font-black text-[10px] text-white/20 bg-white/5 border-b border-white/5 uppercase tracking-[0.2em]">
+              <div className="grid grid-cols-7 text-center font-black text-[9px] sm:text-[10px] text-white/20 bg-white/5 border-b border-white/5 uppercase tracking-widest sm:tracking-[0.2em]">
                 {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map((dia, index) => (
-                  <span key={index} className="py-4 sm:py-5 border-r border-white/5 last:border-r-0">
+                  <span key={index} className="py-3 sm:py-5 border-r border-white/5 last:border-r-0">
                     <span className="hidden sm:inline">{dia}</span>
                     <span className="sm:hidden">{dia.charAt(0)}</span>
                   </span>
@@ -645,7 +646,7 @@ const Dashboard = () => {
                       }
 
                       const tieneRecorridos = Array.isArray(recorridosMensuales[dia.numero]) && recorridosMensuales[dia.numero].length > 0;
-                      let dayClasses = "relative h-20 sm:h-32 border-r border-white/5 last:border-r-0 p-2 sm:p-3 transition-all duration-300 group hover:bg-white/10";
+                      let dayClasses = "relative h-16 sm:h-32 border-r border-white/5 last:border-r-0 p-1 sm:p-3 transition-all duration-300 group hover:bg-white/10";
 
                       if (dia.esHoy) dayClasses += " bg-white/5";
                       if (dia.tieneRecorridos) dayClasses += " bg-primary-500/[0.03]";
@@ -689,11 +690,11 @@ const Dashboard = () => {
 
           {/* --- Detailed Activity List --- */}
           <Card className="p-0 border-none bg-white/5 backdrop-blur-xl rounded-[2.5rem] border border-white/10 shadow-2xl overflow-hidden">
-            <div className="border-b border-white/5 p-8 px-10">
-              <h4 className="text-2xl font-black text-white tracking-tighter uppercase tracking-[0.05em]">
+            <div className="border-b border-white/5 p-6 sm:p-8 px-6 sm:px-10">
+              <h4 className="text-xl sm:text-2xl font-black text-white tracking-tighter uppercase tracking-[0.05em]">
                 Bitácora de Operaciones
               </h4>
-              <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] mt-2">Detalle cronológico de actividad mensual</p>
+              <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] mt-2">Detalle cronológico mensual</p>
             </div>
 
             {Object.keys(recorridosMensuales).length === 0 ? (
@@ -703,14 +704,14 @@ const Dashboard = () => {
                 <p className="text-white/20 text-[10px] font-black uppercase tracking-widest">No se detectaron movimientos en este periodo</p>
               </div>
             ) : (
-              <div className="p-8 px-10 space-y-12">
+              <div className="p-6 sm:p-8 px-6 sm:px-10 space-y-10">
                 {Object.keys(recorridosMensuales)
                   .filter(dia => !isNaN(parseInt(dia)))
                   .sort((a, b) => parseInt(a) - parseInt(b))
                   .map(dia => (
-                    <div key={dia} className="relative pl-12 border-l border-white/10 pb-4 last:pb-0">
+                    <div key={dia} className="relative pl-8 sm:pl-12 border-l border-white/10 pb-4 last:pb-0">
                       {/* Timeline Node */}
-                      <div className="absolute -left-[9px] top-0 bg-primary-500 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(14,165,233,0.5)] ring-4 ring-slate-950">
+                      <div className="absolute -left-2 sm:-left-[9px] top-0 bg-primary-500 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(14,165,233,0.5)] ring-4 ring-slate-950">
                         {dia}
                       </div>
 
@@ -727,46 +728,55 @@ const Dashboard = () => {
                             key={idx}
                             className="group relative bg-white/[0.03] hover:bg-white/[0.08] backdrop-blur-md border border-white/5 hover:border-white/10 rounded-3xl p-6 transition-all duration-500"
                           >
-                            <div className="flex justify-between items-start mb-4">
-                              <div className="flex items-center gap-4">
-                                <span className="h-10 w-10 rounded-xl bg-white/10 text-white flex items-center justify-center text-[10px] font-black border border-white/10 shadow-xl">
+                            <div className="flex flex-col sm:flex-row sm:justify-between items-start gap-3 sm:gap-4 mb-4">
+                              <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
+                                <span className="flex-shrink-0 h-10 w-10 sm:h-11 sm:w-11 rounded-xl bg-white/10 text-white flex items-center justify-center text-[10px] sm:text-xs font-black border border-white/10 shadow-xl">
                                   {formatearHora(recorrido.hora_inicio)}
                                 </span>
-                                <div>
-                                  <p className="text-sm font-black text-white uppercase tracking-tight">
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-sm font-black text-white uppercase tracking-tight truncate sm:whitespace-normal">
                                     {recorrido.vehiculo_descripcion || 'Ruta sin asignar'}
                                   </p>
                                   <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.1em] mt-1">
                                     {recorrido.tipo_recorrido}
                                   </p>
                                 </div>
+                                {/* Mobile Price Container */}
+                                <div className="sm:hidden ml-auto">
+                                  <span className="text-base font-black text-emerald-400 tracking-tighter shrink-0">
+                                    ${parseFloat(recorrido.costo || 0).toFixed(2)}
+                                  </span>
+                                </div>
                               </div>
-                              <span className="text-lg font-black text-emerald-400 tracking-tighter">
+                              {/* Desktop Price Container */}
+                              <span className="hidden sm:block text-lg font-black text-emerald-400 tracking-tighter">
                                 ${parseFloat(recorrido.costo || 0).toFixed(2)}
                               </span>
                             </div>
 
-                            <div className="flex items-center justify-between pt-4 border-t border-white/5">
-                              <div className="flex items-center gap-2">
+                            <div className="flex flex-wrap items-center justify-between pt-4 border-t border-white/5 gap-3">
+                              <div className="flex items-center gap-2 min-w-fit">
                                 <div className="h-1 w-1 rounded-full bg-primary-400 shadow-[0_0_8px_rgba(56,189,248,0.5)]" />
-                                <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">
+                                <span className="text-[9px] font-black text-white/20 uppercase tracking-widest whitespace-nowrap">
                                   {recorrido.ninos?.length || 0} Estudiantes
                                 </span>
                               </div>
-                              <div className="flex gap-2">
+                              <div className="flex gap-2 ml-auto">
                                 <button
                                   onClick={() => handleEdit(recorrido)}
-                                  className="lg:opacity-0 group-hover:opacity-100 bg-white/10 hover:bg-white/20 text-white/60 hover:text-white p-2.5 rounded-xl transition-all border border-white/10"
+                                  className={`bg-white/10 hover:bg-white/20 text-white/60 hover:text-white p-2 sm:p-2.5 rounded-xl transition-all border border-white/10 ${isMobile ? 'opacity-100' : 'lg:opacity-0 group-hover:opacity-100'}`}
                                   title="Gestionar"
                                 >
-                                  ⚙️
+                                  <span className="sm:hidden text-sm">⚙️</span>
+                                  <span className="hidden sm:inline">⚙️</span>
                                 </button>
                                 <button
                                   onClick={() => handleDelete(recorrido.id)}
-                                  className="lg:opacity-0 group-hover:opacity-100 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 p-2.5 rounded-xl transition-all border border-red-500/10"
+                                  className={`bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 p-2 sm:p-2.5 rounded-xl transition-all border border-red-500/10 ${isMobile ? 'opacity-100' : 'lg:opacity-0 group-hover:opacity-100'}`}
                                   title="Eliminar"
                                 >
-                                  🗑️
+                                  <span className="sm:hidden text-sm">🗑️</span>
+                                  <span className="hidden sm:inline">🗑️</span>
                                 </button>
                               </div>
                             </div>
