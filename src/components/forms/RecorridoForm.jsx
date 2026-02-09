@@ -32,10 +32,10 @@ const RecorridoForm = ({ recorridoParaEditar, onSuccess, onCancel }) => {
     tipo_recorrido: 'llevar',
     notas: '',
   };
-  
+
   const [formData, setFormData] = useState(estadoInicialFormulario);
 
-  const inputClass = "p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full transition-all duration-200 shadow-sm bg-white text-gray-900 placeholder-gray-500";
+  const inputClass = "px-4 py-3 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary-500/50 focus:border-white/20 block w-full transition-all duration-300 bg-white/5 text-white placeholder-white/20 outline-none backdrop-blur-sm";
 
   // Cargar datos iniciales
   useEffect(() => {
@@ -126,19 +126,19 @@ const RecorridoForm = ({ recorridoParaEditar, onSuccess, onCancel }) => {
   const agregarNino = (e) => {
     const ninoId = e.target.value;
     if (!ninoId) return;
-    
+
     const nino = ninos.find((n) => n.id.toString() === ninoId.toString());
     if (!nino) return;
-    
-    const yaExiste = ninosSeleccionados.find((n) => 
+
+    const yaExiste = ninosSeleccionados.find((n) =>
       n.nino_id.toString() === ninoId.toString()
     );
-    
+
     if (yaExiste) {
       showAlert('Este niño ya está agregado', 'error');
       return;
     }
-    
+
     setNinosSeleccionados([
       ...ninosSeleccionados,
       {
@@ -158,7 +158,7 @@ const RecorridoForm = ({ recorridoParaEditar, onSuccess, onCancel }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!formData.fecha || !formData.hora_inicio || !formData.vehiculo_id) {
       showAlert('Fecha, hora de inicio y vehículo son requeridos', 'error');
       return;
@@ -184,7 +184,7 @@ const RecorridoForm = ({ recorridoParaEditar, onSuccess, onCancel }) => {
 
       if (response.data.success) {
         showAlert(
-          `Recorrido ${editando ? 'actualizado' : 'creado'} exitosamente`, 
+          `Recorrido ${editando ? 'actualizado' : 'creado'} exitosamente`,
           'success'
         );
         onSuccess(true);
@@ -192,8 +192,8 @@ const RecorridoForm = ({ recorridoParaEditar, onSuccess, onCancel }) => {
     } catch (error) {
       console.error('Error guardando recorrido:', error);
       showAlert(
-        `Error al ${editando ? 'actualizar' : 'crear'} recorrido: ` + 
-        (error.response?.data?.message || error.message), 
+        `Error al ${editando ? 'actualizar' : 'crear'} recorrido: ` +
+        (error.response?.data?.message || error.message),
         'error'
       );
     } finally {
@@ -204,30 +204,26 @@ const RecorridoForm = ({ recorridoParaEditar, onSuccess, onCancel }) => {
   // Renderizado
   if (loadingData) {
     return (
-      <div className="min-h-52 flex items-center justify-center bg-white p-6 rounded-xl">
+      <div className="min-h-52 flex items-center justify-center bg-transparent p-6">
         <div className="text-center">
-          <svg className="animate-spin h-8 w-8 text-indigo-600 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          <p className="text-gray-600 font-medium">Cargando datos necesarios...</p>
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-white/40 font-black uppercase tracking-widest text-[10px]">Cargando formulario...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white p-4 sm:p-6 rounded-xl max-w-2xl mx-auto w-full">
-      <h3 className="text-xl sm:text-2xl font-bold text-indigo-700 mb-6 border-b pb-3">
-        {editando ? '✏️ Editar Recorrido' : '➕ Crear Nuevo Recorrido'}
+    <div className="bg-transparent p-0 max-w-2xl mx-auto w-full">
+      <h3 className="text-2xl font-black text-white mb-8 tracking-tighter">
+        {editando ? 'Editar Recorrido' : 'Nuevo Recorrido'}
       </h3>
-      
+
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           {/* Fecha */}
           <div className="flex flex-col space-y-2">
-            <label className="text-sm font-medium text-gray-700 flex items-center">
-              <span className="mr-2">📅</span>
+            <label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-1">
               Fecha *
             </label>
             <input
@@ -243,8 +239,7 @@ const RecorridoForm = ({ recorridoParaEditar, onSuccess, onCancel }) => {
 
           {/* Hora */}
           <div className="flex flex-col space-y-2">
-            <label className="text-sm font-medium text-gray-700 flex items-center">
-              <span className="mr-2">⏰</span>
+            <label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-1">
               Hora *
             </label>
             <input
@@ -260,8 +255,7 @@ const RecorridoForm = ({ recorridoParaEditar, onSuccess, onCancel }) => {
 
           {/* Vehículo */}
           <div className="flex flex-col space-y-2">
-            <label className="text-sm font-medium text-gray-700 flex items-center">
-              <span className="mr-2">🚗</span>
+            <label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-1">
               Vehículo *
             </label>
             <select
@@ -283,8 +277,7 @@ const RecorridoForm = ({ recorridoParaEditar, onSuccess, onCancel }) => {
 
           {/* Tipo de Recorrido */}
           <div className="flex flex-col space-y-2">
-            <label className="text-sm font-medium text-gray-700 flex items-center">
-              <span className="mr-2">🔄</span>
+            <label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-1">
               Tipo de Recorrido *
             </label>
             <select
@@ -303,9 +296,8 @@ const RecorridoForm = ({ recorridoParaEditar, onSuccess, onCancel }) => {
 
           {/* Notas Generales */}
           <div className="flex flex-col space-y-2 md:col-span-2">
-            <label className="text-sm font-medium text-gray-700 flex items-center">
-              <span className="mr-2">📝</span>
-              Notas Generales del Recorrido
+            <label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-1">
+              Notas Generales
             </label>
             <input
               type="text"
@@ -320,25 +312,24 @@ const RecorridoForm = ({ recorridoParaEditar, onSuccess, onCancel }) => {
         </div>
 
         {/* Sección de Niños */}
-        <div className="mt-8 pt-6 border-t border-gray-200">
-          <h4 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-            <span className="mr-2">👦</span>
-            Niños en el Recorrido ({ninosSeleccionados.length})
+        <div className="mt-10 pt-8 border-t border-white/5">
+          <h4 className="text-lg font-black text-white mb-6 uppercase tracking-widest">
+            Estudiantes ({ninosSeleccionados.length})
           </h4>
-          
+
           <div className="mb-4">
-            <label className="text-sm font-medium text-gray-700 block mb-2">
-              Agregar Niño
+            <label className="text-[10px] font-black text-white/40 uppercase tracking-widest block mb-2 pl-1">
+              Agregar Estudiante
             </label>
-            <select 
-              onChange={agregarNino} 
-              value="" 
+            <select
+              onChange={agregarNino}
+              value=""
               className={inputClass}
               disabled={submitting}
             >
               <option value="">Seleccionar niño...</option>
               {ninos
-                .filter(nino => !ninosSeleccionados.some(ns => 
+                .filter(nino => !ninosSeleccionados.some(ns =>
                   ns.nino_id.toString() === nino.id.toString()
                 ))
                 .map((nino) => (
@@ -352,28 +343,28 @@ const RecorridoForm = ({ recorridoParaEditar, onSuccess, onCancel }) => {
           {/* Lista de niños */}
           <div className="space-y-3 max-h-48 overflow-y-auto pr-2">
             {ninosSeleccionados.length === 0 ? (
-              <div className="text-center py-4 bg-gray-50 rounded-lg">
-                <p className="text-gray-500 italic">No hay niños agregados al recorrido</p>
+              <div className="text-center py-8 bg-white/5 rounded-2xl border border-white/5 border-dashed">
+                <p className="text-white/20 text-[10px] font-black uppercase tracking-widest">No hay estudiantes agregados</p>
               </div>
             ) : (
               ninosSeleccionados.map((nino, index) => (
-                <div key={nino.nino_id} className="flex flex-col sm:flex-row items-start sm:items-center border border-indigo-200 p-3 rounded-lg bg-indigo-50 shadow-sm">
+                <div key={nino.nino_id} className="flex flex-col sm:flex-row items-start sm:items-center border border-white/10 p-4 rounded-2xl bg-white/5 backdrop-blur-md">
                   <div className="flex justify-between items-center w-full sm:w-auto sm:flex-grow sm:pr-4 mb-2 sm:mb-0">
-                    <span className="font-semibold text-indigo-800 flex-grow">
+                    <span className="font-black text-white tracking-tight">
                       {nino.nombre} {nino.apellidos}
                     </span>
                     <button
                       type="button"
                       onClick={() => eliminarNino(index)}
-                      className="text-red-500 hover:text-red-700 p-1 text-xl transition-colors ml-4 sm:ml-0 flex-shrink-0"
+                      className="text-white/20 hover:text-red-400 p-2 text-xl transition-all ml-4 sm:ml-0 flex-shrink-0"
                       title="Eliminar niño del recorrido"
                       disabled={submitting}
                     >
-                      ✖
+                      ✕
                     </button>
                   </div>
-                  
-                  
+
+
                 </div>
               ))
             )}
@@ -381,30 +372,27 @@ const RecorridoForm = ({ recorridoParaEditar, onSuccess, onCancel }) => {
         </div>
 
         {/* Botones de acción */}
-        <div className="mt-8 pt-6 border-t border-gray-200 flex flex-col-reverse sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4">
+        <div className="mt-10 pt-8 border-t border-white/5 flex flex-col-reverse sm:flex-row justify-end gap-4">
           <button
             type="button"
             onClick={() => onCancel(false)}
-            className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-6 rounded-lg shadow-sm transition-colors duration-200 w-full sm:w-auto disabled:opacity-50"
+            className="bg-white/5 hover:bg-white/10 text-white/40 font-black uppercase tracking-[0.2em] py-4 px-8 rounded-2xl border border-white/10 transition-all active:scale-95 w-full sm:w-auto text-[10px]"
             disabled={submitting}
           >
-            ❌ Cancelar
+            Cancelar
           </button>
-          <button 
-            type="submit" 
-            className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-colors duration-200 w-full sm:w-auto disabled:opacity-50 flex items-center justify-center"
+          <button
+            type="submit"
+            className="bg-primary-500 hover:bg-primary-400 text-white font-black uppercase tracking-[0.2em] py-4 px-8 rounded-2xl shadow-2xl shadow-primary-500/20 transition-all active:scale-95 w-full sm:w-auto text-[10px] flex items-center justify-center"
             disabled={submitting}
           >
             {submitting ? (
               <>
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-3"></div>
                 {editando ? 'Actualizando...' : 'Creando...'}
               </>
             ) : (
-              editando ? '💾 Actualizar Recorrido' : '✅ Crear Recorrido'
+              editando ? 'Actualizar Recorrido' : 'Crear Recorrido'
             )}
           </button>
         </div>

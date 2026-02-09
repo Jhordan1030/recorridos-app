@@ -4,10 +4,10 @@ import Sidebar from './Sidebar';
 import Header from './Header';
 // 1. IMPORTAR EL BOTÓN AQUÍ
 // Asumiendo que FloatingThemeToggle.jsx está en src/components/ui/
-import FloatingThemeToggle from '../ui/FloatingThemeToggle';
 
 const Layout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const { user, isAdmin } = useAuth();
   const sidebarRef = useRef(null);
@@ -23,9 +23,9 @@ const Layout = ({ children }) => {
 
       // En desktop, siempre mostrar sidebar abierto
       if (!mobile) {
-        setIsSidebarOpen(false); 
+        setIsSidebarOpen(false);
       } else {
-        setIsSidebarOpen(false); 
+        setIsSidebarOpen(false);
       }
     };
 
@@ -69,7 +69,7 @@ const Layout = ({ children }) => {
   }, [isMobile, isSidebarOpen]);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex transition-colors duration-300">
+    <div className="min-h-screen flex transition-colors duration-300">
       {/* Sidebar */}
       {user && (
         <div ref={sidebarRef}>
@@ -78,33 +78,41 @@ const Layout = ({ children }) => {
             onClose={closeSidebar}
             isAdmin={isAdmin}
             isMobile={isMobile}
+            isCollapsed={isCollapsed}
+            setIsCollapsed={setIsCollapsed}
           />
         </div>
       )}
 
       {/* Contenido principal */}
-      <div className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${user && !isMobile && isSidebarOpen ? 'lg:ml-80' : 'lg:ml-0'
-        }`}>
-        {/* Header */}
-        {user && (
-          <Header
-            onToggleSidebar={toggleSidebar}
-            isSidebarOpen={isSidebarOpen}
-            isMobile={isMobile}
-          />
-        )}
+      <div className="flex-1 flex flex-col min-h-screen transition-all duration-500">
+        <div className="flex flex-1">
+          {/* Espaciador para el Sidebar Flotante en Desktop */}
+          {user && !isMobile && (
+            <div className={`hidden lg:block ${isCollapsed ? 'w-32' : 'w-[22rem]'} flex-shrink-0 transition-all duration-500 ease-in-out`} />
+          )}
 
-        {/* Contenido de la página */}
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-slate-950">
-          <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-4 lg:py-6">
-            {children}
+          <div className="flex-1 flex flex-col min-w-0">
+            {/* Header */}
+            {user && (
+              <Header
+                onToggleSidebar={toggleSidebar}
+                isSidebarOpen={isSidebarOpen}
+                isMobile={isMobile}
+              />
+            )}
+
+            {/* Contenido de la página */}
+            <main className="flex-1 overflow-x-hidden overflow-y-auto">
+              <div className="container mx-auto px-4 lg:px-8 py-6 lg:py-8">
+                {children}
+              </div>
+            </main>
           </div>
-        </main>
+        </div>
       </div>
 
-      {/* 2. AGREGAR EL COMPONENTE AQUÍ AL FINAL */}
-      <FloatingThemeToggle />
-      
+
     </div>
   );
 };

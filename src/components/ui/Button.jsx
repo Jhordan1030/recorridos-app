@@ -1,31 +1,31 @@
 // components/ui/Button.jsx
 import React from 'react';
 
-const Button = ({ 
-  children, 
+const Button = ({
+  children,
   variant = 'primary',
   size = 'md',
   loading = false,
   disabled = false,
   className = '',
   icon = null,
-  ...props 
+  ...props
 }) => {
-  const baseClasses = 'font-semibold rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center';
-  
+  const baseClasses = 'font-black uppercase tracking-[0.2em] rounded-2xl transition-all duration-500 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center border border-transparent active:scale-95';
+
   const variants = {
-    primary: 'bg-indigo-600 hover:bg-indigo-700 text-white focus:ring-indigo-500',
-    secondary: 'bg-gray-200 hover:bg-gray-300 text-gray-800 focus:ring-gray-500',
-    danger: 'bg-red-600 hover:bg-red-700 text-white focus:ring-red-500',
-    success: 'bg-green-600 hover:bg-green-700 text-white focus:ring-green-500',
-    warning: 'bg-yellow-500 hover:bg-yellow-600 text-white focus:ring-yellow-500',
-    info: 'bg-blue-500 hover:bg-blue-600 text-white focus:ring-blue-500'
+    primary: 'bg-primary-500 text-white shadow-[0_8px_24px_-8px_rgba(14,165,233,0.5)] hover:shadow-[0_12px_32px_-8px_rgba(14,165,233,0.6)] hover:bg-primary-400',
+    secondary: 'bg-white/5 backdrop-blur-md text-white border-white/10 hover:bg-white/10 hover:border-white/20',
+    danger: 'bg-red-500/10 text-red-500 border-red-500/30 hover:bg-red-500/20 hover:border-red-500/50',
+    success: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30 hover:bg-emerald-500/20 hover:border-emerald-500/50',
+    warning: 'bg-amber-500/10 text-amber-500 border-amber-500/30 hover:bg-amber-500/20 hover:border-amber-500/50',
+    info: 'bg-blue-500/10 text-blue-500 border-blue-500/30 hover:bg-blue-500/20 hover:border-blue-500/50'
   };
 
   const sizes = {
-    sm: 'px-3 py-2 text-sm',
-    md: 'px-4 py-3 text-base',
-    lg: 'px-6 py-4 text-lg'
+    sm: 'px-4 py-2 text-[10px]',
+    md: 'px-6 py-4 text-[11px]',
+    lg: 'px-8 py-5 text-sm'
   };
 
   const classes = `${baseClasses} ${variants[variant]} ${sizes[size]} ${className}`;

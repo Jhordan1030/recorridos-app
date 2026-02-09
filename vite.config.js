@@ -53,7 +53,8 @@ export default defineConfig({
           utils: ['axios', 'html2canvas']
         }
       }
-    }
+    },
+    chunkSizeWarningLimit: 1000
   },
   server: {
     port: 3000

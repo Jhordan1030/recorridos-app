@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 
 const Modal = ({ title, children, onClose, size = 'max-w-md', isOpen }) => {
-  
+
   // Efecto para manejar la tecla Escape y scroll
   useEffect(() => {
     const handleEscape = (event) => {
@@ -31,34 +31,34 @@ const Modal = ({ title, children, onClose, size = 'max-w-md', isOpen }) => {
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Contenedor principal para centrado */}
-      <div 
+      <div
         className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0"
         onClick={handleBackdropClick}
       >
         {/* Backdrop con Blur y color oscuro */}
-        <div 
-          className="fixed inset-0 bg-gray-900/60 dark:bg-black/80 backdrop-blur-sm transition-opacity"
+        <div
+          className="fixed inset-0 bg-slate-950/80 backdrop-blur-md transition-opacity"
           aria-hidden="true"
         />
 
         {/* Panel del Modal */}
-        <div 
+        <div
           className={`
-            relative transform overflow-hidden rounded-2xl text-left shadow-2xl transition-all sm:my-8 sm:w-full ${size}
-            bg-white dark:bg-slate-900 
-            border border-gray-200 dark:border-slate-800
+            relative transform overflow-hidden rounded-[2.5rem] text-left shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] transition-all sm:my-8 sm:w-full ${size}
+            bg-slate-950/90 backdrop-blur-3xl
+            border border-white/10
           `}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="bg-white dark:bg-slate-900 px-6 py-4 border-b border-gray-100 dark:border-slate-800">
+          <div className="bg-white/5 px-8 py-6 border-b border-white/5">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white tracking-tight">
+              <h3 className="text-2xl font-black text-white tracking-tighter">
                 {title}
               </h3>
               <button
                 onClick={onClose}
-                className="rounded-full p-1 text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors focus:outline-none"
+                className="rounded-2xl p-2 text-white/30 hover:text-white hover:bg-white/10 transition-all focus:outline-none"
                 type="button"
               >
                 <X size={20} />
@@ -67,7 +67,7 @@ const Modal = ({ title, children, onClose, size = 'max-w-md', isOpen }) => {
           </div>
 
           {/* Content */}
-          <div className="px-6 py-6 bg-white dark:bg-slate-900 text-gray-700 dark:text-slate-300">
+          <div className="px-8 py-8 bg-transparent text-white/70">
             {children}
           </div>
         </div>

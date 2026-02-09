@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useAlert } from '../context/AlertContext';
-import { updateUser } from '../services/api'; 
+import { updateUser } from '../services/api';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
@@ -59,7 +59,7 @@ const Profile = () => {
         dataToUpdate.password = formData.password;
       }
 
-      const userId = user.id || user.userId; 
+      const userId = user.id || user.userId;
       const response = await updateUser(userId, dataToUpdate);
 
       if (response.data.success) {
@@ -79,189 +79,148 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 py-4 px-3 sm:px-6 lg:px-8 transition-colors duration-300">
-      
-      {/* Header de la Página MEJORADO */}
-      <div className="max-w-5xl mx-auto mb-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-4">
-            {/* Botón volver atrás - Solo en móvil */}
-            <button 
+    <div className="min-h-screen bg-transparent py-10 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
+
+      {/* --- Page Header --- */}
+      <div className="max-w-5xl mx-auto mb-10">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+          <div className="flex items-center gap-6">
+            <button
               onClick={() => navigate(-1)}
-              className="lg:hidden p-2 rounded-lg bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+              className="p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all group"
             >
-              <ArrowLeft size={20} className="text-gray-600 dark:text-slate-400" />
+              <ArrowLeft size={20} className="text-white/50 group-hover:text-white transition-colors" />
             </button>
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-1">
-                Mi Perfil
-              </h1>
-              <p className="text-gray-600 dark:text-slate-400 text-xs sm:text-sm">
-                Gestiona tu información personal y seguridad
-              </p>
+              <h1 className="text-4xl font-black text-white sm:text-5xl tracking-tighter">Mi Perfil</h1>
+              <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mt-3">Configuración de identidad y seguridad</p>
             </div>
           </div>
-          
-          {/* Badge de estado */}
-          <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${
-            user?.rol === 'admin' 
-              ? 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800' 
-              : 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800'
-          }`}>
-            <div className={`w-2 h-2 rounded-full mr-2 ${
-              user?.rol === 'admin' ? 'bg-amber-500' : 'bg-emerald-500'
-            }`}></div>
-            {user?.rol === 'admin' ? 'Administrador' : 'Activo'}
+
+          <div className="inline-flex items-center px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/10 bg-white/5 text-white shadow-2xl shadow-black/20">
+            <div className={`w-2 h-2 rounded-full mr-3 ${user?.rol === 'admin' ? 'bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.5)]' : 'bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.5)]'}`} />
+            {user?.rol === 'admin' ? 'Nivel Administrador' : 'Usuario Activo'}
           </div>
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        {/* COLUMNA IZQUIERDA: Tarjeta de Resumen MEJORADA */}
-        <div className="lg:col-span-1 space-y-6">
-          <Card className="border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-sm">
-            <div className="p-4 sm:p-6 flex flex-col items-center text-center">
-              
-              {/* Avatar Responsive */}
-              <div className="relative mb-4 group">
-                <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-3xl sm:text-5xl font-bold shadow-xl ring-4 ring-white dark:ring-slate-800">
+      <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10">
+
+        {/* --- Identity Summary --- */}
+        <div className="lg:col-span-4 space-y-6">
+          <Card className="bg-white/5 backdrop-blur-md border border-white/10 rounded-[2.5rem] shadow-2xl p-0 overflow-hidden">
+            <div className="p-10 flex flex-col items-center text-center">
+              <div className="relative mb-8 group">
+                <div className="w-36 h-36 rounded-[2.5rem] bg-gradient-to-br from-white/10 to-white/5 border border-white/20 flex items-center justify-center text-white text-6xl font-black shadow-inner shadow-white/10">
                   {getInitial()}
                 </div>
-                <button className="absolute bottom-0 right-0 sm:-bottom-1 sm:-right-1 bg-white dark:bg-slate-800 rounded-full p-2 shadow-lg border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
-                  <Camera className="w-4 h-4 text-gray-600 dark:text-slate-400" />
+                <button className="absolute -bottom-2 -right-2 bg-primary-500 text-white rounded-2xl p-3.5 shadow-2xl shadow-primary-500/30 border border-primary-400/20 hover:scale-110 transition-all duration-300">
+                  <Camera className="w-5 h-5" />
                 </button>
               </div>
 
-              <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-1 truncate max-w-full">
+              <h2 className="text-2xl font-black text-white mb-2 tracking-tighter">
                 {formData.nombre || 'Usuario'}
               </h2>
-              <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mb-4 truncate max-w-full">
+              <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.1em] mb-10">
                 {formData.email}
               </p>
 
-              {/* Stats Responsive */}
-              <div className="w-full grid grid-cols-2 gap-4 mt-4">
-                <div className="text-center p-3 bg-gray-50 dark:bg-slate-800 rounded-lg">
-                  <span className="block text-sm sm:text-base font-bold text-emerald-600 dark:text-emerald-400">✓</span>
-                  <span className="text-xs text-gray-500 dark:text-slate-500">Verificado</span>
+              <div className="w-full grid grid-cols-2 gap-4">
+                <div className="p-5 bg-white/5 rounded-3xl border border-white/5 flex flex-col items-center gap-1">
+                  <span className="text-emerald-400 text-lg font-black tracking-tighter">✓</span>
+                  <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">Validado</span>
                 </div>
-                <div className="text-center p-3 bg-gray-50 dark:bg-slate-800 rounded-lg">
-                  <span className="block text-sm sm:text-base font-bold text-gray-900 dark:text-white">{new Date().getFullYear()}</span>
-                  <span className="text-xs text-gray-500 dark:text-slate-500">Miembro</span>
+                <div className="p-5 bg-white/5 rounded-3xl border border-white/5 flex flex-col items-center gap-1">
+                  <span className="text-white text-lg font-black tracking-tighter">{new Date().getFullYear()}</span>
+                  <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">Periodo</span>
                 </div>
               </div>
             </div>
           </Card>
         </div>
 
-        {/* COLUMNA DERECHA: Formulario MEJORADO */}
-        <div className="lg:col-span-2">
-          <Card className="border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
-            <div className="p-4 sm:p-6 lg:p-8">
-              <div className="mb-6">
-                <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white flex items-center">
-                  <User className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-blue-500" />
-                  Información Personal
-                </h3>
-                <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">
-                  Actualiza tus datos básicos y de contacto
-                </p>
+        {/* --- Sensitive Data Form --- */}
+        <div className="lg:col-span-8">
+          <Card className="bg-white/5 backdrop-blur-md border border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden p-0">
+            <div className="p-8 sm:p-10 lg:p-12">
+              <div className="mb-10 flex items-center gap-5">
+                <div className="h-12 w-12 rounded-2xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center">
+                  <User className="w-6 h-6 text-primary-400" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-white tracking-tighter uppercase tracking-[0.05em]">Datos Maestros</h3>
+                  <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] mt-1">Sincronización de credenciales principales</p>
+                </div>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                  <div className="space-y-1">
-                    <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Nombre Completo</label>
-                    <div className="relative">
-                      <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                        <User className="w-4 h-4 text-gray-400" />
-                      </div>
-                      <Input
-                        type="text"
-                        name="nombre"
-                        value={formData.nombre}
-                        onChange={handleChange}
-                        className="pl-10 bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
-                        placeholder="Tu nombre completo"
-                      />
+              <form onSubmit={handleSubmit} className="space-y-10">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                  <Input
+                    label="Filiación Completa"
+                    type="text"
+                    name="nombre"
+                    value={formData.nombre}
+                    onChange={handleChange}
+                    placeholder="Escriba su nombre..."
+                  />
+                  <Input
+                    label="Canal de Notificación"
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="su@email.com"
+                  />
+                </div>
+
+                <div className="pt-10 border-t border-white/5">
+                  <div className="mb-8 flex items-center gap-5">
+                    <div className="h-12 w-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                      <Shield className="w-6 h-6 text-amber-400" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-black text-white tracking-tighter uppercase tracking-[0.05em]">Cifrado y Acceso</h3>
+                      <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] mt-1">Gestión de llaves criptográficas</p>
                     </div>
                   </div>
 
-                  <div className="space-y-1">
-                    <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Correo Electrónico</label>
-                    <div className="relative">
-                      <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                        <Mail className="w-4 h-4 text-gray-400" />
-                      </div>
-                      <Input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        className="pl-10 bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
-                        placeholder="tu@email.com"
-                      />
-                    </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                    <Input
+                      label="Nueva Contraseña"
+                      type="password"
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      placeholder="••••••••"
+                    />
+                    <Input
+                      label="Validar Secreto"
+                      type="password"
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      placeholder="••••••••"
+                    />
                   </div>
                 </div>
 
-                {/* Sección Seguridad MEJORADA */}
-                <div className="pt-6 border-t border-gray-100 dark:border-slate-800">
-                  <div className="mb-6">
-                    <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white flex items-center">
-                      <Key className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-amber-500" />
-                      Seguridad
-                    </h3>
-                    <p className="text-xs sm:text-sm text-gray-500 dark:text-slate-400 mt-1">
-                      Cambia tu contraseña (opcional)
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                    <div className="space-y-1">
-                      <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Nueva Contraseña</label>
-                      <Input
-                        type="password"
-                        name="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        placeholder="••••••••"
-                        className="bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white text-sm sm:text-base"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Confirmar</label>
-                      <Input
-                        type="password"
-                        name="confirmPassword"
-                        value={formData.confirmPassword}
-                        onChange={handleChange}
-                        placeholder="••••••••"
-                        className="bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white text-sm sm:text-base"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Botones Responsive */}
-                <div className="pt-6 flex flex-col-reverse sm:flex-row gap-3 border-t border-gray-100 dark:border-slate-800">
+                <div className="pt-10 flex flex-col-reverse sm:flex-row gap-6 border-t border-white/5">
                   <Button
                     type="button"
                     variant="secondary"
                     onClick={() => navigate(-1)}
-                    className="w-full sm:w-auto justify-center bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200 border-gray-300 dark:border-slate-600"
+                    className="w-full sm:w-auto"
                   >
-                    Cancelar
+                    Retroceder
                   </Button>
                   <Button
                     type="submit"
                     variant="primary"
-                    loading={loading}
-                    className="w-full sm:w-auto justify-center shadow-lg shadow-blue-500/20 flex items-center gap-2 order-first sm:order-last"
+                    disabled={loading}
+                    className="w-full sm:w-auto shadow-2xl shadow-primary-500/20 px-10 ml-auto"
                   >
-                    <Save className="w-4 h-4" />
-                    Guardar Cambios
+                    {loading ? 'Procesando...' : 'Fijar Atributos'}
                   </Button>
                 </div>
               </form>

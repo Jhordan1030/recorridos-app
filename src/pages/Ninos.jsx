@@ -7,11 +7,13 @@ import ConfirmModal from "../components/ui/ConfirmModal";
 import Alert from "../components/ui/Alert";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
+import Card from "../components/ui/Card";
+import Skeleton from "../components/ui/Skeleton";
 
 const Ninos = () => {
   const { ninos, setNinos } = useApp();
   const { showAlert } = useAlert();
-  
+
   const [formData, setFormData] = useState({
     nombre: '',
     apellidos: '',
@@ -68,7 +70,7 @@ const Ninos = () => {
       showAlert('error', 'Nombre y apellidos son requeridos');
       return;
     }
-    
+
     setLoading(true);
     try {
       let response;
@@ -104,7 +106,7 @@ const Ninos = () => {
 
   const confirmDelete = async () => {
     if (!ninoAEliminar) return;
-    
+
     setLoading(true);
     try {
       const response = await deleteNino(ninoAEliminar);
@@ -144,35 +146,31 @@ const Ninos = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
+    <div className="min-h-screen bg-transparent py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
       <Alert />
-      
-      {/* --- Header Section --- */}
-      <div className="max-w-7xl mx-auto mb-8">
-        <div className="md:flex md:items-center md:justify-between md:space-x-5">
-          <div className="flex items-start space-x-5">
+
+      {/* --- Page Header --- */}
+      <div className="max-w-7xl mx-auto mb-10">
+        <div className="md:flex md:items-center md:justify-between md:space-x-8">
+          <div className="flex items-start">
             <div className="pt-1.5">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl">Gestión de Niños</h1>
-              <p className="text-sm font-medium text-gray-500 dark:text-slate-400 mt-1">
-                Administra la información de los estudiantes registrados en el sistema.
-              </p>
+              <h1 className="text-4xl font-black text-white sm:text-5xl tracking-tighter">Niños</h1>
+              <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mt-3">Gestión de estudiantes y asignaciones</p>
             </div>
           </div>
-          <div className="mt-6 flex flex-col-reverse justify-stretch space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-y-0 sm:space-x-3 sm:space-x-reverse md:mt-0 md:flex-row md:space-x-3">
+          <div className="mt-8 flex flex-col-reverse justify-stretch gap-4 md:mt-0 md:flex-row md:items-center">
             <Button
-              variant="white" // Asegúrate que tu botón 'white' maneje dark mode, o usa secondary
+              variant="secondary"
               onClick={loadNinos}
               disabled={loading}
-              icon="🔄"
-              className="w-full md:w-auto justify-center shadow-sm bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200 border border-gray-300 dark:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-700"
+              className="w-full md:w-auto"
             >
-              Actualizar
+              Refrescar
             </Button>
             <Button
               variant="primary"
               onClick={handleOpenCreateModal}
-              icon="➕"
-              className="w-full md:w-auto justify-center shadow-md hover:shadow-lg transition-shadow"
+              className="w-full md:w-auto shadow-2xl shadow-primary-500/20"
             >
               Nuevo Niño
             </Button>
@@ -180,108 +178,85 @@ const Ninos = () => {
         </div>
       </div>
 
-      {/* --- Stats & Content --- */}
+      {/* --- Main Content --- */}
       <div className="max-w-7xl mx-auto">
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-          <div className="bg-white dark:bg-slate-900 overflow-hidden rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm px-4 py-5 sm:p-6 transition-colors">
-            <dt className="text-sm font-medium text-gray-500 dark:text-slate-400 truncate">Total Estudiantes</dt>
-            <dd className="mt-1 text-3xl font-semibold text-gray-900 dark:text-white">{ninos.length}</dd>
-          </div>
-          <div className="bg-white dark:bg-slate-900 overflow-hidden rounded-xl border border-gray-100 dark:border-slate-800 shadow-sm px-4 py-5 sm:p-6 transition-colors">
-            <dt className="text-sm font-medium text-gray-500 dark:text-slate-400 truncate">Estado</dt>
-            <dd className="mt-1 text-3xl font-semibold text-emerald-600 dark:text-emerald-400">Activos</dd>
-          </div>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-10">
+          <Card className="p-8">
+            <dt className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">Total Estudiantes</dt>
+            <dd className="text-4xl font-black text-white tracking-tighter">{ninos.length}</dd>
+          </Card>
+          <Card className="p-8 border-emerald-500/20">
+            <dt className="text-[10px] font-black text-emerald-400/50 uppercase tracking-[0.2em] mb-2">Estado Sistema</dt>
+            <dd className="text-4xl font-black text-emerald-400 tracking-tighter uppercase">Óptimo</dd>
+          </Card>
         </div>
 
-        {/* Loading State */}
-        {loading && ninos.length === 0 && (
-          <div className="flex justify-center items-center h-64 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 border-dashed">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-gray-500 dark:text-slate-400 font-medium">Cargando información...</p>
-            </div>
+        {loading ? (
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {[...Array(8)].map((_, i) => (
+              <Skeleton key={i} variant="card" className="h-[300px]" />
+            ))}
           </div>
-        )}
-
-        {/* Empty State */}
-        {!loading && ninos.length === 0 && (
-          <div className="text-center py-16 bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 border-dashed">
-            <div className="mx-auto h-12 w-12 text-gray-400 dark:text-slate-500 text-4xl">👶</div>
-            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">No hay niños registrados</h3>
-            <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">Comienza agregando el primer niño al sistema.</p>
-            <div className="mt-6">
-              <Button variant="primary" onClick={handleOpenCreateModal} icon="➕">
-                Registrar Niño
-              </Button>
-            </div>
+        ) : ninos.length === 0 ? (
+          <div className="text-center py-24 bg-white/5 rounded-[2.5rem] border border-white/5 border-dashed">
+            <div className="text-5xl mb-6 opacity-30">👶</div>
+            <h3 className="text-xl font-black text-white mb-2">Sin registros</h3>
+            <p className="text-white/20 text-[10px] font-black uppercase tracking-widest">Inicia el registro de estudiantes para comenzar</p>
           </div>
-        )}
-
-        {/* Grid de Niños */}
-        {!loading && ninos.length > 0 && (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        ) : (
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {ninos.map((nino) => (
-              <div 
-                key={nino.id} 
-                className="group bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-blue-300 dark:hover:border-blue-700 transition-all duration-300 flex flex-col overflow-hidden"
+              <div
+                key={nino.id}
+                className="group relative bg-white/5 backdrop-blur-md rounded-[2rem] border border-white/10 p-7 hover:bg-white/10 transition-all duration-500 hover:shadow-2xl flex flex-col"
               >
-                {/* Card Header */}
-                <div className="p-5 flex-1">
-                  <div className="flex justify-between items-start mb-4">
-                    {/* Avatar con Iniciales */}
-                    <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-sm">
-                        {nino.nombre.charAt(0)}{nino.apellidos.charAt(0)}
-                    </div>
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800">
-                      Activo
-                    </span>
+                <div className="flex items-start justify-between mb-6">
+                  {/* Avatar */}
+                  <div className="h-14 w-14 rounded-2xl bg-white/10 text-white flex items-center justify-center font-black text-xs shadow-2xl border border-white/20 ring-4 ring-white/5">
+                    {nino.nombre?.charAt(0) || '?'}{nino.apellidos?.charAt(0) || '?'}
                   </div>
-                  
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1 line-clamp-1" title={`${nino.nombre} ${nino.apellidos}`}>
+                  <span className="inline-flex items-center px-3 py-1 text-[10px] font-black uppercase tracking-widest border border-emerald-400/20 bg-emerald-400/10 text-emerald-400 rounded-full">
+                    Activo
+                  </span>
+                </div>
+
+                <div className="mb-8">
+                  <h3 className="text-xl font-black text-white truncate tracking-tighter" title={`${nino.nombre} ${nino.apellidos}`}>
                     {nino.nombre} {nino.apellidos}
                   </h3>
-                  
-                  <div className="space-y-3 mt-4">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-500 dark:text-slate-400 flex items-center gap-1">
-                        <span className="opacity-60">📍</span> Dirección
-                      </span>
-                    </div>
-                    <p className="text-sm font-medium text-gray-700 dark:text-slate-300 bg-gray-50 dark:bg-slate-800 p-2 rounded border border-gray-100 dark:border-slate-700 line-clamp-2 min-h-[2.5rem]">
-                        {nino.direccion || 'No especificada'}
+                  <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mt-1">
+                    {nino.telefono_contacto || 'SIN TELÉFONO'}
+                  </p>
+                </div>
+
+                <div className="space-y-4 py-6 border-t border-white/5">
+                  <div className="flex items-start flex-col gap-2">
+                    <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">Dirección Residencial</span>
+                    <p className="text-[11px] font-black text-white/60 uppercase tracking-tight leading-relaxed line-clamp-2">
+                      {nino.direccion || 'Dirección no registrada'}
                     </p>
-                    
-                    <div className="flex items-center justify-between text-sm pt-2">
-                      <span className="text-gray-500 dark:text-slate-400 flex items-center gap-1">
-                        <span className="opacity-60">📞</span> Contacto
-                      </span>
-                      <span className="font-mono font-medium text-gray-700 dark:text-slate-300">
-                        {nino.telefono_contacto || 'N/A'}
-                      </span>
-                    </div>
                   </div>
                 </div>
 
-                {/* Card Actions - Botones ocultos que aparecen con hover */}
-                <div className="bg-gray-50 dark:bg-slate-800/50 px-5 py-3 border-t border-gray-100 dark:border-slate-800 flex gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
+                {/* Card Actions Footer */}
+                <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-xl rounded-[2rem] flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-500 scale-95 group-hover:scale-100 z-10 pointer-events-none group-hover:pointer-events-auto">
                   <Button
-                    variant="secondary" // Cambiado a secondary para mejor contraste en dark mode
+                    variant="secondary"
                     size="sm"
-                    className="flex-1 justify-center text-xs bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-600"
+                    className="shadow-2xl"
                     onClick={() => handleEdit(nino)}
-                    icon="✏️"
+                    title="Editar"
                   >
-                    Editar
+                    ✏️
                   </Button>
                   <Button
                     variant="danger"
                     size="sm"
-                    className="flex-1 justify-center text-xs"
+                    className="shadow-2xl"
                     onClick={() => handleDeleteClick(nino.id)}
-                    icon="🗑️"
+                    title="Eliminar"
                   >
-                    Eliminar
+                    🗑️
                   </Button>
                 </div>
               </div>
@@ -305,98 +280,55 @@ const Ninos = () => {
       <Modal
         isOpen={mostrarModal}
         onClose={handleCloseModal}
-        title={editMode ? 'Editar Niño' : 'Registrar Nuevo Niño'}
-        size="max-w-2xl"
+        title={editMode ? 'Editar Niño' : 'Registrar Estudiante'}
+        size="max-w-xl"
       >
-        <div className="p-6 bg-white dark:bg-slate-900">
+        <div className="p-0 bg-transparent">
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-              
-              {/* Nombre */}
-              <div className="sm:col-span-3">
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
-                  Nombre <span className="text-red-500">*</span>
-                </label>
-                <Input
-                  type="text"
-                  name="nombre"
-                  value={formData.nombre}
-                  onChange={handleChange}
-                  placeholder="Ej: Juan"
-                  required
-                  disabled={loading}
-                  className="bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
-                />
-              </div>
-
-              {/* Apellidos */}
-              <div className="sm:col-span-3">
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
-                  Apellidos <span className="text-red-500">*</span>
-                </label>
-                <Input
-                  type="text"
-                  name="apellidos"
-                  value={formData.apellidos}
-                  onChange={handleChange}
-                  placeholder="Ej: Pérez García"
-                  required
-                  disabled={loading}
-                  className="bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
-                />
-              </div>
-
-              {/* Dirección */}
-              <div className="sm:col-span-6">
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
-                  Dirección
-                </label>
-                <Input
-                  type="text"
-                  name="direccion"
-                  value={formData.direccion}
-                  onChange={handleChange}
-                  placeholder="Ej: Calle Principal 123, Sector Norte"
-                  disabled={loading}
-                  className="bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
-                />
-              </div>
-
-              {/* Teléfono */}
-              <div className="sm:col-span-3">
-                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">
-                  Teléfono de Contacto
-                </label>
-                <Input
-                  type="tel"
-                  name="telefono_contacto"
-                  value={formData.telefono_contacto}
-                  onChange={handleChange}
-                  placeholder="0999999999"
-                  disabled={loading}
-                  className="bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500"
-                />
-              </div>
+            <div className="grid grid-cols-2 gap-6">
+              <Input
+                label="Nombre"
+                name="nombre"
+                value={formData.nombre}
+                onChange={handleChange}
+                placeholder="Ej: Juan"
+                required
+                disabled={loading}
+              />
+              <Input
+                label="Apellidos"
+                name="apellidos"
+                value={formData.apellidos}
+                onChange={handleChange}
+                placeholder="Ej: Pérez García"
+                required
+                disabled={loading}
+              />
             </div>
 
-            {/* Footer Actions */}
-            <div className="mt-8 pt-5 border-t border-gray-100 dark:border-slate-700 flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-3 gap-3 sm:gap-0">
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={handleCloseModal}
-                disabled={loading}
-                className="w-full sm:w-auto justify-center bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200 border border-gray-300 dark:border-slate-600 hover:bg-gray-50 dark:hover:bg-slate-700"
-              >
-                Cancelar
-              </Button>
-              <Button
-                type="submit"
-                variant="primary"
-                loading={loading}
-                className="w-full sm:w-auto justify-center"
-              >
-                {editMode ? 'Guardar Cambios' : 'Registrar Niño'}
+            <Input
+              label="Dirección Residencial"
+              name="direccion"
+              value={formData.direccion}
+              onChange={handleChange}
+              placeholder="Ej: Calle Principal 123, Sector Norte"
+              disabled={loading}
+            />
+
+            <Input
+              label="Teléfono de Contacto"
+              name="telefono_contacto"
+              type="tel"
+              value={formData.telefono_contacto}
+              onChange={handleChange}
+              placeholder="0999999999"
+              disabled={loading}
+            />
+
+            <div className="mt-10 pt-8 border-t border-white/5 flex flex-col-reverse sm:flex-row sm:justify-end gap-4">
+              <Button type="button" onClick={handleCloseModal} variant="secondary" className="w-full sm:w-auto">Cancelar</Button>
+              <Button type="submit" variant="primary" loading={loading} className="w-full sm:w-auto">
+                {editMode ? 'Guardar Cambios' : 'Registrar'}
               </Button>
             </div>
           </form>
