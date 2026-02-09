@@ -56,7 +56,7 @@ const Layout = ({ children }) => {
   }, [isMobile, isSidebarOpen]);
 
   return (
-    <div className="min-h-screen flex transition-colors duration-300">
+    <div className="min-h-screen flex bg-slate-100/50 transition-colors duration-300 font-sans text-slate-900">
       {/* Sidebar */}
       {user && (
         <div ref={sidebarRef}>
@@ -76,7 +76,7 @@ const Layout = ({ children }) => {
         <div className="flex flex-1">
           {/* Espaciador para el Sidebar Flotante en Desktop */}
           {user && !isMobile && (
-            <div className={`hidden lg:block ${isCollapsed ? 'w-32' : 'w-[22rem]'} flex-shrink-0 transition-all duration-500 ease-in-out`} />
+            <div className={`hidden lg:block ${isCollapsed ? 'w-24' : 'w-[23rem]'} flex-shrink-0 transition-all duration-500 ease-in-out`} />
           )}
 
           <div className="flex-1 flex flex-col min-w-0">
@@ -91,7 +91,7 @@ const Layout = ({ children }) => {
 
             {/* Contenido de la página */}
             <main className="flex-1 overflow-x-hidden overflow-y-auto">
-              <div className="container mx-auto px-4 lg:px-8 py-6 lg:py-8">
+              <div className="w-full max-w-[2000px] mx-auto px-4 lg:px-6 pb-8">
                 {children}
               </div>
             </main>

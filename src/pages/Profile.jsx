@@ -116,18 +116,18 @@ const Profile = () => {
           <div className="flex items-center gap-6">
             <button
               onClick={() => navigate(-1)}
-              className="p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all group"
+              className="p-3 rounded-2xl bg-white border border-slate-200 hover:bg-slate-50 transition-all group shadow-sm"
             >
-              <ArrowLeft size={20} className="text-white/50 group-hover:text-white transition-colors" />
+              <ArrowLeft size={20} className="text-slate-400 group-hover:text-slate-900 transition-colors" />
             </button>
             <div>
-              <h1 className="text-4xl font-black text-white sm:text-5xl tracking-tighter">Mi Perfil</h1>
-              <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mt-3">Configuración de identidad y seguridad</p>
+              <h1 className="text-4xl font-black text-slate-900 sm:text-5xl tracking-tighter">Mi Perfil</h1>
+              <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mt-3">Configuración de identidad y seguridad</p>
             </div>
           </div>
 
-          <div className="inline-flex items-center px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/10 bg-white/5 text-white shadow-2xl shadow-black/20">
-            <div className={`w-2 h-2 rounded-full mr-3 ${user?.rol === 'admin' ? 'bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.5)]' : 'bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.5)]'}`} />
+          <div className="inline-flex items-center px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border border-slate-200 bg-white text-slate-700 shadow-sm">
+            <div className={`w-2 h-2 rounded-full mr-3 ${user?.rol === 'admin' ? 'bg-amber-500 shadow-[0_0_10px_rgba(251,191,36,0.5)]' : 'bg-emerald-500 shadow-[0_0_10px_rgba(52,211,153,0.5)]'}`} />
             {user?.rol === 'admin' ? 'Nivel Administrador' : 'Usuario Activo'}
           </div>
         </div>
@@ -137,10 +137,10 @@ const Profile = () => {
 
         {/* --- Identity Summary --- */}
         <div className="lg:col-span-4 space-y-6">
-          <Card className="bg-white/5 backdrop-blur-md border border-white/10 rounded-[2.5rem] shadow-2xl p-0 overflow-hidden">
+          <Card className="bg-white border border-slate-200 rounded-[2.5rem] shadow-xl p-0 overflow-hidden">
             <div className="p-10 flex flex-col items-center text-center">
               <div className="relative mb-8 group">
-                <div className="w-36 h-36 rounded-[2.5rem] bg-gradient-to-br from-white/10 to-white/5 border border-white/20 flex items-center justify-center text-white text-6xl font-black shadow-inner shadow-white/10">
+                <div className="w-36 h-36 rounded-[2.5rem] bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 text-6xl font-black shadow-inner">
                   {getInitial()}
                 </div>
                 <button className="absolute -bottom-2 -right-2 bg-primary-500 text-white rounded-2xl p-3.5 shadow-2xl shadow-primary-500/30 border border-primary-400/20 hover:scale-110 transition-all duration-300">
@@ -148,21 +148,21 @@ const Profile = () => {
                 </button>
               </div>
 
-              <h2 className="text-2xl font-black text-white mb-2 tracking-tighter">
+              <h2 className="text-2xl font-black text-slate-900 mb-2 tracking-tighter">
                 {formData.nombre || 'Jhordan Huera'}
               </h2>
-              <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.1em] mb-10">
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.1em] mb-10">
                 {user?.rol === 'admin' ? 'Administrador del Sistema' : 'Usuario del Sistema'}
               </p>
 
               <div className="w-full grid grid-cols-2 gap-4">
-                <div className="p-5 bg-white/5 rounded-3xl border border-white/5 flex flex-col items-center gap-1">
-                  <span className="text-emerald-400 text-lg font-black tracking-tighter">✓</span>
-                  <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">Validado</span>
+                <div className="p-5 bg-slate-50 rounded-3xl border border-slate-100 flex flex-col items-center gap-1">
+                  <span className="text-emerald-500 text-lg font-black tracking-tighter">✓</span>
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Validado</span>
                 </div>
-                <div className="p-5 bg-white/5 rounded-3xl border border-white/5 flex flex-col items-center gap-1">
-                  <span className="text-white text-lg font-black tracking-tighter">{new Date().getFullYear()}</span>
-                  <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">Periodo</span>
+                <div className="p-5 bg-slate-50 rounded-3xl border border-slate-100 flex flex-col items-center gap-1">
+                  <span className="text-slate-900 text-lg font-black tracking-tighter">{new Date().getFullYear()}</span>
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Periodo</span>
                 </div>
               </div>
             </div>
@@ -171,15 +171,15 @@ const Profile = () => {
 
         {/* --- Sensitive Data Form --- */}
         <div className="lg:col-span-8">
-          <Card className="bg-white/5 backdrop-blur-md border border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden p-0">
+          <Card className="bg-white border border-slate-200 rounded-[2.5rem] shadow-xl overflow-hidden p-0">
             <div className="p-8 sm:p-10 lg:p-12">
               <div className="mb-10 flex items-center gap-5">
-                <div className="h-12 w-12 rounded-2xl bg-primary-500/10 border border-primary-500/20 flex items-center justify-center">
-                  <User className="w-6 h-6 text-primary-400" />
+                <div className="h-12 w-12 rounded-2xl bg-primary-100 border border-primary-200 flex items-center justify-center">
+                  <User className="w-6 h-6 text-primary-600" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-black text-white tracking-tighter uppercase tracking-[0.05em]">Datos Maestros</h3>
-                  <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] mt-1">Sincronización de credenciales principales</p>
+                  <h3 className="text-xl font-black text-slate-900 tracking-tighter uppercase tracking-[0.05em]">Datos Maestros</h3>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">Sincronización de credenciales principales</p>
                 </div>
               </div>
 
@@ -203,14 +203,14 @@ const Profile = () => {
                   />
                 </div>
 
-                <div className="pt-10 border-t border-white/5">
+                <div className="pt-10 border-t border-slate-100">
                   <div className="mb-8 flex items-center gap-5">
-                    <div className="h-12 w-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
-                      <Shield className="w-6 h-6 text-amber-400" />
+                    <div className="h-12 w-12 rounded-2xl bg-amber-100 border border-amber-200 flex items-center justify-center">
+                      <Shield className="w-6 h-6 text-amber-600" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-black text-white tracking-tighter uppercase tracking-[0.05em]">Cifrado y Acceso</h3>
-                      <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] mt-1">Gestión de llaves criptográficas</p>
+                      <h3 className="text-xl font-black text-slate-900 tracking-tighter uppercase tracking-[0.05em]">Cifrado y Acceso</h3>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">Gestión de llaves criptográficas</p>
                     </div>
                   </div>
 
@@ -234,7 +234,7 @@ const Profile = () => {
                   </div>
                 </div>
 
-                <div className="pt-10 flex flex-col-reverse sm:flex-row gap-6 border-t border-white/5">
+                <div className="pt-10 flex flex-col-reverse sm:flex-row gap-6 border-t border-slate-100">
                   <Button
                     type="button"
                     variant="secondary"

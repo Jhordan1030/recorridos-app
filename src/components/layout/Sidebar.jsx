@@ -77,62 +77,39 @@ const Sidebar = ({ isOpen, onClose, isAdmin, isMobile, isCollapsed, setIsCollaps
         />
       )}
 
-      {/* Sidebar - FLOATING MODE */}
+      {/* Sidebar - FLOATING ENTERPRISE MODE */}
       <aside className={`
-        fixed inset-y-0 left-0 z-50 lg:z-30
-        lg:m-4 lg:rounded-[2.5rem]
-        glass-sidebar
-        transform transition-all duration-500 ease-in-out
+        fixed inset-y-0 left-0 lg:inset-y-auto lg:top-4 lg:bottom-4 lg:left-4 z-50 lg:z-30
+        bg-slate-50
+        transform transition-all duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-        ${isCollapsed && !isMobile ? 'lg:w-24' : 'lg:w-80'}
-        ${isMobile ? 'w-full h-full rounded-none inset-0 p-4' : 'h-[calc(100vh-2rem)]'}
+        ${isCollapsed && !isMobile ? 'lg:w-[90px]' : 'lg:w-[320px]'}
+        ${isMobile ? 'w-[300px] h-full shadow-2xl' : 'lg:rounded-[2.5rem] lg:shadow-2xl lg:border border-slate-200'}
         flex flex-col
         overflow-hidden
-        border border-white/10
+        ${isMobile ? 'border-r border-slate-200' : ''}
       `}>
 
         {/* Header */}
-        <div className={`flex-shrink-0 ${isCollapsed && !isMobile ? 'px-4 py-5' : 'px-6 py-5'} border-b border-white/10`}>
-          <div className="flex items-center justify-between">
-            {/* Solo texto del nombre - SIN LOGO */}
-            {(!isCollapsed || isMobile) ? (
+        <div className={`flex-shrink-0 h-20 flex items-center ${isCollapsed && !isMobile ? 'justify-center' : 'px-6'} border-b border-slate-200/50`}>
+          <div className="flex items-center gap-4 overflow-hidden">
+            <div className={`
+              bg-primary-600 rounded-2xl flex-shrink-0 flex items-center justify-center shadow-lg shadow-primary-600/20 transition-all duration-300
+              ${isCollapsed && !isMobile ? 'w-10 h-10' : 'w-10 h-10'}
+            `}>
+              <span className="text-white font-black text-sm uppercase tracking-tighter">R</span>
+            </div>
+            {(!isCollapsed || isMobile) && (
               <div className="flex flex-col">
-                <h2 className="text-2xl font-black text-white tracking-tighter">Recorridos</h2>
-                <p className="text-[10px] text-white/30 font-black uppercase tracking-widest leading-none">Management System</p>
-              </div>
-            ) : (
-              <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-2xl border border-white/20 mx-auto transition-all hover:bg-white/20">
-                <span className="text-white font-black text-sm tracking-tighter">RA</span>
+                <h2 className="text-lg font-black text-slate-900 tracking-tighter uppercase leading-none">Recorridos</h2>
+                <span className="text-[9px] font-bold text-slate-400 tracking-[0.2em] uppercase mt-1">App v2.0</span>
               </div>
             )}
-
-            {/* Botones de control */}
-            <div className="flex items-center space-x-1">
-              {/* Botón cerrar en móvil */}
-              {isMobile && (
-                <button
-                  onClick={onClose}
-                  className="lg:hidden p-2 text-white/40 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-200"
-                >
-                  <X size={18} />
-                </button>
-              )}
-
-              {/* Botón colapsar en desktop */}
-              {!isMobile && (
-                <button
-                  onClick={() => setIsCollapsed(!isCollapsed)}
-                  className="hidden lg:flex p-2 text-white/40 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-200"
-                >
-                  {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-                </button>
-              )}
-            </div>
           </div>
         </div>
 
         {/* Navegación */}
-        <nav className="flex-1 overflow-y-auto py-4">
+        <nav className="flex-1 overflow-y-auto py-6">
           <ul className="space-y-2 px-4">
             {menuItems.map((item) => {
               const Icon = item.icon;
@@ -149,43 +126,32 @@ const Sidebar = ({ isOpen, onClose, isAdmin, isMobile, isCollapsed, setIsCollaps
                       }
                     }}
                     className={`
-                      group relative flex items-center rounded-2xl transition-all duration-200
+                      group relative flex items-center py-3 rounded-2xl transition-all duration-300
                       ${isActive
-                        ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/25'
-                        : 'text-white/70 hover:bg-white/10 hover:text-white hover:shadow-xl'
+                        ? 'bg-primary-50 text-primary-700 shadow-sm ring-1 ring-primary-100'
+                        : 'text-slate-500 hover:bg-white hover:text-slate-900 hover:shadow-md hover:shadow-slate-200/50'
                       }
-                      ${(isCollapsed && !isMobile) ? 'justify-center p-3' : 'space-x-4 px-4 py-3'}
-                      overflow-hidden
+                      ${(isCollapsed && !isMobile) ? 'justify-center px-0 h-12 w-12 mx-auto' : 'px-5 gap-4'}
                     `}
                   >
-                    <div className={`absolute inset-0 bg-gradient-to-r from-white/10 to-white/5 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-                      } transition-opacity duration-200`} />
-
                     <Icon
-                      size={20}
-                      className={`relative z-10 flex-shrink-0 ${isActive ? 'text-white' : 'text-white/40 group-hover:text-white'
-                        } transition-colors duration-200`}
+                      size={isCollapsed && !isMobile ? 22 : 20}
+                      className={`flex-shrink-0 ${isActive ? 'text-primary-600' : 'text-slate-400 group-hover:text-primary-500'} transition-colors duration-300`}
                     />
 
                     {(!isCollapsed || isMobile) && (
-                      <div className="relative z-10 flex-1 min-w-0">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-black uppercase tracking-widest">{item.label}</span>
-                          {item.badge && (
-                            <span className="bg-amber-400/20 text-amber-400 text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest border border-amber-400/20">
-                              {item.badge}
-                            </span>
-                          )}
-                        </div>
-                        <p className={`text-[10px] mt-0.5 truncate uppercase tracking-widest font-bold ${isActive ? 'text-white/80' : 'text-white/30 group-hover:text-white/60'
-                          }`}>
+                      <div className="flex-1 min-w-0">
+                        <span className={`block text-sm font-bold tracking-tight ${isActive ? 'text-primary-900' : 'group-hover:text-slate-900'}`}>
+                          {item.label}
+                        </span>
+                        <span className="block text-[10px] font-medium text-slate-400 truncate group-hover:text-slate-500 transition-colors">
                           {item.description}
-                        </p>
+                        </span>
                       </div>
                     )}
 
                     {isActive && (!isCollapsed || isMobile) && (
-                      <div className="absolute right-3 w-2 h-2 bg-white rounded-full" />
+                      <div className="w-1.5 h-1.5 bg-primary-500 rounded-full shadow-[0_0_8px_rgba(79,70,229,0.5)]" />
                     )}
                   </Link>
                 </li>
@@ -194,34 +160,26 @@ const Sidebar = ({ isOpen, onClose, isAdmin, isMobile, isCollapsed, setIsCollaps
           </ul>
         </nav>
 
-        {/* Footer - SOLO LOGOUT */}
-        <div className={`flex-shrink-0 p-6 border-t border-white/5 bg-white/5 ${(isCollapsed && !isMobile) ? 'text-center' : ''}`}>
+        {/* Footer */}
+        <div className={`flex-shrink-0 p-5 mt-auto border-t border-slate-200/50`}>
+
+
           <button
             onClick={handleLogout}
             className={`
-              group flex items-center rounded-2xl transition-all duration-200
-              text-white/70 hover:bg-red-400/10 hover:text-red-400 w-full
-              ${(isCollapsed && !isMobile) ? 'justify-center p-3' : 'space-x-4 px-5 py-4'}
-              relative overflow-hidden border border-transparent hover:border-red-400/20
+              flex items-center h-12 rounded-2xl transition-all duration-300
+              text-slate-400 hover:bg-red-50 hover:text-red-600 hover:shadow-lg hover:shadow-red-500/10 w-full group
+              ${(isCollapsed && !isMobile) ? 'justify-center px-0 w-12 mx-auto' : 'px-5 gap-3'}
             `}
           >
             <LogOut
-              size={18}
-              className="relative z-10 flex-shrink-0 text-white/30 group-hover:text-red-400 transition-colors duration-200"
+              size={20}
+              className="flex-shrink-0 transition-transform duration-300 group-hover:-translate-x-1"
             />
             {(!isCollapsed || isMobile) && (
-              <span className="relative z-10 font-black text-[10px] uppercase tracking-widest">Cerrar sesión</span>
+              <span className="text-xs font-black tracking-wide uppercase">Cerrar Sesión</span>
             )}
           </button>
-
-          {/* Información de versión */}
-          {(!isCollapsed || isMobile) && (
-            <div className="mt-8 text-center">
-              <div className="text-[10px] text-white/20 font-black uppercase tracking-widest">
-                v3.1.4
-              </div>
-            </div>
-          )}
         </div>
       </aside>
     </>

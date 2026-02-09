@@ -4,23 +4,36 @@ const Input = ({
   label,
   error,
   className = '',
+  id,
   ...props
 }) => {
-  const baseClasses = 'px-4 py-3 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary-500/50 focus:border-white/20 block w-full transition-all duration-300 bg-white/5 text-white placeholder-white/20 outline-none backdrop-blur-sm';
-  const errorClasses = error ? 'border-red-500/50 focus:ring-red-500/30' : '';
-
-  const inputClasses = `${baseClasses} ${errorClasses} ${className}`;
-
   return (
-    <div className="flex flex-col space-y-2">
+    <div className="flex flex-col space-y-1.5 w-full">
       {label && (
-        <label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-1">
+        <label
+          htmlFor={id}
+          className="text-xs font-semibold text-slate-500 tracking-tight block pl-0.5"
+        >
           {label}
         </label>
       )}
-      <input className={inputClasses} {...props} />
+      <div className="relative group/input">
+        <input
+          id={id}
+          className={`
+            w-full transition-all duration-200 bg-white border border-slate-200
+            rounded-lg h-10 px-3 text-slate-900 text-sm outline-none
+            placeholder:text-slate-400
+            focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10
+            disabled:opacity-50 disabled:cursor-not-allowed disabled:grayscale
+            ${error ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500/10' : ''}
+            ${className}
+          `}
+          {...props}
+        />
+      </div>
       {error && (
-        <p className="text-red-400 text-[10px] font-black uppercase tracking-widest pl-1">{error}</p>
+        <p className="text-red-400 text-xs font-medium pl-0.5 animate-fade-in">{error}</p>
       )}
     </div>
   );

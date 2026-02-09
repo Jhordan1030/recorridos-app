@@ -5,12 +5,19 @@ const Card = ({
   className = '',
   padding = 'p-6',
   hover = false,
+  variant = 'base',
   ...props
 }) => {
-  const baseClasses = 'backdrop-blur-xl border border-white/10 rounded-2xl transition-all duration-300';
-  const glassClass = className.includes('bg-') ? '' : 'bg-white/5';
-  const hoverClass = hover ? 'hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2' : '';
-  const classes = `${baseClasses} ${glassClass} ${padding} ${hoverClass} ${className}`;
+  const baseClasses = 'transition-all duration-200 border rounded-xl overflow-hidden';
+
+  const variants = {
+    base: 'bg-white border-slate-200 shadow-sm',
+    raised: 'bg-white border-slate-200 shadow-md',
+    subtle: 'bg-slate-50 border-slate-100 shadow-none'
+  };
+
+  const hoverClasses = hover ? 'hover:border-primary-200 hover:shadow-md hover:-translate-y-0.5' : '';
+  const classes = `${baseClasses} ${variants[variant]} ${padding} ${hoverClasses} ${className}`;
 
   return (
     <div className={classes} {...props}>
@@ -32,7 +39,7 @@ export const CardContent = ({ children, className = '' }) => (
 );
 
 export const CardFooter = ({ children, className = '' }) => (
-  <div className={`mt-6 pt-4 border-t border-white/5 ${className}`}>
+  <div className={`mt-6 pt-4 border-t border-slate-100 ${className}`}>
     {children}
   </div>
 );
