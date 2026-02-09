@@ -186,7 +186,7 @@ const Header = ({ onToggleSidebar, isSidebarOpen, isMobile }) => {
 
                 <div className="px-6 py-4 bg-white/5 border-t border-white/5">
                   <div className="text-[10px] text-white/20 text-center font-black uppercase tracking-[0.2em]">
-                    Recorridos App v3.1.3
+                    Recorridos App v3.1.4
                   </div>
                 </div>
               </div>
