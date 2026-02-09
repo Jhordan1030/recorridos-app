@@ -7,6 +7,7 @@ import Alert from '../components/ui/Alert';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import Input from '../components/ui/Input';
+import Skeleton from '../components/ui/Skeleton';
 
 const Recorridos = () => {
   const { showAlert } = useAlert();
@@ -227,8 +228,8 @@ const Recorridos = () => {
     } catch (error) { showAlert('error', 'Error al guardar'); }
   };
 
-  const handleDelete = (recorrido) => {
-    setRecorridoAEliminar(recorrido);
+  const handleDelete = (id) => {
+    setRecorridoAEliminar(id);
     setShowDeleteModal(true);
   };
 
@@ -236,7 +237,7 @@ const Recorridos = () => {
     if (!recorridoAEliminar) return;
     setLoading(true);
     try {
-      const response = await deleteRecorrido(recorridoAEliminar.id);
+      const response = await deleteRecorrido(recorridoAEliminar);
       if (response.data.success) {
         showAlert('success', 'Recorrido eliminado');
         loadRecorridos();
@@ -342,7 +343,13 @@ const Recorridos = () => {
 
       {/* Recorridos Grid */}
       <div className="max-w-7xl mx-auto">
-        {!loading && recorridosFiltrados.length > 0 ? (
+        {loading ? (
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {[...Array(8)].map((_, i) => (
+              <Skeleton key={i} variant="card" className="h-[350px]" />
+            ))}
+          </div>
+        ) : recorridosFiltrados.length > 0 ? (
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {recorridosFiltrados.map((recorrido) => (
               <div
@@ -423,8 +430,8 @@ const Recorridos = () => {
                   <Button
                     variant="danger"
                     size="sm"
-                    className="shadow-2xl"
-                    onClick={() => handleDelete(recorrido)}
+                    className="shadow-2xl translate-y-4 group-hover:translate-y-0 transition-all duration-500 delay-75"
+                    onClick={() => handleDelete(recorrido.id)}
                     title="Eliminar"
                   >
                     🗑️
@@ -572,6 +579,17 @@ const Recorridos = () => {
           </form>
         </div>
       </Modal>
+
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={confirmDelete}
+        title="Eliminar Recorrido"
+        message="¿Estás seguro de que quieres eliminar esta ruta permanentemente? Esta acción no se puede deshacer."
+        confirmText="Sí, eliminar"
+        cancelText="Cancelar"
+        type="danger"
+      />
     </div>
   );
 };
