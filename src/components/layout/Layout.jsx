@@ -7,6 +7,7 @@ import Header from './Header';
 
 const Layout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const { user, isAdmin } = useAuth();
   const sidebarRef = useRef(null);
@@ -77,6 +78,8 @@ const Layout = ({ children }) => {
             onClose={closeSidebar}
             isAdmin={isAdmin}
             isMobile={isMobile}
+            isCollapsed={isCollapsed}
+            setIsCollapsed={setIsCollapsed}
           />
         </div>
       )}
@@ -86,7 +89,7 @@ const Layout = ({ children }) => {
         <div className="flex flex-1">
           {/* Espaciador para el Sidebar Flotante en Desktop */}
           {user && !isMobile && (
-            <div className="hidden lg:block w-[22rem] flex-shrink-0 transition-all duration-500" />
+            <div className={`hidden lg:block ${isCollapsed ? 'w-32' : 'w-[22rem]'} flex-shrink-0 transition-all duration-500 ease-in-out`} />
           )}
 
           <div className="flex-1 flex flex-col min-w-0">

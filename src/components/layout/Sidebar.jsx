@@ -14,18 +14,17 @@ import {
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
-const Sidebar = ({ isOpen, onClose, isAdmin, isMobile }) => {
+const Sidebar = ({ isOpen, onClose, isAdmin, isMobile, isCollapsed, setIsCollapsed }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const [collapsed, setCollapsed] = useState(false);
 
   // Auto-colapsar en móvil
   useEffect(() => {
     if (isMobile) {
-      setCollapsed(false);
+      setIsCollapsed(false);
     }
-  }, [isMobile]);
+  }, [isMobile, setIsCollapsed]);
 
   const handleLogout = () => {
     logout();
@@ -86,7 +85,7 @@ const Sidebar = ({ isOpen, onClose, isAdmin, isMobile }) => {
         glass-sidebar
         transform transition-all duration-500 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-        ${collapsed && !isMobile ? 'lg:w-24' : 'lg:w-80'}
+        ${isCollapsed && !isMobile ? 'lg:w-24' : 'lg:w-80'}
         ${isMobile ? 'w-full h-full rounded-none inset-0 p-4' : 'h-[calc(100vh-2rem)]'}
         flex flex-col
         overflow-hidden
@@ -94,10 +93,10 @@ const Sidebar = ({ isOpen, onClose, isAdmin, isMobile }) => {
       `}>
 
         {/* Header */}
-        <div className={`flex-shrink-0 ${collapsed && !isMobile ? 'px-4 py-5' : 'px-6 py-5'} border-b border-white/10`}>
+        <div className={`flex-shrink-0 ${isCollapsed && !isMobile ? 'px-4 py-5' : 'px-6 py-5'} border-b border-white/10`}>
           <div className="flex items-center justify-between">
             {/* Solo texto del nombre - SIN LOGO */}
-            {(!collapsed || isMobile) ? (
+            {(!isCollapsed || isMobile) ? (
               <div className="flex flex-col">
                 <h2 className="text-2xl font-black text-white tracking-tighter">Recorridos</h2>
                 <p className="text-[10px] text-white/30 font-black uppercase tracking-widest leading-none">Management System</p>
@@ -123,10 +122,10 @@ const Sidebar = ({ isOpen, onClose, isAdmin, isMobile }) => {
               {/* Botón colapsar en desktop */}
               {!isMobile && (
                 <button
-                  onClick={() => setCollapsed(!collapsed)}
+                  onClick={() => setIsCollapsed(!isCollapsed)}
                   className="hidden lg:flex p-2 text-white/40 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-200"
                 >
-                  {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+                  {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
                 </button>
               )}
             </div>
@@ -156,7 +155,7 @@ const Sidebar = ({ isOpen, onClose, isAdmin, isMobile }) => {
                         ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/25'
                         : 'text-white/70 hover:bg-white/10 hover:text-white hover:shadow-xl'
                       }
-                      ${(collapsed && !isMobile) ? 'justify-center p-3' : 'space-x-4 px-4 py-3'}
+                      ${(isCollapsed && !isMobile) ? 'justify-center p-3' : 'space-x-4 px-4 py-3'}
                       overflow-hidden
                     `}
                   >
@@ -169,7 +168,7 @@ const Sidebar = ({ isOpen, onClose, isAdmin, isMobile }) => {
                         } transition-colors duration-200`}
                     />
 
-                    {(!collapsed || isMobile) && (
+                    {(!isCollapsed || isMobile) && (
                       <div className="relative z-10 flex-1 min-w-0">
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-black uppercase tracking-widest">{item.label}</span>
@@ -186,7 +185,7 @@ const Sidebar = ({ isOpen, onClose, isAdmin, isMobile }) => {
                       </div>
                     )}
 
-                    {isActive && (!collapsed || isMobile) && (
+                    {isActive && (!isCollapsed || isMobile) && (
                       <div className="absolute right-3 w-2 h-2 bg-white rounded-full" />
                     )}
                   </Link>
@@ -197,13 +196,13 @@ const Sidebar = ({ isOpen, onClose, isAdmin, isMobile }) => {
         </nav>
 
         {/* Footer - SOLO LOGOUT */}
-        <div className={`flex-shrink-0 p-6 border-t border-white/5 bg-white/5 ${(collapsed && !isMobile) ? 'text-center' : ''}`}>
+        <div className={`flex-shrink-0 p-6 border-t border-white/5 bg-white/5 ${(isCollapsed && !isMobile) ? 'text-center' : ''}`}>
           <button
             onClick={handleLogout}
             className={`
               group flex items-center rounded-2xl transition-all duration-200
               text-white/70 hover:bg-red-400/10 hover:text-red-400 w-full
-              ${(collapsed && !isMobile) ? 'justify-center p-3' : 'space-x-4 px-5 py-4'}
+              ${(isCollapsed && !isMobile) ? 'justify-center p-3' : 'space-x-4 px-5 py-4'}
               relative overflow-hidden border border-transparent hover:border-red-400/20
             `}
           >
@@ -211,13 +210,13 @@ const Sidebar = ({ isOpen, onClose, isAdmin, isMobile }) => {
               size={18}
               className="relative z-10 flex-shrink-0 text-white/30 group-hover:text-red-400 transition-colors duration-200"
             />
-            {(!collapsed || isMobile) && (
+            {(!isCollapsed || isMobile) && (
               <span className="relative z-10 font-black text-[10px] uppercase tracking-widest">Cerrar sesión</span>
             )}
           </button>
 
           {/* Información de versión */}
-          {(!collapsed || isMobile) && (
+          {(!isCollapsed || isMobile) && (
             <div className="mt-8 text-center">
               <div className="text-[10px] text-white/20 font-black uppercase tracking-widest">
                 v3.1.3
