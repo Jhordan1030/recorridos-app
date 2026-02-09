@@ -367,7 +367,7 @@ const Dashboard = () => {
     try {
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.width;
-      
+
       // --- 1. ENCABEZADO ---
       // Banda Superior Color Indigo
       doc.setFillColor(79, 70, 229); // Indigo 600
@@ -389,7 +389,7 @@ const Dashboard = () => {
       doc.setFontSize(14);
       doc.setFont("helvetica", "bold");
       doc.text('Reporte Mensual de Actividad', 14, 35);
-      
+
       doc.setFontSize(10);
       doc.setFont("helvetica", "normal");
       doc.setTextColor(120, 120, 120);
@@ -409,12 +409,12 @@ const Dashboard = () => {
 
             // Construcción de detalles en una sola celda rica
             let detalleTexto = `${recorrido.vehiculo_descripcion || 'Sin Vehículo'} (${recorrido.tipo_recorrido.toUpperCase()})\n`;
-            
+
             if (recorrido.ninos && recorrido.ninos.length > 0) {
-               const nombresNinos = recorrido.ninos.map(n => n.nombre + ' ' + n.apellidos).join(', ');
-               detalleTexto += `Pasajeros (${recorrido.ninos.length}): ${nombresNinos}\n`;
+              const nombresNinos = recorrido.ninos.map(n => n.nombre + ' ' + n.apellidos).join(', ');
+              detalleTexto += `Pasajeros (${recorrido.ninos.length}): ${nombresNinos}\n`;
             }
-            
+
             if (recorrido.notas) {
               detalleTexto += `Nota: ${recorrido.notas}`;
             }
@@ -458,7 +458,7 @@ const Dashboard = () => {
 
       // --- 4. TOTAL FINAL ---
       const finalY = doc.lastAutoTable.finalY + 10;
-      
+
       // Caja de Total destacada
       doc.setFillColor(240, 245, 255); // Fondo azul muy claro
       doc.setDrawColor(79, 70, 229); // Borde índigo
@@ -491,271 +491,234 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 py-4 px-3 sm:px-4 lg:px-6 xl:px-8 transition-colors duration-300">
+    <div className="min-h-screen bg-transparent py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
       <Alert />
-      
-      {/* Header Principal Simplificado */}
-      <div className="mb-8 pt-4 max-w-7xl mx-auto">
-        <div className="text-center sm:text-left">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-2">
-            Dashboard de Recorridos
-          </h1>
-          <p className="text-gray-600 dark:text-slate-400 text-sm sm:text-base lg:text-lg">
-            Gestión y seguimiento de transportes escolares
-          </p>
-        </div>
-      </div>
 
-      {/* Controles del Calendario */}
-      <Card className="mb-6 shadow-sm border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors duration-300">
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-4 p-4 sm:p-6">
-          
-          {/* Navegación del Mes */}
-          <div className="flex items-center justify-center w-full lg:w-auto order-2 lg:order-1">
-            <div className="flex items-center bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden">
-              
-              {/* Botón Anterior */}
-              <button
-                onClick={() => cambiarMes(-1)}
-                className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-600 dark:text-slate-200 transition-colors border-r border-gray-200 dark:border-slate-700 flex items-center focus:outline-none"
-                title="Mes anterior"
-              >
-                <span className="hidden xs:inline text-sm font-medium mr-1">Anterior</span>
-                <span className="text-xl font-bold leading-none">‹</span>
-              </button>
-
-              {/* Texto del Mes */}
-              <div className="px-6 py-2 min-w-[160px] text-center bg-white dark:bg-slate-800">
-                <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white whitespace-nowrap">
-                  {nombresMeses[mesActual - 1]}
-                </h3>
-                <span className="text-xs text-gray-500 dark:text-slate-400 font-medium">
-                  {añoActual}
-                </span>
-              </div>
-
-              {/* Botón Siguiente */}
-              <button
-                onClick={() => cambiarMes(1)}
-                className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-600 dark:text-slate-200 transition-colors border-l border-gray-200 dark:border-slate-700 flex items-center focus:outline-none"
-                title="Mes siguiente"
-              >
-                <span className="text-xl font-bold leading-none">›</span>
-                <span className="hidden xs:inline text-sm font-medium ml-1">Siguiente</span>
-              </button>
-
+      {/* --- Page Header --- */}
+      <div className="max-w-7xl mx-auto mb-10">
+        <div className="md:flex md:items-center md:justify-between md:space-x-8">
+          <div className="flex items-start">
+            <div className="pt-1.5">
+              <h1 className="text-4xl font-black text-white sm:text-5xl tracking-tighter">Dashboard</h1>
+              <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mt-3">Panel central de operaciones logísticas</p>
             </div>
           </div>
-
-          {/* Botones de Acción */}
-          <div className='flex flex-col xs:flex-row gap-3 w-full lg:w-auto justify-center lg:justify-end order-1 lg:order-2'>
-            <Button
-              variant="primary"
-              onClick={handleOpenModal}
-              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg hover:bg-blue-600 transition-colors shadow-md bg-blue-500 text-white font-medium text-sm sm:text-base w-full xs:w-auto"
-            >
-              <span>➕</span>
-              <span className="whitespace-nowrap">Nuevo Recorrido</span>
-            </Button>
-
+          <div className="mt-8 flex flex-col-reverse justify-stretch gap-4 md:mt-0 md:flex-row md:items-center">
             <Button
               variant="secondary"
               onClick={exportarPDF}
               disabled={loading || totalRecorridosMes === 0}
-              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors shadow-sm bg-white dark:bg-slate-800 text-gray-700 dark:text-slate-200 border border-gray-300 dark:border-slate-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base w-full xs:w-auto"
+              className="w-full md:w-auto"
             >
-              <span>📄</span>
-              <span className="whitespace-nowrap">Exportar PDF</span>
+              Exportar Reporte
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handleOpenModal}
+              className="w-full md:w-auto shadow-2xl shadow-primary-500/20"
+            >
+              Nuevo Registro
             </Button>
           </div>
         </div>
-      </Card>
+      </div>
+
+      {/* --- Period Controls & Overview --- */}
+      <div className="max-w-7xl mx-auto mb-10 space-y-6">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+          {/* Calendar Period Navigation */}
+          <div className="lg:col-span-4">
+            <div className="flex items-center bg-white/5 backdrop-blur-md rounded-3xl border border-white/10 overflow-hidden h-full">
+              <button
+                onClick={() => cambiarMes(-1)}
+                className="px-6 py-4 hover:bg-white/10 text-white/50 hover:text-white transition-all border-r border-white/5 focus:outline-none"
+              >
+                ‹
+              </button>
+              <div className="flex-1 px-8 py-4 text-center">
+                <h3 className="text-sm font-black text-primary-400 uppercase tracking-[0.2em]">
+                  {nombresMeses[mesActual - 1]}
+                </h3>
+                <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">{añoActual}</span>
+              </div>
+              <button
+                onClick={() => cambiarMes(1)}
+                className="px-6 py-4 hover:bg-white/10 text-white/50 hover:text-white transition-all border-l border-white/5 focus:outline-none"
+              >
+                ›
+              </button>
+            </div>
+          </div>
+
+          {/* Key Summary Stats */}
+          <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <Card className="p-8 border-white/5">
+              <dt className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">Presupuesto Mes</dt>
+              <dd className="text-4xl font-black text-white tracking-tighter">
+                ${costoTotalMes.toFixed(2)}
+              </dd>
+            </Card>
+            <Card className="p-8">
+              <dt className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">Operación</dt>
+              <dd className="text-4xl font-black text-white tracking-tighter">{totalRecorridosMes} <span className="text-xs text-white/20 ml-1">Rutas</span></dd>
+            </Card>
+            <Card className="p-8 border-emerald-500/20">
+              <dt className="text-[10px] font-black text-emerald-400/50 uppercase tracking-[0.2em] mb-2">Consistencia</dt>
+              <dd className="text-4xl font-black text-emerald-400 tracking-tighter">
+                {diasConRecorridos} <span className="text-xs text-emerald-400/30 ml-1">Días</span>
+              </dd>
+            </Card>
+          </div>
+        </div>
+      </div>
 
       {loading ? (
-        <Card className="flex justify-center items-center h-48 sm:h-64 shadow-sm border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+        <Card className="flex justify-center items-center h-48 sm:h-64 bg-white/5 border-white/10 backdrop-blur-md">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-            <p className="text-base sm:text-lg text-gray-600 dark:text-slate-400 font-medium">Cargando datos...</p>
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-500 mx-auto mb-4"></div>
+            <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">Sincronizando registros...</p>
           </div>
         </Card>
       ) : (
         <>
-          {/* Resumen del Mes - Grid Responsivo */}
-          <Card className="mb-6 shadow-sm border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors">
-            <div className="p-4 sm:p-6">
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-6">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                  <span className="text-lg font-bold text-gray-700 dark:text-slate-200">Resumen:</span>
-                  <div className="bg-gray-900 dark:bg-black/40 px-5 py-3 rounded-xl shadow-sm w-full sm:w-auto border border-gray-800 dark:border-slate-700 flex items-center gap-3">
-                    <span className="text-2xl sm:text-3xl font-bold text-white">
-                      ${costoTotalMes.toFixed(2)}
-                    </span>
-                    <span className="text-gray-400 text-xs uppercase tracking-wide font-semibold">Costo Total</span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 sm:flex sm:flex-row gap-3">
-                  <div className="bg-blue-500 dark:bg-blue-600/90 px-4 py-3 rounded-lg shadow-sm text-center flex-1">
-                    <div className="text-xl sm:text-2xl font-bold text-white">{diasConRecorridos}</div>
-                    <div className="text-blue-100 text-xs font-medium uppercase">Días Activos</div>
-                  </div>
-                  <div className="bg-green-500 dark:bg-green-600/90 px-4 py-3 rounded-lg shadow-sm text-center flex-1">
-                    <div className="text-xl sm:text-2xl font-bold text-white">{totalRecorridosMes}</div>
-                    <div className="text-green-100 text-xs font-medium uppercase">Viajes</div>
-                  </div>
-                </div>
+          {/* --- Main Calendar Interface --- */}
+          <div className="max-w-7xl mx-auto mb-10">
+            <Card className="p-0 overflow-hidden border-none bg-white/5 backdrop-blur-xl rounded-[2.5rem] border border-white/10 shadow-2xl">
+              {/* Day Headers */}
+              <div className="grid grid-cols-7 text-center font-black text-[10px] text-white/20 bg-white/5 border-b border-white/5 uppercase tracking-[0.2em]">
+                {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map((dia, index) => (
+                  <span key={index} className="py-5 border-r border-white/5 last:border-r-0">
+                    {dia}
+                  </span>
+                ))}
               </div>
 
-              <div className="border-t border-gray-100 dark:border-slate-800 pt-4">
-                <div className="flex flex-wrap gap-4 text-xs sm:text-sm font-medium text-gray-600 dark:text-slate-400">
-                  <div className="flex items-center">
-                    <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
-                    <span>Con Recorrido</span>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-3 h-3 rounded-full bg-white dark:bg-slate-800 border-2 border-blue-500 mr-2"></div>
-                    <span>Hoy</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          {/* Calendario */}
-          <Card className="mb-6 p-0 overflow-hidden shadow-sm border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors">
-            <div className="grid grid-cols-7 text-center font-semibold text-xs sm:text-sm text-white bg-gray-800 dark:bg-slate-950 border-b border-gray-700 dark:border-slate-800">
-              {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map((dia, index) => (
-                <span key={index} className="py-3 border-r border-gray-700/50 last:border-r-0">
-                  {dia}
-                </span>
-              ))}
-            </div>
-
-            <div className="bg-white dark:bg-slate-900">
-              {matrizCalendario.map((semana, idx) => (
-                <div key={idx} className="grid grid-cols-7 border-b border-gray-200 dark:border-slate-800 last:border-b-0">
-                  {semana.map((dia, dIdx) => {
-                    let dayClasses = "relative p-1 sm:p-2 h-14 sm:h-20 lg:h-24 border-r border-gray-200 dark:border-slate-800 last:border-r-0 flex flex-col items-center sm:items-end justify-start transition-all duration-200";
-
-                    if (!dia) {
-                      dayClasses += " bg-gray-50 dark:bg-slate-950/50 pointer-events-none";
-                    } else {
-                      dayClasses += " hover:bg-gray-50 dark:hover:bg-slate-800 cursor-pointer";
-                      
-                      if (dia.tieneRecorridos) {
-                        dayClasses += " bg-green-50 dark:bg-green-900/10";
-                      } else if (dia.esHoy) {
-                        dayClasses += " bg-blue-50 dark:bg-blue-900/10";
-                      } else {
-                        dayClasses += " bg-white dark:bg-slate-900";
+              {/* Calendar Grid */}
+              <div className="bg-transparent">
+                {matrizCalendario.map((semana, idx) => (
+                  <div key={idx} className="grid grid-cols-7 border-b border-white/5 last:border-b-0">
+                    {semana.map((dia, dIdx) => {
+                      if (!dia) {
+                        return (
+                          <div key={dIdx} className="h-24 sm:h-32 border-r border-white/5 last:border-r-0 bg-white/[0.02]" />
+                        );
                       }
-                    }
 
-                    return (
-                      <div key={dIdx} className={dayClasses}>
-                        {dia && (
-                          <>
+                      let dayClasses = "relative h-24 sm:h-32 border-r border-white/5 last:border-r-0 p-3 transition-all duration-300 group hover:bg-white/10";
+
+                      if (dia.esHoy) dayClasses += " bg-white/5";
+                      if (dia.tieneRecorridos) dayClasses += " bg-primary-500/[0.03]";
+
+                      return (
+                        <div key={dIdx} className={dayClasses}>
+                          <div className="flex items-center justify-center sm:justify-end mb-2">
                             <span className={`
-                              flex items-center justify-center rounded-full text-xs sm:text-sm font-medium mb-1
-                              w-6 h-6 sm:w-7 sm:h-7
-                              ${dia.esHoy 
-                                ? 'bg-blue-500 text-white ring-2 ring-blue-200 dark:ring-blue-900' 
-                                : dia.tieneRecorridos 
-                                  ? 'text-green-700 dark:text-green-400 font-bold' 
-                                  : 'text-gray-700 dark:text-slate-400'}
-                            `}>
+                          flex items-center justify-center w-8 h-8 rounded-xl text-xs font-black transition-all duration-300
+                          ${dia.esHoy
+                                ? 'bg-primary-500 text-white shadow-2xl shadow-primary-500/40 ring-4 ring-primary-500/10'
+                                : dia.tieneRecorridos
+                                  ? 'text-white font-black bg-white/10 border border-white/10'
+                                  : 'text-white/30 group-hover:text-white/60'}
+                        `}>
                               {dia.numero}
                             </span>
-                            
-                            {/* Indicadores de Recorridos (Puntos) */}
-                            {dia.tieneRecorridos && (
-                              <div className="flex gap-1 mt-auto sm:mb-1">
-                                <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
-                                {recorridosMensuales[dia.numero]?.length > 1 && (
-                                  <div className="w-1.5 h-1.5 rounded-full bg-green-500/50"></div>
-                                )}
-                              </div>
-                            )}
-                          </>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              ))}
-            </div>
-          </Card>
+                          </div>
 
-          {/* Lista Detallada de Recorridos */}
-          <Card className="shadow-sm border border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors">
-            <div className="border-b border-gray-200 dark:border-slate-800 p-4 sm:p-6">
-              <h4 className="text-xl font-bold text-gray-900 dark:text-white">
-                Detalle de Actividad
+                          {dia.tieneRecorridos && (
+                            <div className="mt-auto flex flex-wrap gap-1 justify-center sm:justify-end opacity-60 group-hover:opacity-100 transition-opacity">
+                              {recorridosMensuales[dia.numero]?.length > 0 && (
+                                <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
+                              )}
+                              {recorridosMensuales[dia.numero]?.length > 1 && (
+                                <div className="h-1.5 w-1.5 rounded-full bg-emerald-500/40" />
+                              )}
+                              {recorridosMensuales[dia.numero]?.length > 2 && (
+                                <div className="h-1.5 w-1.5 rounded-full bg-emerald-500/20" />
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+
+          {/* --- Detailed Activity List --- */}
+          <Card className="p-0 border-none bg-white/5 backdrop-blur-xl rounded-[2.5rem] border border-white/10 shadow-2xl overflow-hidden">
+            <div className="border-b border-white/5 p-8 px-10">
+              <h4 className="text-2xl font-black text-white tracking-tighter uppercase tracking-[0.05em]">
+                Bitácora de Operaciones
               </h4>
+              <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] mt-2">Detalle cronológico de actividad mensual</p>
             </div>
 
             {Object.keys(recorridosMensuales).length === 0 ? (
-              <div className="p-10 text-center">
-                <div className="text-5xl mb-4 opacity-50">📅</div>
-                <p className="text-gray-500 dark:text-slate-400 text-lg">No hay recorridos registrados este mes.</p>
-                <Button
-                  variant="primary"
-                  onClick={handleOpenModal}
-                  className="mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                >
-                  Crear el primero
-                </Button>
+              <div className="py-24 text-center">
+                <div className="text-6xl mb-6 opacity-20">📂</div>
+                <h3 className="text-xl font-black text-white mb-2">Archivo vacío</h3>
+                <p className="text-white/20 text-[10px] font-black uppercase tracking-widest">No se detectaron movimientos en este periodo</p>
               </div>
             ) : (
-              <div className="p-4 sm:p-6 space-y-6">
+              <div className="p-8 px-10 space-y-12">
                 {Object.keys(recorridosMensuales)
                   .filter(dia => !isNaN(parseInt(dia)))
                   .sort((a, b) => parseInt(a) - parseInt(b))
                   .map(dia => (
-                    <div key={dia} className="relative pl-6 sm:pl-8 border-l-2 border-gray-200 dark:border-slate-700 pb-2 last:pb-0">
-                      {/* Badge de Día */}
-                      <div className="absolute -left-[11px] top-0 bg-blue-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-sm ring-4 ring-white dark:ring-slate-900">
+                    <div key={dia} className="relative pl-12 border-l border-white/10 pb-4 last:pb-0">
+                      {/* Timeline Node */}
+                      <div className="absolute -left-[9px] top-0 bg-primary-500 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(14,165,233,0.5)] ring-4 ring-slate-950">
                         {dia}
                       </div>
 
-                      <div className="mb-3">
-                        <span className="text-sm font-medium text-gray-500 dark:text-slate-400 uppercase tracking-wider">
-                           {dia} de {nombresMeses[mesActual-1]}
+                      <div className="mb-6 flex items-center gap-4">
+                        <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">
+                          {dia} {nombresMeses[mesActual - 1]}
                         </span>
+                        <div className="h-[1px] flex-1 bg-white/[0.03]" />
                       </div>
 
-                      <div className="space-y-3">
-                        {recorridosMensuales[dia].map((recorrido, idx) => (
-                          <div key={idx} className="bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow">
-                            <div className="flex flex-col sm:flex-row justify-between gap-3">
-                              {/* Info Principal */}
-                              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                                <span className="bg-white dark:bg-slate-800 text-gray-800 dark:text-slate-200 px-2 py-1 rounded border border-gray-200 dark:border-slate-600 text-sm font-mono">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {(recorridosMensuales[dia] || []).map((recorrido, idx) => (
+                          <div
+                            key={idx}
+                            className="group relative bg-white/[0.03] hover:bg-white/[0.08] backdrop-blur-md border border-white/5 hover:border-white/10 rounded-3xl p-6 transition-all duration-500"
+                          >
+                            <div className="flex justify-between items-start mb-4">
+                              <div className="flex items-center gap-4">
+                                <span className="h-10 w-10 rounded-xl bg-white/10 text-white flex items-center justify-center text-[10px] font-black border border-white/10 shadow-xl">
                                   {formatearHora(recorrido.hora_inicio)}
                                 </span>
                                 <div>
-                                  <p className="font-medium text-gray-900 dark:text-white">
-                                    {recorrido.vehiculo_descripcion || 'Vehículo no asignado'}
+                                  <p className="text-sm font-black text-white uppercase tracking-tight">
+                                    {recorrido.vehiculo_descripcion || 'Ruta sin asignar'}
                                   </p>
-                                  <p className="text-xs text-gray-500 dark:text-slate-400 capitalize">
-                                    {recorrido.tipo_recorrido} • {recorrido.ninos?.length || 0} niños
+                                  <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.1em] mt-1">
+                                    {recorrido.tipo_recorrido}
                                   </p>
                                 </div>
                               </div>
+                              <span className="text-lg font-black text-emerald-400 tracking-tighter">
+                                ${parseFloat(recorrido.costo || 0).toFixed(2)}
+                              </span>
+                            </div>
 
-                              {/* Costo y Acciones */}
-                              <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4 border-t sm:border-t-0 border-gray-200 dark:border-slate-700 pt-2 sm:pt-0 mt-2 sm:mt-0">
-                                <span className="font-bold text-green-600 dark:text-green-400 text-lg">
-                                  ${parseFloat(recorrido.costo || 0).toFixed(2)}
+                            <div className="flex items-center justify-between pt-4 border-t border-white/5">
+                              <div className="flex items-center gap-2">
+                                <div className="h-1 w-1 rounded-full bg-primary-400 shadow-[0_0_8px_rgba(56,189,248,0.5)]" />
+                                <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">
+                                  {recorrido.ninos?.length || 0} Estudiantes
                                 </span>
-                                <button
-                                  onClick={() => handleEdit(recorrido)}
-                                  className="text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 p-1.5 rounded transition-colors"
-                                  title="Editar"
-                                >
-                                  ✏️
-                                </button>
                               </div>
+                              <button
+                                onClick={() => handleEdit(recorrido)}
+                                className="opacity-0 group-hover:opacity-100 bg-white/10 hover:bg-white/20 text-white/60 hover:text-white p-2 rounded-xl transition-all border border-white/10"
+                                title="Gestionar"
+                              >
+                                ⚙️
+                              </button>
                             </div>
                           </div>
                         ))}
@@ -768,164 +731,136 @@ const Dashboard = () => {
         </>
       )}
 
-      {/* Modal Formulario */}
+      {/* --- Management Modal --- */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => handleCloseModal(false)}
-        title={editando ? 'Editar Recorrido' : 'Crear Recorrido'}
+        title={editando ? 'Modificar Registro' : 'Nueva Operación'}
         size="max-w-3xl"
       >
-        {loadingForm ? (
-          <div className="p-12 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
-            <span className="text-gray-500 dark:text-slate-400">Cargando formulario...</span>
-          </div>
-        ) : (
-          <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 transition-colors">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Grid de Inputs */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                <div className="space-y-1">
-                  <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Fecha</label>
-                  <Input
-                    type="date"
-                    name="fecha"
-                    value={formData.fecha}
-                    onChange={handleChange}
-                    required
-                    className="w-full bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg p-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Hora</label>
-                  <Input
-                    type="time"
-                    name="hora_inicio"
-                    value={formData.hora_inicio}
-                    onChange={handleChange}
-                    required
-                    className="w-full bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg p-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Vehículo</label>
+        <div className="p-0 bg-transparent">
+          {loadingForm ? (
+            <div className="py-24 text-center">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-500 mx-auto mb-6"></div>
+              <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">Preparando entorno...</p>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <Input
+                  label="Fecha de Operación"
+                  type="date"
+                  name="fecha"
+                  value={formData.fecha}
+                  onChange={handleChange}
+                  required
+                />
+                <Input
+                  label="Hora Estimada"
+                  type="time"
+                  name="hora_inicio"
+                  value={formData.hora_inicio}
+                  onChange={handleChange}
+                  required
+                />
+                <div>
+                  <label className="text-[10px] font-black text-white/40 uppercase tracking-widest block mb-2 pl-1">Selección de Unidad</label>
                   <select
                     name="vehiculo_id"
                     value={formData.vehiculo_id}
                     onChange={handleChange}
                     required
-                    className="w-full bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg p-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none appearance-none"
+                    className="px-4 py-3 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary-500/50 focus:border-white/20 block w-full transition-all duration-300 bg-white/5 text-white outline-none backdrop-blur-sm"
                   >
-                    <option value="">-- Seleccionar --</option>
-                    {vehiculos.map((v) => (
-                      <option key={v.id} value={v.id}>
-                        {v.descripcion} (${parseFloat(v.costo_por_recorrido || 0).toFixed(2)})
-                      </option>
-                    ))}
+                    <option value="">Buscar unidad...</option>
+                    {vehiculos.map(v => <option key={v.id} value={v.id}>{v.descripcion}</option>)}
                   </select>
                 </div>
-
-                <div className="space-y-1">
-                  <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Tipo</label>
+                <div>
+                  <label className="text-[10px] font-black text-white/40 uppercase tracking-widest block mb-2 pl-1">Modalidad de Ruta</label>
                   <select
                     name="tipo_recorrido"
                     value={formData.tipo_recorrido}
                     onChange={handleChange}
                     required
-                    className="w-full bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg p-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="px-4 py-3 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary-500/50 focus:border-white/20 block w-full transition-all duration-300 bg-white/5 text-white outline-none backdrop-blur-sm"
                   >
-                    <option value="traer">Traer (Recogida)</option>
-                    <option value="llevar">Llevar (Retorno)</option>
-                    <option value="ambos">Ambos</option>
+                    <option value="traer">Recolección (Traer)</option>
+                    <option value="llevar">Despacho (Llevar)</option>
+                    <option value="ambos">Operación Dual</option>
                   </select>
                 </div>
-
-                <div className="space-y-1 sm:col-span-2">
-                  <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Notas</label>
+                <div className="sm:col-span-2">
                   <Input
-                    type="text"
+                    label="Observaciones"
                     name="notas"
                     value={formData.notas}
                     onChange={handleChange}
-                    placeholder="Opcional: Notas sobre el viaje..."
-                    className="w-full bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg p-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                    placeholder="Detalles sobre tráfico, desvíos o novedades..."
                   />
                 </div>
               </div>
 
-              {/* Sección Niños */}
-              <div className="border-t border-gray-200 dark:border-slate-700 pt-6">
-                <div className="flex justify-between items-center mb-4">
-                  <h4 className="text-md font-bold text-gray-800 dark:text-white">Niños Asignados</h4>
-                  <span className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs px-2 py-1 rounded-full font-bold">
-                    {ninosSeleccionados.length}
-                  </span>
+              {/* Passenger Management inside Modal */}
+              <div className="pt-8 border-t border-white/5">
+                <div className="flex justify-between items-center mb-6">
+                  <h4 className="text-[10px] font-black text-white/40 uppercase tracking-widest">Nómina de Pasajeros ({ninosSeleccionados.length})</h4>
                 </div>
 
-                <div className="mb-4">
+                <div className="mb-6">
                   <select
                     onChange={agregarNino}
                     value=""
-                    className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg p-2.5 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="px-4 py-3 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary-500/50 focus:border-white/20 block w-full transition-all duration-300 bg-white/5 text-white outline-none backdrop-blur-sm"
                   >
-                    <option value="">+ Agregar un niño al recorrido...</option>
-                    {ninos
-                      .filter(n => !ninosSeleccionados.some(ns => ns.nino_id.toString() === n.id.toString()))
-                      .map((n) => (
-                        <option key={n.id} value={n.id}>
-                          {n.nombre} {n.apellidos}
-                        </option>
-                      ))}
+                    <option value="">+ Vincular estudiante a este trayecto...</option>
+                    {(ninos || []).filter(n => !ninosSeleccionados.some(sel => sel.nino_id?.toString() === n.id?.toString())).map(n => (
+                      <option key={n.id} value={n.id}>{n.nombre} {n.apellidos}</option>
+                    ))}
                   </select>
                 </div>
 
-                <div className="space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
-                  {ninosSeleccionados.length === 0 ? (
-                    <p className="text-center text-sm text-gray-500 dark:text-slate-500 italic py-4">
-                      No se han seleccionado niños aún.
-                    </p>
-                  ) : (
-                    ninosSeleccionados.map((nino, idx) => (
-                      <div key={nino.nino_id} className="flex items-center justify-between bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-lg p-3">
-                        <span className="text-sm font-medium text-gray-800 dark:text-slate-200">
-                          {nino.nombre} {nino.apellidos}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => eliminarNino(idx)}
-                          className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-1 hover:bg-red-50 dark:hover:bg-red-900/30 rounded transition-colors"
-                        >
-                          ✕
-                        </button>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
+                  {(ninosSeleccionados || []).map((n, idx) => (
+                    <div key={n.nino_id} className="group flex items-center justify-between bg-white/5 border border-white/5 hover:border-white/10 rounded-2xl p-3 transition-all">
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-lg bg-white/5 text-white flex items-center justify-center text-[10px] font-black border border-white/10">
+                          {n.nombre?.charAt(0) || '?'}
+                        </div>
+                        <span className="text-xs font-black text-white/70 uppercase tracking-tight">{n.nombre} {n.apellidos}</span>
                       </div>
-                    ))
+                      <button type="button" onClick={() => eliminarNino(idx)} className="text-white/20 hover:text-red-400 p-2 transition-colors">✕</button>
+                    </div>
+                  ))}
+                  {ninosSeleccionados.length === 0 && (
+                    <div className="sm:col-span-2 py-8 text-center border-2 border-dashed border-white/5 rounded-3xl">
+                      <p className="text-[10px] font-black text-white/10 uppercase tracking-widest">Nómina vacía</p>
+                    </div>
                   )}
                 </div>
               </div>
 
               {/* Botones Finales */}
-              <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4 border-t border-gray-200 dark:border-slate-700">
+              <div className="flex flex-col-reverse sm:flex-row justify-end gap-4 pt-8 border-t border-white/5">
                 <Button
                   type="button"
                   variant="secondary"
                   onClick={() => handleCloseModal(false)}
-                  className="w-full sm:w-auto px-5 py-2.5 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+                  className="w-full sm:w-auto"
                 >
                   Cancelar
                 </Button>
                 <Button
                   type="submit"
                   variant="primary"
-                  className="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-medium shadow-md"
+                  className="w-full sm:w-auto shadow-2xl shadow-primary-500/20"
                 >
-                  {editando ? 'Guardar Cambios' : 'Crear Recorrido'}
+                  {editando ? 'Actualizar Registro' : 'Confirmar Operación'}
                 </Button>
               </div>
             </form>
-          </div>
-        )}
+          )}
+        </div>
       </Modal>
     </div>
   );

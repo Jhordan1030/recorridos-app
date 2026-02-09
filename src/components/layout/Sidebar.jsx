@@ -82,28 +82,28 @@ const Sidebar = ({ isOpen, onClose, isAdmin, isMobile }) => {
       {/* Sidebar */}
       <aside className={`
         fixed lg:sticky inset-y-0 left-0 z-50 lg:z-30
-        bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-r border-gray-100 dark:border-slate-800
+        glass-sidebar
         transform transition-all duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         ${collapsed && !isMobile ? 'w-20' : 'w-80'}
-        ${isMobile ? 'w-80 shadow-2xl' : 'lg:shadow-lg'}
+        ${isMobile ? 'w-80 shadow-2xl' : ''}
         flex flex-col
         h-screen
         overflow-hidden
       `}>
 
-        {/* Header - SIN LOGO DEL CARRITO */}
-        <div className={`flex-shrink-0 ${collapsed && !isMobile ? 'px-4 py-5' : 'px-6 py-5'} border-b border-gray-100 dark:border-slate-800 bg-gradient-to-r from-white to-gray-50/50 dark:from-slate-900 dark:to-slate-800/50`}>
+        {/* Header */}
+        <div className={`flex-shrink-0 ${collapsed && !isMobile ? 'px-4 py-5' : 'px-6 py-5'} border-b border-white/10`}>
           <div className="flex items-center justify-between">
             {/* Solo texto del nombre - SIN LOGO */}
             {(!collapsed || isMobile) ? (
               <div className="flex flex-col">
-                <h2 className="text-lg font-bold text-gray-900 dark:text-white">Recorridos App</h2>
-                <p className="text-xs text-gray-500 dark:text-slate-400 font-medium">Sistema de transporte</p>
+                <h2 className="text-2xl font-black text-white tracking-tighter">Recorridos</h2>
+                <p className="text-[10px] text-white/30 font-black uppercase tracking-widest leading-none">Management System</p>
               </div>
             ) : (
-              <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/20 mx-auto">
-                <span className="text-white font-bold text-sm">RA</span>
+              <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center shadow-2xl border border-white/20 mx-auto transition-all hover:bg-white/20">
+                <span className="text-white font-black text-sm tracking-tighter">RA</span>
               </div>
             )}
 
@@ -113,7 +113,7 @@ const Sidebar = ({ isOpen, onClose, isAdmin, isMobile }) => {
               {isMobile && (
                 <button
                   onClick={onClose}
-                  className="lg:hidden p-2 text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition-all duration-200"
+                  className="lg:hidden p-2 text-white/40 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-200"
                 >
                   <X size={18} />
                 </button>
@@ -123,7 +123,7 @@ const Sidebar = ({ isOpen, onClose, isAdmin, isMobile }) => {
               {!isMobile && (
                 <button
                   onClick={() => setCollapsed(!collapsed)}
-                  className="hidden lg:flex p-2 text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition-all duration-200"
+                  className="hidden lg:flex p-2 text-white/40 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-200"
                 >
                   {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
                 </button>
@@ -153,7 +153,7 @@ const Sidebar = ({ isOpen, onClose, isAdmin, isMobile }) => {
                       group relative flex items-center rounded-2xl transition-all duration-200
                       ${isActive
                         ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/25'
-                        : 'text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white hover:shadow-md'
+                        : 'text-white/70 hover:bg-white/10 hover:text-white hover:shadow-xl'
                       }
                       ${(collapsed && !isMobile) ? 'justify-center p-3' : 'space-x-4 px-4 py-3'}
                       overflow-hidden
@@ -164,21 +164,21 @@ const Sidebar = ({ isOpen, onClose, isAdmin, isMobile }) => {
 
                     <Icon
                       size={20}
-                      className={`relative z-10 flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-400 dark:text-slate-500 group-hover:text-primary-500 dark:group-hover:text-white'
+                      className={`relative z-10 flex-shrink-0 ${isActive ? 'text-white' : 'text-white/40 group-hover:text-white'
                         } transition-colors duration-200`}
                     />
 
                     {(!collapsed || isMobile) && (
                       <div className="relative z-10 flex-1 min-w-0">
                         <div className="flex items-center justify-between">
-                          <span className="font-semibold text-sm truncate">{item.label}</span>
+                          <span className="text-sm font-black uppercase tracking-widest">{item.label}</span>
                           {item.badge && (
-                            <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded-full font-medium">
+                            <span className="bg-amber-400/20 text-amber-400 text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest border border-amber-400/20">
                               {item.badge}
                             </span>
                           )}
                         </div>
-                        <p className={`text-xs mt-0.5 truncate ${isActive ? 'text-primary-100' : 'text-gray-500 dark:text-slate-500'
+                        <p className={`text-[10px] mt-0.5 truncate uppercase tracking-widest font-bold ${isActive ? 'text-white/80' : 'text-white/30 group-hover:text-white/60'
                           }`}>
                           {item.description}
                         </p>
@@ -196,35 +196,30 @@ const Sidebar = ({ isOpen, onClose, isAdmin, isMobile }) => {
         </nav>
 
         {/* Footer - SOLO LOGOUT */}
-        <div className={`flex-shrink-0 p-4 border-t border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-900/50 ${(collapsed && !isMobile) ? 'text-center' : ''
-          }`}>
+        <div className={`flex-shrink-0 p-6 border-t border-white/5 bg-white/5 ${(collapsed && !isMobile) ? 'text-center' : ''}`}>
           <button
             onClick={handleLogout}
             className={`
               group flex items-center rounded-2xl transition-all duration-200
-              text-gray-600 dark:text-slate-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 w-full
-              ${(collapsed && !isMobile) ? 'justify-center p-3' : 'space-x-3 px-4 py-3'}
-              relative overflow-hidden
+              text-white/70 hover:bg-red-400/10 hover:text-red-400 w-full
+              ${(collapsed && !isMobile) ? 'justify-center p-3' : 'space-x-4 px-5 py-4'}
+              relative overflow-hidden border border-transparent hover:border-red-400/20
             `}
           >
-            <div className="absolute inset-0 bg-red-500/5 group-hover:bg-red-500/10 transition-colors duration-200 rounded-2xl" />
             <LogOut
-              size={20}
-              className="relative z-10 flex-shrink-0 text-gray-400 group-hover:text-red-500 transition-colors duration-200"
+              size={18}
+              className="relative z-10 flex-shrink-0 text-white/30 group-hover:text-red-400 transition-colors duration-200"
             />
             {(!collapsed || isMobile) && (
-              <span className="relative z-10 font-semibold text-sm">Cerrar sesión</span>
+              <span className="relative z-10 font-black text-[10px] uppercase tracking-widest">Cerrar sesión</span>
             )}
           </button>
 
           {/* Información de versión */}
           {(!collapsed || isMobile) && (
-            <div className="mt-4 text-center">
-              <div className="text-xs text-gray-500 dark:text-slate-500 font-medium">
+            <div className="mt-8 text-center">
+              <div className="text-[10px] text-white/20 font-black uppercase tracking-widest">
                 v3.1.3
-              </div>
-              <div className="text-[10px] text-gray-400 dark:text-slate-600 mt-1">
-                Sistema de Transporte Escolar
               </div>
             </div>
           )}

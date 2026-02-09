@@ -20,28 +20,28 @@ const Alert = () => {
   // Configuración de estilos según el tipo
   const config = {
     success: {
-      icon: <CheckCircle className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />,
-      container: "bg-white dark:bg-slate-800 border-emerald-500 dark:border-emerald-500",
-      title: "text-emerald-800 dark:text-emerald-400",
-      text: "text-emerald-600 dark:text-slate-400"
+      icon: <CheckCircle className="w-5 h-5 text-emerald-400" />,
+      container: "bg-emerald-500/10 border-emerald-500/30",
+      title: "text-emerald-400",
+      text: "text-emerald-400/70"
     },
     error: {
-      icon: <AlertCircle className="w-5 h-5 text-red-500 dark:text-red-400" />,
-      container: "bg-white dark:bg-slate-800 border-red-500 dark:border-red-500",
-      title: "text-red-800 dark:text-red-400",
-      text: "text-red-600 dark:text-slate-400"
+      icon: <AlertCircle className="w-5 h-5 text-red-400" />,
+      container: "bg-red-500/10 border-red-500/30",
+      title: "text-red-400",
+      text: "text-red-400/70"
     },
     warning: {
-      icon: <AlertTriangle className="w-5 h-5 text-amber-500 dark:text-amber-400" />,
-      container: "bg-white dark:bg-slate-800 border-amber-500 dark:border-amber-500",
-      title: "text-amber-800 dark:text-amber-400",
-      text: "text-amber-600 dark:text-slate-400"
+      icon: <AlertTriangle className="w-5 h-5 text-amber-400" />,
+      container: "bg-amber-500/10 border-amber-500/30",
+      title: "text-amber-400",
+      text: "text-amber-400/70"
     },
     info: {
-      icon: <Info className="w-5 h-5 text-blue-500 dark:text-blue-400" />,
-      container: "bg-white dark:bg-slate-800 border-blue-500 dark:border-blue-500",
-      title: "text-blue-800 dark:text-blue-400",
-      text: "text-blue-600 dark:text-slate-400"
+      icon: <Info className="w-5 h-5 text-blue-400" />,
+      container: "bg-blue-500/10 border-blue-500/30",
+      title: "text-blue-400",
+      text: "text-blue-400/70"
     },
   };
 
@@ -50,9 +50,9 @@ const Alert = () => {
   return (
     <div className="fixed z-[60] bottom-4 right-4 w-full max-w-sm px-4 sm:px-0 animate-in slide-in-from-bottom-5 fade-in duration-300">
       <div className={`
-        relative flex items-start p-4 rounded-xl shadow-lg border-l-4
+        relative flex items-start p-5 rounded-[2rem] shadow-2xl border border-white/10
         ${style.container} 
-        ring-1 ring-black/5 dark:ring-white/10
+        bg-slate-900/40 backdrop-blur-3xl ring-1 ring-white/10
       `}>
         {/* Icono */}
         <div className="flex-shrink-0 mt-0.5">
@@ -60,13 +60,13 @@ const Alert = () => {
         </div>
 
         {/* Contenido */}
-        <div className="ml-3 w-0 flex-1">
-          <p className={`text-sm font-bold capitalize ${style.title}`}>
-            {alert.type === 'success' ? '¡Éxito!' : 
-             alert.type === 'error' ? 'Error' : 
-             alert.type === 'warning' ? 'Advertencia' : 'Información'}
+        <div className="ml-4 w-0 flex-1">
+          <p className={`text-[10px] font-black uppercase tracking-widest ${style.title}`}>
+            {alert.type === 'success' ? '¡Éxito!' :
+              alert.type === 'error' ? 'Error' :
+                alert.type === 'warning' ? 'Advertencia' : 'Información'}
           </p>
-          <p className={`mt-1 text-sm ${style.text} leading-snug`}>
+          <p className={`mt-1 text-xs ${style.text} leading-snug font-medium`}>
             {alert.message}
           </p>
         </div>
@@ -75,10 +75,10 @@ const Alert = () => {
         <div className="ml-4 flex flex-shrink-0">
           <button
             onClick={hideAlert}
-            className="inline-flex rounded-md text-gray-400 hover:text-gray-500 dark:hover:text-white focus:outline-none transition-colors"
+            className="inline-flex rounded-xl p-1 text-white/30 hover:text-white hover:bg-white/10 focus:outline-none transition-all"
           >
             <span className="sr-only">Cerrar</span>
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </button>
         </div>
       </div>

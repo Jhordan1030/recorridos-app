@@ -1,16 +1,16 @@
 import React from 'react';
 
-const Card = ({ 
-  children, 
+const Card = ({
+  children,
   className = '',
   padding = 'p-6',
   hover = false,
-  ...props 
+  ...props
 }) => {
-  const baseClasses = 'bg-white rounded-xl shadow-lg border border-gray-200';
-  const hoverClass = hover ? 'hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1' : '';
-  
-  const classes = `${baseClasses} ${padding} ${hoverClass} ${className}`;
+  const baseClasses = 'backdrop-blur-xl border border-white/10 rounded-2xl transition-all duration-300';
+  const glassClass = className.includes('bg-') ? '' : 'bg-white/5';
+  const hoverClass = hover ? 'hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2' : '';
+  const classes = `${baseClasses} ${glassClass} ${padding} ${hoverClass} ${className}`;
 
   return (
     <div className={classes} {...props}>
@@ -32,7 +32,7 @@ export const CardContent = ({ children, className = '' }) => (
 );
 
 export const CardFooter = ({ children, className = '' }) => (
-  <div className={`mt-6 pt-4 border-t border-gray-200 ${className}`}>
+  <div className={`mt-6 pt-4 border-t border-white/5 ${className}`}>
     {children}
   </div>
 );
