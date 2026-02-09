@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useAlert } from '../context/AlertContext';
-import { updateUser } from '../services/api';
+import { updateUser, getCurrentUser } from '../services/api';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
@@ -14,6 +14,15 @@ const Profile = () => {
   const navigate = useNavigate(); // ← Hook para navegación
   const [loading, setLoading] = useState(false);
 
+  // --- LÓGICA DE NOMBRE ---
+  const extractName = (u) => {
+    if (!u) return null;
+    return u.nombre ||
+      u.full_name ||
+      u.user_metadata?.full_name ||
+      u.user_metadata?.name;
+  };
+
   // Estado del formulario
   const [formData, setFormData] = useState({
     nombre: '',
@@ -24,13 +33,33 @@ const Profile = () => {
 
   // Cargar datos del usuario al montar
   useEffect(() => {
-    if (user) {
-      setFormData(prev => ({
-        ...prev,
-        nombre: user.nombre || user.user_metadata?.full_name || '',
-        email: user.email || ''
-      }));
-    }
+    const fetchProfile = async () => {
+      try {
+        setLoading(true);
+        const response = await getCurrentUser();
+        const userData = response.data.user || response.data;
+
+        setFormData(prev => ({
+          ...prev,
+          nombre: extractName(userData) || '',
+          email: userData.email || ''
+        }));
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+        // Si falla, al menos usamos lo que tenemos en el context
+        if (user) {
+          setFormData(prev => ({
+            ...prev,
+            nombre: extractName(user) || '',
+            email: user.email || ''
+          }));
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
   }, [user]);
 
   const handleChange = (e) => {
@@ -120,10 +149,10 @@ const Profile = () => {
               </div>
 
               <h2 className="text-2xl font-black text-white mb-2 tracking-tighter">
-                {formData.nombre || 'Usuario'}
+                {formData.nombre || 'Jhordan Huera'}
               </h2>
               <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.1em] mb-10">
-                {formData.email}
+                {user?.rol === 'admin' ? 'Administrador del Sistema' : 'Usuario del Sistema'}
               </p>
 
               <div className="w-full grid grid-cols-2 gap-4">
