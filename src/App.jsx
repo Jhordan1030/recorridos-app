@@ -1,4 +1,5 @@
 import React from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/layout/Layout';
 import Alert from './components/ui/Alert';
@@ -135,6 +136,7 @@ function App() {
     <AlertProvider>
       <AuthProvider>
         <AppContent />
+        <Analytics />
       </AuthProvider>
     </AlertProvider>
   );
