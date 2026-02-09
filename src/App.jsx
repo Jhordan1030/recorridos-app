@@ -125,6 +125,7 @@ function AppContent() {
             }
           />
         </Routes>
+        <Analytics />
       </Router>
     </AppProvider>
   );
@@ -136,7 +137,6 @@ function App() {
     <AlertProvider>
       <AuthProvider>
         <AppContent />
-        <Analytics />
       </AuthProvider>
     </AlertProvider>
   );

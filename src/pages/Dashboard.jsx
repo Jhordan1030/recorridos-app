@@ -582,19 +582,19 @@ const Dashboard = () => {
 
           {/* Key Summary Stats */}
           <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <Card className="p-8 border-white/5">
+            <Card className="p-6 sm:p-8 border-white/5">
               <dt className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">Presupuesto Mes</dt>
-              <dd className="text-4xl font-black text-white tracking-tighter">
+              <dd className="text-3xl sm:text-4xl font-black text-white tracking-tighter">
                 ${costoTotalMes.toFixed(2)}
               </dd>
             </Card>
-            <Card className="p-8">
+            <Card className="p-6 sm:p-8">
               <dt className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">Operación</dt>
-              <dd className="text-4xl font-black text-white tracking-tighter">{totalRecorridosMes} <span className="text-xs text-white/20 ml-1">Rutas</span></dd>
+              <dd className="text-3xl sm:text-4xl font-black text-white tracking-tighter">{totalRecorridosMes} <span className="text-xs text-white/20 ml-1">Rutas</span></dd>
             </Card>
-            <Card className="p-8 border-emerald-500/20">
+            <Card className="p-6 sm:p-8 border-emerald-500/20">
               <dt className="text-[10px] font-black text-emerald-400/50 uppercase tracking-[0.2em] mb-2">Consistencia</dt>
-              <dd className="text-4xl font-black text-emerald-400 tracking-tighter">
+              <dd className="text-3xl sm:text-4xl font-black text-emerald-400 tracking-tighter">
                 {diasConRecorridos} <span className="text-xs text-emerald-400/30 ml-1">Días</span>
               </dd>
             </Card>
@@ -626,8 +626,9 @@ const Dashboard = () => {
               {/* Day Headers */}
               <div className="grid grid-cols-7 text-center font-black text-[10px] text-white/20 bg-white/5 border-b border-white/5 uppercase tracking-[0.2em]">
                 {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map((dia, index) => (
-                  <span key={index} className="py-5 border-r border-white/5 last:border-r-0">
-                    {dia}
+                  <span key={index} className="py-4 sm:py-5 border-r border-white/5 last:border-r-0">
+                    <span className="hidden sm:inline">{dia}</span>
+                    <span className="sm:hidden">{dia.charAt(0)}</span>
                   </span>
                 ))}
               </div>
@@ -637,22 +638,17 @@ const Dashboard = () => {
                 {matrizCalendario.map((semana, idx) => (
                   <div key={idx} className="grid grid-cols-7 border-b border-white/5 last:border-b-0">
                     {semana.map((dia, dIdx) => {
-                      if (!dia) {
-                        return (
-                          <div key={dIdx} className="h-24 sm:h-32 border-r border-white/5 last:border-r-0 bg-white/[0.02]" />
-                        );
-                      }
-
-                      let dayClasses = "relative h-24 sm:h-32 border-r border-white/5 last:border-r-0 p-3 transition-all duration-300 group hover:bg-white/10";
+                      const tieneRecorridos = Array.isArray(recorridosMensuales[dia.numero]) && recorridosMensuales[dia.numero].length > 0;
+                      let dayClasses = "relative h-20 sm:h-32 border-r border-white/5 last:border-r-0 p-2 sm:p-3 transition-all duration-300 group hover:bg-white/10";
 
                       if (dia.esHoy) dayClasses += " bg-white/5";
                       if (dia.tieneRecorridos) dayClasses += " bg-primary-500/[0.03]";
 
                       return (
                         <div key={dIdx} className={dayClasses}>
-                          <div className="flex items-center justify-center sm:justify-end mb-2">
+                          <div className="flex items-center justify-center sm:justify-end mb-1 sm:mb-2">
                             <span className={`
-                          flex items-center justify-center w-8 h-8 rounded-xl text-xs font-black transition-all duration-300
+                          flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-black transition-all duration-300
                           ${dia.esHoy
                                 ? 'bg-primary-500 text-white shadow-2xl shadow-primary-500/40 ring-4 ring-primary-500/10'
                                 : dia.tieneRecorridos
