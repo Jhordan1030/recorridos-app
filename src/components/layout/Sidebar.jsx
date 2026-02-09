@@ -12,7 +12,6 @@ import {
   ChevronRight,
   X
 } from 'lucide-react';
-import { X } from 'lucide-react';
 
 const Sidebar = ({ isOpen, onClose, isAdmin, isMobile, isCollapsed, setIsCollapsed }) => {
   const location = useLocation();
