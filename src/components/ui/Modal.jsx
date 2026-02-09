@@ -32,7 +32,7 @@ const Modal = ({ title, children, onClose, size = 'max-w-md', isOpen }) => {
     <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Contenedor principal para centrado */}
       <div
-        className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0"
+        className="flex min-h-full items-end justify-center sm:items-center sm:p-0"
         onClick={handleBackdropClick}
       >
         {/* Backdrop con Blur y color oscuro */}
@@ -44,16 +44,19 @@ const Modal = ({ title, children, onClose, size = 'max-w-md', isOpen }) => {
         {/* Panel del Modal */}
         <div
           className={`
-            relative transform overflow-hidden rounded-[2.5rem] text-left shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] transition-all sm:my-8 sm:w-full ${size}
+            relative transform overflow-hidden 
+            rounded-t-[2rem] sm:rounded-[2.5rem] 
+            text-left shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] transition-all 
+            sm:my-8 w-full ${size}
             bg-slate-950/90 backdrop-blur-3xl
-            border border-white/10
+            border-t border-x sm:border border-white/10
           `}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="bg-white/5 px-8 py-6 border-b border-white/5">
+          <div className="bg-white/5 px-6 sm:px-8 py-5 sm:py-6 border-b border-white/5">
             <div className="flex items-center justify-between">
-              <h3 className="text-2xl font-black text-white tracking-tighter">
+              <h3 className="text-xl sm:text-2xl font-black text-white tracking-tighter">
                 {title}
               </h3>
               <button
@@ -67,7 +70,7 @@ const Modal = ({ title, children, onClose, size = 'max-w-md', isOpen }) => {
           </div>
 
           {/* Content */}
-          <div className="px-8 py-8 bg-transparent text-white/70">
+          <div className="px-6 sm:px-8 py-6 sm:py-8 bg-transparent text-white/70">
             {children}
           </div>
         </div>

@@ -125,6 +125,7 @@ function AppContent() {
             }
           />
         </Routes>
+        <Analytics />
       </Router>
     </AppProvider>
   );
