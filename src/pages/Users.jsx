@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getUsers, deleteUser, createUser, updateUser } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useAlert } from '../context/AlertContext';
+import { useApp } from '../context/AppContext';
 import ConfirmModal from '../components/ui/ConfirmModal';
 import Alert from '../components/ui/Alert';
 import Modal from '../components/ui/Modal';
@@ -27,6 +28,7 @@ const Users = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const { isAdmin, user: currentUser } = useAuth();
   const { showAlert } = useAlert();
+  const { isMobile } = useApp();
 
   // Forms Data
   const [createFormData, setCreateFormData] = useState({
@@ -315,37 +317,23 @@ const Users = () => {
                 </div>
 
                 {/* Card Actions Footer */}
-                <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-xl rounded-[2rem] flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-500 scale-95 group-hover:scale-100 z-10 pointer-events-none group-hover:pointer-events-auto">
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="shadow-2xl"
-                    onClick={() => openEditForm(user)}
-                    title="Editar"
-                  >
-                    ✏️
-                  </Button>
+                <div className={`
+                  absolute inset-0 bg-slate-950/80 backdrop-blur-xl rounded-[2rem] flex items-center justify-center gap-3 transition-all duration-500
+                  ${isMobile
+                    ? 'opacity-0 scale-95 pointer-events-none'
+                    : 'opacity-0 lg:group-hover:opacity-100 scale-95 lg:group-hover:scale-100 z-10 pointer-events-none lg:group-hover:pointer-events-auto'
+                  }
+                `}>
+                  <Button variant="secondary" size="sm" onClick={() => openEditForm(user)}>✏️</Button>
+                  <Button variant="warning" size="sm" onClick={() => openPasswordModal(user)}>🔑</Button>
+                  <Button variant="danger" size="sm" onClick={() => handleDeleteUser(user.id)} disabled={user.rol === 'admin' || user.id === currentUser?.userId}>🗑️</Button>
+                </div>
 
-                  <Button
-                    variant="warning"
-                    size="sm"
-                    className="shadow-2xl"
-                    onClick={() => openPasswordModal(user)}
-                    title="Password"
-                  >
-                    🔑
-                  </Button>
-
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    className="shadow-2xl"
-                    onClick={() => handleDeleteUser(user.id)}
-                    disabled={user.rol === 'admin' || user.id === currentUser?.userId}
-                    title="Eliminar"
-                  >
-                    🗑️
-                  </Button>
+                {/* Mobile Actions (Visible) */}
+                <div className="mt-auto pt-6 border-t border-white/5 flex gap-2 lg:hidden">
+                  <Button variant="secondary" size="sm" className="flex-1" onClick={() => openEditForm(user)}>Editar</Button>
+                  <Button variant="warning" size="sm" className="px-3" onClick={() => openPasswordModal(user)}>🔑</Button>
+                  <Button variant="danger" size="sm" className="flex-1" onClick={() => handleDeleteUser(user.id)} disabled={user.rol === 'admin' || user.id === currentUser?.userId}>Eliminar</Button>
                 </div>
               </div>
             ))}

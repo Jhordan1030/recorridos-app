@@ -69,8 +69,8 @@ const Header = ({ onToggleSidebar, isSidebarOpen, isMobile }) => {
   };
 
   return (
-    <header className="glass-navbar sticky top-4 z-40 mx-4 mt-4 lg:ml-auto lg:w-fit rounded-[2rem] border border-white/10">
-      <div className="flex items-center justify-between h-16 px-6 sm:px-8 lg:px-10 space-x-8">
+    <header className="glass-navbar sticky top-2 sm:top-4 z-40 mx-2 sm:mx-4 mt-2 sm:mt-4 lg:ml-auto lg:w-fit rounded-2xl sm:rounded-[2rem] border border-white/10">
+      <div className="flex items-center justify-between h-14 sm:h-16 px-4 sm:px-8 lg:px-10 space-x-4 sm:space-x-8">
 
         {/* Lado Izquierdo */}
         <div className="flex items-center">
@@ -83,13 +83,13 @@ const Header = ({ onToggleSidebar, isSidebarOpen, isMobile }) => {
             {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
 
-          <div className={`flex items-center space-x-3 ${isMobile ? 'lg:hidden' : 'hidden'}`}>
-            <div className="w-9 h-9 bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/25 ring-2 ring-white">
-              <span className="text-white font-bold text-sm">🚌</span>
+          <div className={`flex items-center space-x-2 sm:space-x-3 ${isMobile ? 'lg:hidden' : 'hidden'}`}>
+            <div className="w-8 h-8 sm:w-9 sm:h-9 bg-gradient-to-br from-primary-600 to-primary-700 rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/25 ring-1 sm:ring-2 ring-white">
+              <span className="text-white font-bold text-xs sm:text-sm">🚌</span>
             </div>
             <div className="flex flex-col">
-              <h1 className="text-xl font-black text-white tracking-tighter">Recorridos</h1>
-              <p className="text-[10px] text-white/30 font-black uppercase tracking-widest leading-none">Panel de control</p>
+              <h1 className="text-lg sm:text-xl font-black text-white tracking-tighter">Recorridos</h1>
+              <p className="text-[8px] sm:text-[10px] text-white/30 font-black uppercase tracking-widest leading-none">Panel</p>
             </div>
           </div>
         </div>
@@ -186,7 +186,7 @@ const Header = ({ onToggleSidebar, isSidebarOpen, isMobile }) => {
 
                 <div className="px-6 py-4 bg-white/5 border-t border-white/5">
                   <div className="text-[10px] text-white/20 text-center font-black uppercase tracking-[0.2em]">
-                    Recorridos App v3.1.3
+                    Recorridos App v3.1.4
                   </div>
                 </div>
               </div>

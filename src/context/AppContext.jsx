@@ -8,6 +8,13 @@ export const AppProvider = ({ children }) => {
   const [ninos, setNinos] = useState([]);
   const [vehiculos, setVehiculos] = useState([]);
   const [recorridos, setRecorridos] = useState([]);
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth < 1024 : false);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 1024);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Theme State
   const [theme, setTheme] = useState(() => {
@@ -48,7 +55,9 @@ export const AppProvider = ({ children }) => {
     recorridos,
     setRecorridos,
     theme,
-    toggleTheme
+    toggleTheme,
+    isMobile,
+    setIsMobile
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
