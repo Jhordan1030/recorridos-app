@@ -11,7 +11,7 @@ import Card from "../components/ui/Card";
 import Skeleton from "../components/ui/Skeleton";
 
 const Ninos = () => {
-  const { ninos, setNinos } = useApp();
+  const { ninos, setNinos, isMobile } = useApp();
   const { showAlert } = useAlert();
 
   const [formData, setFormData] = useState({
@@ -239,25 +239,21 @@ const Ninos = () => {
                 </div>
 
                 {/* Card Actions Footer */}
-                <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-xl rounded-[2rem] flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-500 scale-95 group-hover:scale-100 z-10 pointer-events-none group-hover:pointer-events-auto">
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="shadow-2xl"
-                    onClick={() => handleEdit(nino)}
-                    title="Editar"
-                  >
-                    ✏️
-                  </Button>
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    className="shadow-2xl"
-                    onClick={() => handleDeleteClick(nino.id)}
-                    title="Eliminar"
-                  >
-                    🗑️
-                  </Button>
+                <div className={`
+                  absolute inset-0 bg-slate-950/80 backdrop-blur-xl rounded-[2rem] flex items-center justify-center gap-3 transition-all duration-500
+                  ${isMobile
+                    ? 'opacity-0 scale-95 pointer-events-none'
+                    : 'opacity-0 lg:group-hover:opacity-100 scale-95 lg:group-hover:scale-100 z-10 pointer-events-none lg:group-hover:pointer-events-auto'
+                  }
+                `}>
+                  <Button variant="secondary" size="sm" onClick={() => handleEdit(nino)}>✏️</Button>
+                  <Button variant="danger" size="sm" onClick={() => handleDeleteClick(nino.id)}>🗑️</Button>
+                </div>
+
+                {/* Mobile Actions (Visible) */}
+                <div className="mt-auto pt-6 border-t border-white/5 flex gap-2 lg:hidden">
+                  <Button variant="secondary" size="sm" className="flex-1" onClick={() => handleEdit(nino)}>Editar</Button>
+                  <Button variant="danger" size="sm" className="flex-1" onClick={() => handleDeleteClick(nino.id)}>Eliminar</Button>
                 </div>
               </div>
             ))}
