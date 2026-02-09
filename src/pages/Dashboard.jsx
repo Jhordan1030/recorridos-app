@@ -14,8 +14,13 @@ import {
   ChevronRight,
   Clock,
   Trash2,
-  Plus
+
+  Plus,
+  TrendingUp,
+  ArrowUpRight,
+  ArrowDownRight
 } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import Modal from '../components/ui/Modal';
 import ConfirmModal from '../components/ui/ConfirmModal';
 import Alert from '../components/ui/Alert';
@@ -37,6 +42,7 @@ const Dashboard = () => {
   const [ninosSeleccionados, setNinosSeleccionados] = useState([]);
   const [loadingForm, setLoadingForm] = useState(false);
   const [recorridosMensuales, setRecorridosMensuales] = useState({});
+  const [chartData, setChartData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mesActual, setMesActual] = useState(new Date().getMonth() + 1);
   const [añoActual, setAñoActual] = useState(new Date().getFullYear());
@@ -128,6 +134,60 @@ const Dashboard = () => {
       });
 
     setRecorridosMensuales(recorridosLimpios);
+
+    // --- LÓGICA DE GRÁFICO COMPARATIVO ---
+    const chartDataMap = {};
+    const diasDelMes = new Date(añoActual, mesActual, 0).getDate();
+
+
+
+    // Inicializar mapa con días
+    for (let i = 1; i <= diasDelMes; i++) {
+      chartDataMap[i] = { name: i.toString(), actual: 0, anterior: 0 };
+    }
+
+    if (Array.isArray(data)) {
+      data.forEach(r => {
+        if (!r?.fecha) return;
+
+        // Manejo robusto de fechas - ZONA HORARIA NEUTRA
+        let a, m, d;
+        if (typeof r.fecha === 'string') {
+          // Tomamos la fecha YYYY-MM-DD ignorando hora y zona
+          const fechaStr = r.fecha.includes('T') ? r.fecha.split('T')[0] : r.fecha;
+          const parts = fechaStr.split('-');
+
+          if (parts.length === 3) {
+            // Parseo directo de componentes
+            a = parseInt(parts[0], 10);
+            m = parseInt(parts[1], 10);
+            d = parseInt(parts[2], 10);
+          } else {
+            return;
+          }
+        } else {
+          return;
+        }
+
+        // Datos Mes Actual
+        if (m === mesActual && a === añoActual) {
+          if (chartDataMap[d]) chartDataMap[d].actual += 1;
+        }
+
+        // Datos Mes Anterior
+        const fechaMesAnterior = new Date(añoActual, mesActual - 1, 0); // Último día mes anterior
+        const mesAnterior = fechaMesAnterior.getMonth() + 1;
+        const anioAnterior = fechaMesAnterior.getFullYear();
+
+        if (m === mesAnterior && a === anioAnterior) {
+          if (chartDataMap[d]) chartDataMap[d].anterior += 1;
+        }
+      });
+    }
+
+
+
+    setChartData(Object.values(chartDataMap));
     setLoading(false);
   };
 
@@ -662,6 +722,86 @@ const Dashboard = () => {
         </Card>
       </div>
 
+      {/* --- GRÁFICO COMPARATIVO --- */}
+      <div className="mb-8">
+        <Card variant="base" className="p-6 border border-slate-200 shadow-sm relative overflow-hidden">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
+                <TrendingUp size={20} className="text-indigo-600" />
+                Rendimiento Operativo
+              </h3>
+              <p className="text-xs font-medium text-slate-500 mt-1">Comparativa de rutas: {nombresMeses[mesActual - 1]} vs Mes Anterior</p>
+            </div>
+            <div className="flex items-center gap-4 text-xs font-bold">
+              <div className="flex items-center gap-1.5">
+                <div className="w-2.5 h-2.5 rounded-full bg-indigo-500"></div>
+                <span className="text-slate-600">Actual</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-2.5 h-2.5 rounded-full bg-slate-200"></div>
+                <span className="text-slate-400">Anterior</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="h-[250px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={chartData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <XAxis
+                  dataKey="name"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 'bold' }}
+                  dy={10}
+                />
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 'bold' }}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: '#fff',
+                    borderRadius: '12px',
+                    border: '1px solid #e2e8f0',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                    fontSize: '12px',
+                    fontWeight: 'bold',
+                    color: '#1e293b'
+                  }}
+                  itemStyle={{ color: '#475569' }}
+                  cursor={{ stroke: '#6366f1', strokeWidth: 1, strokeDasharray: '4 4' }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="anterior"
+                  stroke="#cbd5e1"
+                  strokeWidth={2}
+                  fill="transparent"
+                  activeDot={{ r: 4, strokeWidth: 0 }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="actual"
+                  stroke="#6366f1"
+                  strokeWidth={3}
+                  fill="url(#colorActual)"
+                  activeDot={{ r: 6, stroke: '#fff', strokeWidth: 2 }}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
+      </div>
+
       {loading ? (
         <div className="space-y-6">
           <Skeleton variant="card" className="h-[400px]" />
@@ -738,7 +878,7 @@ const Dashboard = () => {
                                       }
                                     `}>
                                       <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${r.tipo_recorrido === 'traer' ? 'bg-emerald-500' :
-                                          r.tipo_recorrido === 'llevar' ? 'bg-amber-500' : 'bg-blue-500'
+                                        r.tipo_recorrido === 'llevar' ? 'bg-amber-500' : 'bg-blue-500'
                                         }`} />
                                       <span className="truncate">{r.vehiculo_descripcion || 'Sin Unidad'}</span>
                                     </div>
