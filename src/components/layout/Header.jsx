@@ -69,8 +69,8 @@ const Header = ({ onToggleSidebar, isSidebarOpen, isMobile }) => {
   };
 
   return (
-    <header className="glass-navbar sticky top-0 z-40">
-      <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
+    <header className="glass-navbar sticky top-4 z-40 mx-4 mt-4 lg:ml-auto lg:w-fit rounded-[2rem] border border-white/10">
+      <div className="flex items-center justify-between h-16 px-6 sm:px-8 lg:px-10 space-x-8">
 
         {/* Lado Izquierdo */}
         <div className="flex items-center">
@@ -114,7 +114,7 @@ const Header = ({ onToggleSidebar, isSidebarOpen, isMobile }) => {
                   {displayName}
                 </p>
                 <p className="text-[10px] font-black text-white/30 uppercase tracking-widest truncate">
-                  {user?.email}
+                  {isAdmin ? 'Administrador' : 'Usuario'}
                 </p>
               </div>
 
@@ -145,7 +145,7 @@ const Header = ({ onToggleSidebar, isSidebarOpen, isMobile }) => {
                         {displayName}
                       </p>
                       <p className="text-[10px] font-black text-white/30 truncate mt-0.5 uppercase tracking-widest">
-                        {user?.email}
+                        {user?.rol === 'admin' ? 'Administrador del Sistema' : 'Nivel de Usuario'}
                       </p>
                       <div className="mt-3">
                         <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${isAdmin ? 'bg-amber-400/20 text-amber-400 border-amber-400/20' : 'bg-primary-400/20 text-primary-400 border-primary-400/20'}`}>
@@ -194,7 +194,7 @@ const Header = ({ onToggleSidebar, isSidebarOpen, isMobile }) => {
           </div>
         </div>
       </div>
-      <div className="h-0.5 bg-gradient-to-r from-transparent via-primary-500/20 to-transparent animate-pulse"></div>
+      <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
     </header>
   );
 };
