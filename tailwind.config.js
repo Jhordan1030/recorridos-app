@@ -21,32 +21,38 @@ export default {
           800: '#075985',
           900: '#0c4a6e',
         },
-        accent: {
-          pink: '#ff0080',
-          blue: '#7928ca',
-          purple: '#4c1d95',
-          cyan: '#00dfd8',
+        slate: {
+          950: '#020617',
         },
-        medical: {
-          50: '#f0fdf4',
-          100: '#dcfce7',
-          500: '#22c55e',
-          600: '#16a34a',
-        },
-        glass: {
-          white: 'rgba(255, 255, 255, 0.1)',
-          dark: 'rgba(0, 0, 0, 0.2)',
-          border: 'rgba(255, 255, 255, 0.2)',
+        enterprise: {
+          bg: '#0a0a0b',
+          surface: '#121214',
+          border: 'rgba(255, 255, 255, 0.08)',
+          'border-hover': 'rgba(255, 255, 255, 0.15)',
         }
       },
       backgroundImage: {
+        'grid-pattern': "url(\"data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 40 L40 40 L40 0' fill='none' stroke='white' stroke-opacity='0.03' stroke-width='1'/%3E%3C/svg%3E\")",
       },
       boxShadow: {
-        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
-        'glass-inner': 'inset 0 0 0 1px rgba(255, 255, 255, 0.1)',
+        'inner-glow': 'inset 0 1px 1px rgba(0, 0, 0, 0.05)',
+        'ent-sm': 'var(--shadow-ent-sm)',
+        'ent-md': 'var(--shadow-ent-md)',
+        'ent-lg': 'var(--shadow-ent-lg)',
       },
-      backdropBlur: {
-        'xs': '2px',
+      animation: {
+        'spring-in': 'spring 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+        'fade-in': 'fadeIn 0.3s ease-out forwards',
+      },
+      keyframes: {
+        spring: {
+          '0%': { transform: 'scale(0.95)', opacity: '0' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
+        },
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        }
       }
     },
   },

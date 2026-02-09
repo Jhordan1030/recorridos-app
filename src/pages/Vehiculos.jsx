@@ -9,6 +9,7 @@ import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import Card from '../components/ui/Card';
 import Skeleton from '../components/ui/Skeleton';
+import { Settings, Trash2 } from 'lucide-react';
 
 const Vehiculos = () => {
   const { vehiculos, setVehiculos, isMobile } = useApp();
@@ -172,7 +173,7 @@ const Vehiculos = () => {
       },
       default: {
         icon: '🚗',
-        color: 'bg-white/10 text-white/70 border-white/10'
+        color: 'bg-slate-100 text-slate-600 border-slate-200'
       }
     };
     return config[tipo] || config.default;
@@ -183,119 +184,105 @@ const Vehiculos = () => {
       <Alert />
 
       {/* --- Page Header --- */}
-      <div className="max-w-7xl mx-auto mb-10">
-        <div className="md:flex md:items-center md:justify-between md:space-x-8">
-          <div className="flex items-start">
-            <div className="pt-1.5">
-              <h1 className="text-4xl font-black text-white sm:text-5xl tracking-tighter">Vehículos</h1>
-              <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mt-3">Gestión de flota y costos operativos</p>
-            </div>
+      <div className="w-full mx-auto mb-8">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Gestión de Vehículos</h1>
+            <p className="text-xs font-medium text-slate-500 mt-1 uppercase tracking-wider">Control de flota y costos operativos</p>
           </div>
-          <div className="mt-8 flex flex-col-reverse justify-stretch gap-4 md:mt-0 md:flex-row md:items-center">
-            <Button
-              variant="secondary"
-              onClick={loadVehiculos}
-              disabled={loading}
-              className="w-full md:w-auto"
-            >
-              Refrescar
+          <div className="flex items-center gap-3">
+            <Button variant="secondary" size="sm" onClick={loadVehiculos} disabled={loading} icon={<Settings size={14} />}>
+              Actualizar
             </Button>
-            <Button
-              variant="primary"
-              onClick={handleOpenCreateModal}
-              className="w-full md:w-auto shadow-2xl shadow-primary-500/20"
-            >
-              Nuevo Vehículo
+            <Button variant="primary" size="sm" onClick={handleOpenCreateModal} icon={<Plus size={14} />}>
+              Añadir Transporte
             </Button>
           </div>
         </div>
       </div>
 
       {/* --- Content Section --- */}
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-10">
-          <Card className="p-8">
-            <dt className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">Total Flota</dt>
-            <dd className="text-4xl font-black text-white tracking-tighter">{vehiculos.length}</dd>
+      <div className="w-full mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <Card variant="base" padding="p-5">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Total Flota</span>
+            <div className="flex items-end gap-2">
+              <span className="text-2xl font-bold text-slate-900 tracking-tight">{vehiculos.length}</span>
+              <span className="text-[10px] text-slate-400 mb-1 font-semibold uppercase">Vehículos</span>
+            </div>
           </Card>
-          <Card className="p-8 border-blue-500/20">
-            <dt className="text-[10px] font-black text-blue-400/50 uppercase tracking-[0.2em] mb-2">Vehículos Propios</dt>
-            <dd className="text-4xl font-black text-blue-400 tracking-tighter">
-              {vehiculos.filter(v => v.tipo === 'propio').length}
-            </dd>
+          <Card variant="base" padding="p-5">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Costo Promedio</span>
+            <div className="flex items-end gap-2">
+              <span className="text-2xl font-bold text-primary-600 tracking-tight">$42.50</span>
+              <span className="text-[10px] text-slate-400 mb-1 font-semibold uppercase">Por ruta</span>
+            </div>
           </Card>
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {[...Array(8)].map((_, i) => (
-              <Skeleton key={i} variant="card" className="h-[280px]" />
+              <Skeleton key={i} variant="card" className="h-[200px] border border-white/5 bg-white/[0.02] rounded-xl" />
             ))}
           </div>
         ) : vehiculos.length === 0 ? (
-          <div className="text-center py-24 bg-white/5 rounded-[2.5rem] border border-white/5 border-dashed">
-            <div className="text-5xl mb-6 opacity-30">🚗</div>
-            <h3 className="text-xl font-black text-white mb-2">Sin vehículos</h3>
-            <p className="text-white/20 text-[10px] font-black uppercase tracking-widest">Registra tu primer transporte para comenzar</p>
+          <div className="text-center py-20 bg-slate-50 rounded-2xl border border-slate-200 border-dashed">
+            <div className="text-4xl mb-4 opacity-30">🚗</div>
+            <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Sin vehículos</h3>
+            <p className="text-xs text-slate-500 mt-1 tracking-tight">Registra tu primer transporte para comenzar a operar</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {(vehiculos || []).map((vehiculo) => {
               const styleInfo = getTipoInfo(vehiculo.tipo);
               return (
-                <div
+                <Card
                   key={vehiculo.id}
-                  className="group relative bg-white/5 backdrop-blur-md rounded-[2rem] border border-white/10 p-7 hover:bg-white/10 transition-all duration-500 hover:shadow-2xl flex flex-col"
+                  variant="base"
+                  padding="p-0"
+                  hover
+                  className="flex flex-col group/v"
                 >
-                  <div className="flex items-start justify-between mb-6">
-                    <span className="text-3xl filter drop-shadow-2xl">{styleInfo.icon}</span>
-                    <span className={`inline-flex items-center px-3 py-1 text-[10px] font-black uppercase tracking-widest border rounded-full ${styleInfo.color}`}>
-                      {vehiculo.tipo}
-                    </span>
-                  </div>
+                  <div className="p-5 flex-1">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="w-10 h-10 bg-slate-50 rounded-lg border border-slate-100 flex items-center justify-center text-lg">
+                        {styleInfo.icon}
+                      </div>
+                      <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border ${styleInfo.color}`}>
+                        {vehiculo.tipo}
+                      </span>
+                    </div>
 
-                  <div className="mb-8">
-                    <h3 className="text-xl font-black text-white truncate tracking-tighter" title={vehiculo.descripcion}>
+                    <h3 className="text-sm font-bold text-slate-900 tracking-tight truncate line-clamp-1 mb-1 uppercase" title={vehiculo.descripcion}>
                       {vehiculo.descripcion}
                     </h3>
-                    <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mt-1">
-                      {vehiculo.placa || 'SIN PLACA'}
-                    </p>
-                  </div>
 
-                  <div className="space-y-4 py-6 border-t border-white/5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">Capacidad</span>
-                      <span className="text-[10px] font-black text-white/70 uppercase tracking-widest">
-                        {vehiculo.capacidad ? `${vehiculo.capacidad} Pas.` : '--'}
-                      </span>
+                    <div className="flex items-center gap-2 mb-4">
+                      <span className="text-[10px] font-mono text-slate-500">PLACA: {vehiculo.placa || 'N/D'}</span>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">Costo/Recorrido</span>
-                      <span className="text-xl font-black text-emerald-400 tracking-tighter">
-                        ${parseFloat(vehiculo.costo_por_recorrido || 0).toFixed(2)}
-                      </span>
+
+                    <div className="pt-4 border-t border-slate-100 grid grid-cols-2 gap-2">
+                      <div>
+                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Capacidad</p>
+                        <p className="text-xs font-bold text-slate-700">{vehiculo.capacidad || '--'} PAS.</p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Costo</p>
+                        <p className="text-sm font-bold text-emerald-600">${parseFloat(vehiculo.costo_por_recorrido || 0).toFixed(2)}</p>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Card Actions Footer */}
-                  <div className={`
-                    absolute inset-0 bg-slate-950/80 backdrop-blur-xl rounded-[2rem] flex items-center justify-center gap-3 transition-all duration-500
-                    ${isMobile
-                      ? 'opacity-0 scale-95 pointer-events-none'
-                      : 'opacity-0 lg:group-hover:opacity-100 scale-95 lg:group-hover:scale-100 z-10 pointer-events-none lg:group-hover:pointer-events-auto'
-                    }
-                  `}>
-                    <Button variant="secondary" size="sm" onClick={() => handleEdit(vehiculo)}>✏️</Button>
-                    <Button variant="danger" size="sm" onClick={() => handleDeleteClick(vehiculo.id)}>🗑️</Button>
+                  <div className="p-3 bg-slate-50 border-t border-slate-100 flex gap-2 opacity-0 group-hover/v:opacity-100 transition-opacity">
+                    <Button variant="secondary" size="sm" className="flex-1 h-8 text-[10px]" onClick={() => handleEdit(vehiculo)}>
+                      Editar
+                    </Button>
+                    <Button variant="danger" size="sm" className="w-8 h-8 p-0" onClick={() => handleDeleteClick(vehiculo.id)}>
+                      <Trash2 size={12} />
+                    </Button>
                   </div>
-
-                  {/* Mobile Actions (Visible) */}
-                  <div className="mt-auto pt-6 border-t border-white/5 flex gap-2 lg:hidden">
-                    <Button variant="secondary" size="sm" className="flex-1" onClick={() => handleEdit(vehiculo)}>Editar</Button>
-                    <Button variant="danger" size="sm" className="flex-1" onClick={() => handleDeleteClick(vehiculo.id)}>Eliminar</Button>
-                  </div>
-                </div>
+                </Card>
               );
             })}
           </div>
@@ -324,13 +311,13 @@ const Vehiculos = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-2 gap-6">
               <div>
-                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest block mb-2 pl-1">Tipo de Vehículo</label>
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2 pl-1">Tipo de Vehículo</label>
                 <select
                   name="tipo"
                   value={formData.tipo}
                   onChange={handleChange}
                   required
-                  className="px-4 py-3 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary-500/50 focus:border-white/20 block w-full transition-all duration-300 bg-white/5 text-white outline-none backdrop-blur-sm"
+                  className="px-4 py-3 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary-500/50 focus:border-slate-300 block w-full transition-all duration-300 bg-white text-slate-900 outline-none"
                   disabled={loading}
                 >
                   <option value="propio">🚗 Propio</option>
@@ -385,7 +372,7 @@ const Vehiculos = () => {
               />
             </div>
 
-            <div className="mt-10 pt-8 border-t border-white/5 flex flex-col-reverse sm:flex-row sm:justify-end gap-4">
+            <div className="mt-10 pt-8 border-t border-slate-200 flex flex-col-reverse sm:flex-row sm:justify-end gap-4">
               <Button type="button" onClick={handleCloseModal} variant="secondary" className="w-full sm:w-auto">Cancelar</Button>
               <Button type="submit" variant="primary" loading={loading} className="w-full sm:w-auto">
                 {editMode ? 'Guardar Cambios' : 'Registrar Vehículo'}

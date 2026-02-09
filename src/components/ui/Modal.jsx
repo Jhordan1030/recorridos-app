@@ -6,7 +6,7 @@ const Modal = ({ title, children, onClose, size = 'max-w-md', isOpen }) => {
   // Efecto para manejar la tecla Escape y scroll
   useEffect(() => {
     const handleEscape = (event) => {
-      if (event.keyCode === 27) onClose();
+      if (event.key === 'Escape') onClose();
     };
 
     if (isOpen) {
@@ -37,7 +37,7 @@ const Modal = ({ title, children, onClose, size = 'max-w-md', isOpen }) => {
       >
         {/* Backdrop con Blur y color oscuro */}
         <div
-          className="fixed inset-0 bg-slate-950/80 backdrop-blur-md transition-opacity"
+          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"
           aria-hidden="true"
         />
 
@@ -45,32 +45,32 @@ const Modal = ({ title, children, onClose, size = 'max-w-md', isOpen }) => {
         <div
           className={`
             relative transform overflow-hidden 
-            rounded-t-[2rem] sm:rounded-[2.5rem] 
-            text-left shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] transition-all 
+            rounded-2xl sm:rounded-3xl
+            text-left shadow-2xl transition-all 
             sm:my-8 w-full ${size}
-            bg-slate-950/90 backdrop-blur-3xl
-            border-t border-x sm:border border-white/10
+            bg-white
+            border border-slate-200
           `}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="bg-white/5 px-6 sm:px-8 py-5 sm:py-6 border-b border-white/5">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xl sm:text-2xl font-black text-white tracking-tighter">
-                {title}
-              </h3>
-              <button
-                onClick={onClose}
-                className="rounded-2xl p-2 text-white/30 hover:text-white hover:bg-white/10 transition-all focus:outline-none"
-                type="button"
-              >
-                <X size={20} />
-              </button>
-            </div>
+          {/* Header */}
+          <div className="bg-white px-6 sm:px-8 py-5 sm:py-6 border-b border-slate-100 flex items-center justify-between">
+            <h3 className="text-xl font-bold text-slate-900 tracking-tight">
+              {title}
+            </h3>
+            <button
+              onClick={onClose}
+              className="rounded-lg p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all focus:outline-none"
+              type="button"
+            >
+              <X size={20} />
+            </button>
           </div>
 
           {/* Content */}
-          <div className="px-6 sm:px-8 py-6 sm:py-8 bg-transparent text-white/70">
+          {/* Content */}
+          <div className="px-6 sm:px-8 py-6 sm:py-8 bg-white text-slate-600">
             {children}
           </div>
         </div>

@@ -23,10 +23,25 @@ function AppContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-transparent flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto mb-6"></div>
-          <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">Inicializando sistema...</p>
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center">
+        <div className="relative flex items-center justify-center mb-8">
+          {/* Efecto de respiración (Glow) */}
+          <div className="absolute inset-0 bg-primary-500/20 rounded-2xl blur-xl animate-pulse"></div>
+
+          {/* Logo Container */}
+          <div className="relative w-16 h-16 bg-primary-600 rounded-2xl flex items-center justify-center shadow-lg shadow-primary-500/30 ring-1 ring-white/10 z-10 transition-transform duration-700 hover:scale-105">
+            <span className="text-white font-black text-3xl uppercase tracking-tighter">R</span>
+          </div>
+        </div>
+
+        {/* Indicador de carga */}
+        <div className="flex flex-col items-center gap-3">
+          <h3 className="text-sm font-bold text-white tracking-widest uppercase opacity-80">Recorridos</h3>
+          <div className="flex gap-1.5">
+            <div className="w-1.5 h-1.5 bg-primary-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+            <div className="w-1.5 h-1.5 bg-primary-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+            <div className="w-1.5 h-1.5 bg-primary-500 rounded-full animate-bounce"></div>
+          </div>
         </div>
       </div>
     );

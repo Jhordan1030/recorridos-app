@@ -150,12 +150,12 @@ const Ninos = () => {
       <Alert />
 
       {/* --- Page Header --- */}
-      <div className="max-w-7xl mx-auto mb-10">
+      <div className="w-full mx-auto mb-10">
         <div className="md:flex md:items-center md:justify-between md:space-x-8">
           <div className="flex items-start">
             <div className="pt-1.5">
-              <h1 className="text-4xl font-black text-white sm:text-5xl tracking-tighter">Niños</h1>
-              <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mt-3">Gestión de estudiantes y asignaciones</p>
+              <h1 className="text-4xl font-black text-slate-900 sm:text-5xl tracking-tighter">Niños</h1>
+              <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mt-3">Gestión de estudiantes y asignaciones</p>
             </div>
           </div>
           <div className="mt-8 flex flex-col-reverse justify-stretch gap-4 md:mt-0 md:flex-row md:items-center">
@@ -179,11 +179,11 @@ const Ninos = () => {
       </div>
 
       {/* --- Main Content --- */}
-      <div className="max-w-7xl mx-auto">
+      <div className="w-full mx-auto">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-10">
           <Card className="p-8">
-            <dt className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">Total Estudiantes</dt>
-            <dd className="text-4xl font-black text-white tracking-tighter">{ninos.length}</dd>
+            <dt className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2">Total Estudiantes</dt>
+            <dd className="text-4xl font-black text-slate-900 tracking-tighter">{ninos.length}</dd>
           </Card>
           <Card className="p-8 border-emerald-500/20">
             <dt className="text-[10px] font-black text-emerald-400/50 uppercase tracking-[0.2em] mb-2">Estado Sistema</dt>
@@ -198,10 +198,10 @@ const Ninos = () => {
             ))}
           </div>
         ) : ninos.length === 0 ? (
-          <div className="text-center py-24 bg-white/5 rounded-[2.5rem] border border-white/5 border-dashed">
+          <div className="text-center py-24 bg-white rounded-[2.5rem] border border-slate-200 border-dashed">
             <div className="text-5xl mb-6 opacity-30">👶</div>
-            <h3 className="text-xl font-black text-white mb-2">Sin registros</h3>
-            <p className="text-white/20 text-[10px] font-black uppercase tracking-widest">Inicia el registro de estudiantes para comenzar</p>
+            <h3 className="text-xl font-black text-slate-900 mb-2">Sin registros</h3>
+            <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest">Inicia el registro de estudiantes para comenzar</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -215,24 +215,24 @@ const Ninos = () => {
                   <div className="h-14 w-14 rounded-2xl bg-white/10 text-white flex items-center justify-center font-black text-xs shadow-2xl border border-white/20 ring-4 ring-white/5">
                     {nino.nombre?.charAt(0) || '?'}{nino.apellidos?.charAt(0) || '?'}
                   </div>
-                  <span className="inline-flex items-center px-3 py-1 text-[10px] font-black uppercase tracking-widest border border-emerald-400/20 bg-emerald-400/10 text-emerald-400 rounded-full">
+                  <span className="inline-flex items-center px-3 py-1 text-[10px] font-black uppercase tracking-widest border border-emerald-200 bg-emerald-50 text-emerald-600 rounded-full">
                     Activo
                   </span>
                 </div>
 
                 <div className="mb-8">
-                  <h3 className="text-xl font-black text-white truncate tracking-tighter" title={`${nino.nombre} ${nino.apellidos}`}>
+                  <h3 className="text-xl font-black text-slate-900 truncate tracking-tighter" title={`${nino.nombre} ${nino.apellidos}`}>
                     {nino.nombre} {nino.apellidos}
                   </h3>
-                  <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mt-1">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">
                     {nino.telefono_contacto || 'SIN TELÉFONO'}
                   </p>
                 </div>
 
-                <div className="space-y-4 py-6 border-t border-white/5">
+                <div className="space-y-4 py-6 border-t border-slate-100">
                   <div className="flex items-start flex-col gap-2">
-                    <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">Dirección Residencial</span>
-                    <p className="text-[11px] font-black text-white/60 uppercase tracking-tight leading-relaxed line-clamp-2">
+                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Dirección Residencial</span>
+                    <p className="text-[11px] font-black text-slate-600 uppercase tracking-tight leading-relaxed line-clamp-2">
                       {nino.direccion || 'Dirección no registrada'}
                     </p>
                   </div>
@@ -240,7 +240,7 @@ const Ninos = () => {
 
                 {/* Card Actions Footer */}
                 <div className={`
-                  absolute inset-0 bg-slate-950/80 backdrop-blur-xl rounded-[2rem] flex items-center justify-center gap-3 transition-all duration-500
+                  absolute inset-0 bg-white/90 backdrop-blur-xl rounded-[2rem] flex items-center justify-center gap-3 transition-all duration-500
                   ${isMobile
                     ? 'opacity-0 scale-95 pointer-events-none'
                     : 'opacity-0 lg:group-hover:opacity-100 scale-95 lg:group-hover:scale-100 z-10 pointer-events-none lg:group-hover:pointer-events-auto'
@@ -251,7 +251,7 @@ const Ninos = () => {
                 </div>
 
                 {/* Mobile Actions (Visible) */}
-                <div className="mt-auto pt-6 border-t border-white/5 flex gap-2 lg:hidden">
+                <div className="mt-auto pt-6 border-t border-slate-100 flex gap-2 lg:hidden">
                   <Button variant="secondary" size="sm" className="flex-1" onClick={() => handleEdit(nino)}>Editar</Button>
                   <Button variant="danger" size="sm" className="flex-1" onClick={() => handleDeleteClick(nino.id)}>Eliminar</Button>
                 </div>
@@ -321,7 +321,7 @@ const Ninos = () => {
               disabled={loading}
             />
 
-            <div className="mt-10 pt-8 border-t border-white/5 flex flex-col-reverse sm:flex-row sm:justify-end gap-4">
+            <div className="mt-10 pt-8 border-t border-slate-100 flex flex-col-reverse sm:flex-row sm:justify-end gap-4">
               <Button type="button" onClick={handleCloseModal} variant="secondary" className="w-full sm:w-auto">Cancelar</Button>
               <Button type="submit" variant="primary" loading={loading} className="w-full sm:w-auto">
                 {editMode ? 'Guardar Cambios' : 'Registrar'}
