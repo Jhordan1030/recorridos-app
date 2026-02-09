@@ -218,7 +218,7 @@ const Sidebar = ({ isOpen, onClose, isAdmin, isMobile, isCollapsed, setIsCollaps
           {(!isCollapsed || isMobile) && (
             <div className="mt-8 text-center">
               <div className="text-[10px] text-white/20 font-black uppercase tracking-widest">
-                v3.1.3
+                v3.1.4
               </div>
             </div>
           )}

@@ -638,6 +638,12 @@ const Dashboard = () => {
                 {matrizCalendario.map((semana, idx) => (
                   <div key={idx} className="grid grid-cols-7 border-b border-white/5 last:border-b-0">
                     {semana.map((dia, dIdx) => {
+                      if (!dia) {
+                        return (
+                          <div key={dIdx} className="h-20 sm:h-32 border-r border-white/5 last:border-r-0 bg-white/[0.02]" />
+                        );
+                      }
+
                       const tieneRecorridos = Array.isArray(recorridosMensuales[dia.numero]) && recorridosMensuales[dia.numero].length > 0;
                       let dayClasses = "relative h-20 sm:h-32 border-r border-white/5 last:border-r-0 p-2 sm:p-3 transition-all duration-300 group hover:bg-white/10";
 
