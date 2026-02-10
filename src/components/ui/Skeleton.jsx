@@ -1,7 +1,7 @@
 import React from 'react';
 
 const Skeleton = ({ className = '', variant = 'rect' }) => {
-    const baseStyles = "animate-pulse bg-white/10 rounded-2xl";
+    const baseStyles = "animate-pulse bg-slate-200 rounded-2xl";
 
     const variants = {
         rect: "h-24 w-full",

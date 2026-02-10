@@ -10,6 +10,7 @@ import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import Card from '../components/ui/Card';
 import Skeleton from '../components/ui/Skeleton';
+import { Plus } from 'lucide-react';
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -241,13 +242,15 @@ const Users = () => {
               variant="secondary"
               onClick={loadUsers}
               disabled={loading}
-              className="w-full md:w-auto"
+              size={isMobile ? 'sm' : 'lg'}
+              className="w-full md:w-auto !bg-white !border !border-slate-200 !text-slate-700 hover:!text-indigo-600 hover:!border-indigo-200 hover:!bg-indigo-50 transition-all shadow-sm"
             >
               Refrescar
             </Button>
             <Button
               variant="primary"
               onClick={() => setShowCreateForm(true)}
+              size={isMobile ? 'sm' : 'lg'}
               className="w-full md:w-auto shadow-2xl shadow-primary-500/20"
             >
               Nuevo Usuario

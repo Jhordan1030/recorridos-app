@@ -635,20 +635,26 @@ const Dashboard = () => {
             <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Panel de Control</h1>
             <p className="text-xs font-medium text-slate-500 mt-1 uppercase tracking-wider">Gestión centralizada de operaciones</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
             <Button
               variant="secondary"
-              size="sm"
+              size={isMobile ? 'sm' : 'lg'}
               onClick={exportarPDF}
               disabled={loading || totalRecorridosMes === 0}
-              className="bg-white border-slate-200 text-slate-600 hover:text-indigo-600 hover:border-indigo-200 hover:bg-indigo-50 transition-all shadow-sm"
+              className="w-full sm:w-auto justify-center !bg-white !border !border-slate-200 !text-slate-700 hover:!text-indigo-600 hover:!border-indigo-200 hover:!bg-indigo-50 transition-all shadow-sm"
             >
               <div className="flex items-center gap-2">
-                <FileText size={16} />
+                <FileText size={isMobile ? 16 : 20} className="text-slate-400 group-hover:text-indigo-600" />
                 <span>Exportar Reporte</span>
               </div>
             </Button>
-            <Button variant="primary" size="sm" onClick={handleOpenModal} icon={<Plus size={14} />}>
+            <Button
+              variant="primary"
+              size={isMobile ? 'sm' : 'lg'}
+              onClick={handleOpenModal}
+              icon={<Plus size={isMobile ? 14 : 20} />}
+              className="w-full sm:w-auto justify-center shadow-lg shadow-primary-500/20"
+            >
               Nueva Ruta
             </Button>
           </div>
@@ -993,9 +999,33 @@ const Dashboard = () => {
       >
         <div className="p-0 bg-transparent">
           {loadingForm ? (
-            <div className="py-24 text-center">
-              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600 mx-auto mb-6"></div>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Preparando entorno...</p>
+            <div className="space-y-8 p-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Skeleton variant="title" className="w-1/3 h-4" />
+                  <Skeleton variant="text" className="h-10 w-full" />
+                </div>
+                <div className="space-y-2">
+                  <Skeleton variant="title" className="w-1/3 h-4" />
+                  <Skeleton variant="text" className="h-10 w-full" />
+                </div>
+                <div className="space-y-2">
+                  <Skeleton variant="title" className="w-2/3 h-4" />
+                  <Skeleton variant="text" className="h-10 w-full" />
+                </div>
+                <div className="space-y-2">
+                  <Skeleton variant="title" className="w-1/2 h-4" />
+                  <Skeleton variant="text" className="h-10 w-full" />
+                </div>
+                <div className="sm:col-span-2 space-y-2">
+                  <Skeleton variant="title" className="w-1/4 h-4" />
+                  <Skeleton variant="text" className="h-16 w-full" />
+                </div>
+              </div>
+              <div className="pt-8 border-t border-slate-100 flex justify-end gap-4">
+                <Skeleton variant="rect" className="w-24 h-10 rounded-xl" />
+                <Skeleton variant="rect" className="w-32 h-10 rounded-xl" />
+              </div>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-8">
