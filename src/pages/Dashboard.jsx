@@ -625,7 +625,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-transparent py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
+    <div className="min-h-screen bg-transparent py-4 sm:py-8 px-0 sm:px-6 lg:px-8 transition-colors duration-300">
       <Alert />
 
       {/* --- Header Section --- */}
@@ -751,244 +751,268 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="h-[250px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis
-                  dataKey="name"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 'bold' }}
-                  dy={10}
-                />
-                <YAxis
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 'bold' }}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#fff',
-                    borderRadius: '12px',
-                    border: '1px solid #e2e8f0',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-                    fontSize: '12px',
-                    fontWeight: 'bold',
-                    color: '#1e293b'
-                  }}
-                  itemStyle={{ color: '#475569' }}
-                  cursor={{ stroke: '#6366f1', strokeWidth: 1, strokeDasharray: '4 4' }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="anterior"
-                  stroke="#cbd5e1"
-                  strokeWidth={2}
-                  fill="transparent"
-                  activeDot={{ r: 4, strokeWidth: 0 }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="actual"
-                  stroke="#6366f1"
-                  strokeWidth={3}
-                  fill="url(#colorActual)"
-                  activeDot={{ r: 6, stroke: '#fff', strokeWidth: 2 }}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+          <div className="h-[250px] w-full min-w-0">
+            {chartData && chartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <XAxis
+                    dataKey="name"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 'bold' }}
+                    dy={10}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 'bold' }}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#fff',
+                      borderRadius: '12px',
+                      border: '1px solid #e2e8f0',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                      fontSize: '12px',
+                      fontWeight: 'bold',
+                      color: '#1e293b'
+                    }}
+                    itemStyle={{ color: '#475569' }}
+                    cursor={{ stroke: '#6366f1', strokeWidth: 1, strokeDasharray: '4 4' }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="anterior"
+                    stroke="#cbd5e1"
+                    strokeWidth={2}
+                    fill="transparent"
+                    activeDot={{ r: 4, strokeWidth: 0 }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="actual"
+                    stroke="#6366f1"
+                    strokeWidth={3}
+                    fill="url(#colorActual)"
+                    activeDot={{ r: 6, stroke: '#fff', strokeWidth: 2 }}
+                  />
+                </AreaChart>
+
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-full w-full flex items-center justify-center text-slate-400 text-sm">
+                No hay datos para mostrar
+              </div>
+            )}
           </div>
         </Card>
-      </div>
+      </div >
 
-      {loading ? (
-        <div className="space-y-6">
-          <Skeleton variant="card" className="h-[400px]" />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Skeleton variant="card" className="h-[300px]" />
-            <Skeleton variant="card" className="h-[300px]" />
+      {
+        loading ? (
+          <div className="space-y-6" >
+            <Skeleton variant="card" className="h-[400px]" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Skeleton variant="card" className="h-[300px]" />
+              <Skeleton variant="card" className="h-[300px]" />
+            </div>
           </div>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Lado Izquierdo: Calendario Estilo Enterprise */}
-          <div className="lg:col-span-12 xl:col-span-8">
-            <Card variant="base" padding="p-0" className="h-full overflow-hidden border border-slate-200 shadow-sm">
-              <div className="p-6 border-b border-slate-100 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <h3 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
-                    <CalendarIcon size={20} className="text-primary-600" />
-                    Cronograma Operativo
-                  </h3>
-                  <p className="text-xs font-medium text-slate-500 mt-1">Gestión visual de rutas y despachos</p>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Lado Izquierdo: Calendario Estilo Enterprise */}
+            <div className="lg:col-span-12 xl:col-span-8">
+              <Card variant="base" padding="p-0" className="h-full overflow-hidden border border-slate-200 shadow-sm">
+                <div className="p-6 border-b border-slate-100 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <h3 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
+                      <CalendarIcon size={20} className="text-primary-600" />
+                      Cronograma Operativo
+                    </h3>
+                    <p className="text-xs font-medium text-slate-500 mt-1">Gestión visual de rutas y despachos</p>
+                  </div>
+
+                  <div className="flex items-center gap-1 bg-slate-50 p-1.5 rounded-xl border border-slate-200">
+                    <button onClick={() => cambiarMes(-1)} className="p-2 hover:bg-white hover:shadow-sm rounded-lg text-slate-500 transition-all"><ChevronLeft size={18} /></button>
+                    <span className="text-sm font-black text-slate-800 px-4 min-w-[140px] text-center uppercase tracking-widest leading-none">
+                      {nombresMeses[mesActual - 1]} <span className="text-slate-400 font-medium">{añoActual}</span>
+                    </span>
+                    <button onClick={() => cambiarMes(1)} className="p-2 hover:bg-white hover:shadow-sm rounded-lg text-slate-500 transition-all"><ChevronRight size={18} /></button>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-1 bg-slate-50 p-1.5 rounded-xl border border-slate-200">
-                  <button onClick={() => cambiarMes(-1)} className="p-2 hover:bg-white hover:shadow-sm rounded-lg text-slate-500 transition-all"><ChevronLeft size={18} /></button>
-                  <span className="text-sm font-black text-slate-800 px-4 min-w-[140px] text-center uppercase tracking-widest leading-none">
-                    {nombresMeses[mesActual - 1]} <span className="text-slate-400 font-medium">{añoActual}</span>
-                  </span>
-                  <button onClick={() => cambiarMes(1)} className="p-2 hover:bg-white hover:shadow-sm rounded-lg text-slate-500 transition-all"><ChevronRight size={18} /></button>
-                </div>
-              </div>
+                <div className="p-2 sm:p-6 bg-slate-50/50">
+                  <div className="pb-2">
+                    <div className="w-full">
+                      <div className="grid grid-cols-7 mb-4">
+                        {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map(d => (
+                          <div key={d} className="text-[9px] sm:text-[11px] font-black text-slate-400 uppercase text-center tracking-wider">{d}</div>
+                        ))}
+                      </div>
+                      <div className="grid grid-cols-7 gap-1 sm:gap-3">
+                        {matrizCalendario.map((semana, idx) => (
+                          <React.Fragment key={idx}>
+                            {semana.map((dia, dIdx) => {
+                              if (!dia) return <div key={`empty-${dIdx}`} className="h-14 sm:h-32 bg-transparent" />;
 
-              <div className="p-6 bg-slate-50/50">
-                <div className="overflow-x-auto pb-2">
-                  <div className="min-w-[700px]">
-                    <div className="grid grid-cols-7 mb-4">
-                      {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map(d => (
-                        <div key={d} className="text-[11px] font-black text-slate-400 uppercase text-center tracking-wider">{d}</div>
-                      ))}
+                              const recorridoDelDia = recorridosMensuales[dia.numero] || [];
+                              const tieneRecorridos = recorridoDelDia.length > 0;
+                              const esHoy = dia.esHoy;
+
+                              return (
+                                <div
+                                  key={dia.numero}
+                                  className={`
+                                  relative h-14 sm:h-32 p-1 sm:p-3 rounded-xl sm:rounded-2xl border transition-all duration-200 flex flex-col group
+                                  ${esHoy ? 'bg-white border-primary-500 ring-2 sm:ring-4 ring-primary-500/10 z-10' : 'bg-white border-slate-200 hover:border-slate-300 hover:shadow-md'}
+                                `}
+                                >
+                                  <span className={`
+                                   absolute top-1 right-1 sm:top-3 sm:right-3 w-5 h-5 sm:w-7 sm:h-7 flex items-center justify-center rounded-full text-[10px] sm:text-xs font-bold transition-colors
+                                   ${esHoy ? 'bg-primary-600 text-white' : 'text-slate-400 group-hover:text-slate-600 bg-slate-50'}
+                                 `}>
+                                    {dia.numero}
+                                  </span>
+
+                                  {/* Mobile Dots View */}
+                                  <div className="mt-6 sm:hidden flex flex-wrap gap-0.5 justify-center">
+                                    {recorridoDelDia.slice(0, 4).map((r, ri) => (
+                                      <div
+                                        key={ri}
+                                        className={`w-1.5 h-1.5 rounded-full ${r.tipo_recorrido === 'traer' ? 'bg-emerald-500' :
+                                          r.tipo_recorrido === 'llevar' ? 'bg-amber-500' : 'bg-blue-500'
+                                          }`}
+                                      />
+                                    ))}
+                                    {recorridoDelDia.length > 4 && (
+                                      <div className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+                                    )}
+                                  </div>
+
+                                  {/* Desktop List View */}
+                                  <div className="hidden sm:block mt-8 space-y-1.5 overflow-y-auto custom-scrollbar pr-1">
+                                    {recorridoDelDia.map((r, ri) => (
+                                      <div key={ri} className={`
+                                      flex items-center gap-2 px-2 py-1.5 rounded-lg border text-[10px] font-bold truncate transition-colors
+                                      ${r.tipo_recorrido === 'traer'
+                                          ? 'bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-100'
+                                          : r.tipo_recorrido === 'llevar'
+                                            ? 'bg-amber-50 text-amber-700 border-amber-100 hover:bg-amber-100'
+                                            : 'bg-blue-50 text-blue-700 border-blue-100 hover:bg-blue-100'
+                                        }
+                                    `}>
+                                        <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${r.tipo_recorrido === 'traer' ? 'bg-emerald-500' :
+                                          r.tipo_recorrido === 'llevar' ? 'bg-amber-500' : 'bg-blue-500'
+                                          }`} />
+                                        <span className="truncate">{r.vehiculo_descripcion || 'Sin Unidad'}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </React.Fragment>
+                        ))}
+                      </div>
                     </div>
-                    <div className="grid grid-cols-7 gap-3">
-                      {matrizCalendario.map((semana, idx) => (
-                        <React.Fragment key={idx}>
-                          {semana.map((dia, dIdx) => {
-                            if (!dia) return <div key={`empty-${dIdx}`} className="h-28 sm:h-32 bg-transparent" />;
+                  </div>
+                </div>
+              </Card>
+            </div>
 
-                            const recorridoDelDia = recorridosMensuales[dia.numero] || [];
-                            const tieneRecorridos = recorridoDelDia.length > 0;
-                            const esHoy = dia.esHoy;
+            {/* --- Bitácora de Operaciones (Derecha) --- */}
+            <div className="lg:col-span-12 xl:col-span-4 h-full">
+              <Card variant="base" padding="p-0" className="h-[500px] lg:h-[650px] flex flex-col border border-slate-200 shadow-sm">
+                <div className="p-6 border-b border-slate-100 bg-white flex items-center justify-between">
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                      <Clock size={16} className="text-emerald-600" />
+                      Actividad Reciente
+                    </h3>
+                    <p className="text-[10px] font-medium text-slate-400 mt-0.5">Operaciones de {nombresMeses[mesActual - 1]}</p>
+                  </div>
+                  <div className="animate-pulse">
+                    <span className="text-[10px] font-black bg-emerald-100 text-emerald-700 px-2 py-1 rounded-md border border-emerald-200 tracking-wider">LIVE</span>
+                  </div>
+                </div>
+                <div className="flex-1 overflow-y-auto p-5 space-y-6 custom-scrollbar bg-slate-50/30">
+                  {Object.keys(recorridosMensuales).length > 0 ? (
+                    Object.keys(recorridosMensuales)
+                      .filter(dia => !isNaN(parseInt(dia)))
+                      .sort((a, b) => parseInt(b) - parseInt(a))
+                      .map(dia => (
+                        <div key={dia} className="relative pl-4 border-l-2 border-slate-200 space-y-4">
+                          <div className="absolute -left-[9px] top-0 w-4 h-4 bg-slate-200 rounded-full border-2 border-white"></div>
+                          <h4 className="text-xs font-black text-slate-500 uppercase tracking-widest leading-none mb-2">{dia} de {nombresMeses[mesActual - 1]}</h4>
+
+                          {recorridosMensuales[dia].map((recorrido, idx) => {
+                            // Calcular pasajeros aquí si no viene del backend
+                            const totalPasajeros = recorrido.total_ninos !== undefined ? recorrido.total_ninos : (recorrido.ninos?.length || 0);
 
                             return (
                               <div
-                                key={dia.numero}
-                                className={`
-                                  relative h-28 sm:h-32 p-3 rounded-2xl border transition-all duration-200 flex flex-col group
-                                  ${esHoy ? 'bg-white border-primary-500 ring-4 ring-primary-500/10 z-10' : 'bg-white border-slate-200 hover:border-slate-300 hover:shadow-md'}
-                                `}
+                                key={idx}
+                                className="group p-4 bg-white border border-slate-200 rounded-xl hover:border-primary-200 hover:shadow-md transition-all duration-200 relative overflow-hidden"
                               >
-                                <span className={`
-                                   absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded-full text-xs font-bold transition-colors
-                                   ${esHoy ? 'bg-primary-600 text-white' : 'text-slate-400 group-hover:text-slate-600 bg-slate-50'}
-                                 `}>
-                                  {dia.numero}
-                                </span>
+                                {/* Hover Accent */}
+                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
 
-                                <div className="mt-8 space-y-1.5 overflow-y-auto custom-scrollbar pr-1">
-                                  {recorridoDelDia.map((r, ri) => (
-                                    <div key={ri} className={`
-                                      flex items-center gap-2 px-2 py-1.5 rounded-lg border text-[10px] font-bold truncate transition-colors
-                                      ${r.tipo_recorrido === 'traer'
-                                        ? 'bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-100'
-                                        : r.tipo_recorrido === 'llevar'
-                                          ? 'bg-amber-50 text-amber-700 border-amber-100 hover:bg-amber-100'
-                                          : 'bg-blue-50 text-blue-700 border-blue-100 hover:bg-blue-100'
-                                      }
-                                    `}>
-                                      <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${r.tipo_recorrido === 'traer' ? 'bg-emerald-500' :
-                                        r.tipo_recorrido === 'llevar' ? 'bg-amber-500' : 'bg-blue-500'
-                                        }`} />
-                                      <span className="truncate">{r.vehiculo_descripcion || 'Sin Unidad'}</span>
+                                <div className="flex items-center justify-between mb-2">
+                                  <span className={`
+                                  text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider
+                                  ${recorrido.tipo_recorrido === 'traer' ? 'bg-emerald-50 text-emerald-600' :
+                                      recorrido.tipo_recorrido === 'llevar' ? 'bg-amber-50 text-amber-600' : 'bg-blue-50 text-blue-600'}
+                                `}>
+                                    {recorrido.tipo_recorrido?.toUpperCase() || 'GENERAL'}
+                                  </span>
+                                  <span className="text-[11px] font-bold text-slate-400 flex items-center gap-1">
+                                    <Clock size={12} />
+                                    {formatearHora(recorrido.hora_inicio)}
+                                  </span>
+                                </div>
+
+                                <h5 className="text-sm font-bold text-slate-800 mb-3 pr-6">{recorrido.vehiculo_descripcion}</h5>
+
+                                <div className="flex items-center justify-between pt-2 border-t border-slate-50">
+                                  <div className="flex items-center gap-2">
+                                    <div className="bg-slate-100 p-1.5 rounded-full text-slate-500">
+                                      <Users size={12} />
                                     </div>
-                                  ))}
+                                    <span className="text-xs font-semibold text-slate-600">{totalPasajeros} Pasajeros</span>
+                                  </div>
+
+                                  <button
+                                    onClick={() => handleDelete(recorrido.id)}
+                                    className="text-slate-300 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-lg transition-all"
+                                    title="Eliminar registro"
+                                  >
+                                    <Trash2 size={14} />
+                                  </button>
                                 </div>
                               </div>
                             );
                           })}
-                        </React.Fragment>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </div>
-
-          {/* --- Bitácora de Operaciones (Derecha) --- */}
-          <div className="lg:col-span-12 xl:col-span-4 h-full">
-            <Card variant="base" padding="p-0" className="h-[650px] flex flex-col border border-slate-200 shadow-sm">
-              <div className="p-6 border-b border-slate-100 bg-white flex items-center justify-between">
-                <div>
-                  <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                    <Clock size={16} className="text-emerald-600" />
-                    Actividad Reciente
-                  </h3>
-                  <p className="text-[10px] font-medium text-slate-400 mt-0.5">Operaciones de {nombresMeses[mesActual - 1]}</p>
-                </div>
-                <div className="animate-pulse">
-                  <span className="text-[10px] font-black bg-emerald-100 text-emerald-700 px-2 py-1 rounded-md border border-emerald-200 tracking-wider">LIVE</span>
-                </div>
-              </div>
-              <div className="flex-1 overflow-y-auto p-5 space-y-6 custom-scrollbar bg-slate-50/30">
-                {Object.keys(recorridosMensuales).length > 0 ? (
-                  Object.keys(recorridosMensuales)
-                    .filter(dia => !isNaN(parseInt(dia)))
-                    .sort((a, b) => parseInt(b) - parseInt(a))
-                    .map(dia => (
-                      <div key={dia} className="relative pl-4 border-l-2 border-slate-200 space-y-4">
-                        <div className="absolute -left-[9px] top-0 w-4 h-4 bg-slate-200 rounded-full border-2 border-white"></div>
-                        <h4 className="text-xs font-black text-slate-500 uppercase tracking-widest leading-none mb-2">{dia} de {nombresMeses[mesActual - 1]}</h4>
-
-                        {recorridosMensuales[dia].map((recorrido, idx) => {
-                          // Calcular pasajeros aquí si no viene del backend
-                          const totalPasajeros = recorrido.total_ninos !== undefined ? recorrido.total_ninos : (recorrido.ninos?.length || 0);
-
-                          return (
-                            <div
-                              key={idx}
-                              className="group p-4 bg-white border border-slate-200 rounded-xl hover:border-primary-200 hover:shadow-md transition-all duration-200 relative overflow-hidden"
-                            >
-                              {/* Hover Accent */}
-                              <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-
-                              <div className="flex items-center justify-between mb-2">
-                                <span className={`
-                                  text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider
-                                  ${recorrido.tipo_recorrido === 'traer' ? 'bg-emerald-50 text-emerald-600' :
-                                    recorrido.tipo_recorrido === 'llevar' ? 'bg-amber-50 text-amber-600' : 'bg-blue-50 text-blue-600'}
-                                `}>
-                                  {recorrido.tipo_recorrido?.toUpperCase() || 'GENERAL'}
-                                </span>
-                                <span className="text-[11px] font-bold text-slate-400 flex items-center gap-1">
-                                  <Clock size={12} />
-                                  {formatearHora(recorrido.hora_inicio)}
-                                </span>
-                              </div>
-
-                              <h5 className="text-sm font-bold text-slate-800 mb-3 pr-6">{recorrido.vehiculo_descripcion}</h5>
-
-                              <div className="flex items-center justify-between pt-2 border-t border-slate-50">
-                                <div className="flex items-center gap-2">
-                                  <div className="bg-slate-100 p-1.5 rounded-full text-slate-500">
-                                    <Users size={12} />
-                                  </div>
-                                  <span className="text-xs font-semibold text-slate-600">{totalPasajeros} Pasajeros</span>
-                                </div>
-
-                                <button
-                                  onClick={() => handleDelete(recorrido.id)}
-                                  className="text-slate-300 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-lg transition-all"
-                                  title="Eliminar registro"
-                                >
-                                  <Trash2 size={14} />
-                                </button>
-                              </div>
-                            </div>
-                          );
-                        })}
+                        </div>
+                      ))
+                  ) : (
+                    <div className="h-full flex flex-col items-center justify-center text-center opacity-40">
+                      <div className="bg-slate-100 p-4 rounded-full mb-4">
+                        <FileText size={32} className="text-slate-400" />
                       </div>
-                    ))
-                ) : (
-                  <div className="h-full flex flex-col items-center justify-center text-center opacity-40">
-                    <div className="bg-slate-100 p-4 rounded-full mb-4">
-                      <FileText size={32} className="text-slate-400" />
+                      <p className="text-xs font-bold uppercase tracking-widest text-slate-500">No hay actividad registrada</p>
                     </div>
-                    <p className="text-xs font-bold uppercase tracking-widest text-slate-500">No hay actividad registrada</p>
-                  </div>
-                )}
-              </div>
-            </Card>
+                  )}
+                </div>
+              </Card>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
       {/* --- Management Modal --- */}
       <Modal
@@ -1156,7 +1180,7 @@ const Dashboard = () => {
         cancelText="Cancelar"
         type="danger"
       />
-    </div>
+    </div >
   );
 };
 

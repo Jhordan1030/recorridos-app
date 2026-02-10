@@ -69,7 +69,7 @@ const Header = ({ onToggleSidebar, isSidebarOpen, isMobile }) => {
   };
 
   return (
-    <header className="sticky top-4 z-40 mx-4 lg:mx-6 rounded-2xl bg-white/80 backdrop-blur-md border border-slate-200 shadow-sm transition-all duration-300 mb-6">
+    <header className="sticky top-4 z-40 mx-2 lg:mx-6 rounded-2xl bg-white/80 backdrop-blur-md border border-slate-200 shadow-sm transition-all duration-300 mb-6">
       <div className="flex items-center justify-between h-14 px-4 sm:px-6">
 
         {/* Lado Izquierdo */}
