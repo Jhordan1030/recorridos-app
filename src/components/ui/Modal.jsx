@@ -32,7 +32,7 @@ const Modal = ({ title, children, onClose, size = 'max-w-md', isOpen }) => {
     <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Contenedor principal para centrado */}
       <div
-        className="flex min-h-full items-end justify-center sm:items-center sm:p-0"
+        className="flex min-h-full items-end justify-center sm:items-center p-4 sm:p-0"
         onClick={handleBackdropClick}
       >
         {/* Backdrop con Blur y color oscuro */}

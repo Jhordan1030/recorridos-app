@@ -9,7 +9,7 @@ import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import Card from '../components/ui/Card';
 import Skeleton from '../components/ui/Skeleton';
-import { Settings, Trash2 } from 'lucide-react';
+import { Settings, Trash2, Plus } from 'lucide-react';
 
 const Vehiculos = () => {
   const { vehiculos, setVehiculos, isMobile } = useApp();
@@ -191,10 +191,23 @@ const Vehiculos = () => {
             <p className="text-xs font-medium text-slate-500 mt-1 uppercase tracking-wider">Control de flota y costos operativos</p>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="secondary" size="sm" onClick={loadVehiculos} disabled={loading} icon={<Settings size={14} />}>
+            <Button
+              variant="secondary"
+              size={isMobile ? 'sm' : 'lg'}
+              onClick={loadVehiculos}
+              disabled={loading}
+              icon={<Settings size={isMobile ? 14 : 18} />}
+              className="!bg-white !border !border-slate-200 !text-slate-700 hover:!text-indigo-600 hover:!border-indigo-200 hover:!bg-indigo-50 transition-all shadow-sm"
+            >
               Actualizar
             </Button>
-            <Button variant="primary" size="sm" onClick={handleOpenCreateModal} icon={<Plus size={14} />}>
+            <Button
+              variant="primary"
+              size={isMobile ? 'sm' : 'lg'}
+              onClick={handleOpenCreateModal}
+              icon={<Plus size={isMobile ? 14 : 18} />}
+              className="shadow-2xl shadow-primary-500/20"
+            >
               Añadir Transporte
             </Button>
           </div>
@@ -211,13 +224,7 @@ const Vehiculos = () => {
               <span className="text-[10px] text-slate-400 mb-1 font-semibold uppercase">Vehículos</span>
             </div>
           </Card>
-          <Card variant="base" padding="p-5">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Costo Promedio</span>
-            <div className="flex items-end gap-2">
-              <span className="text-2xl font-bold text-primary-600 tracking-tight">$42.50</span>
-              <span className="text-[10px] text-slate-400 mb-1 font-semibold uppercase">Por ruta</span>
-            </div>
-          </Card>
+
         </div>
 
         {loading ? (

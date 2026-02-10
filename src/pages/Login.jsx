@@ -33,7 +33,7 @@ const Login = () => {
     <div className="flex min-h-screen w-full bg-transparent overflow-hidden">
 
       {/* --- LADO IZQUIERDO (FORMULARIO) --- */}
-      <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-6 md:p-12 relative bg-transparent transition-colors duration-300">
+      <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-6 md:p-12 relative bg-transparent transition-colors duration-300 px-4">
 
         <div className="w-full max-w-[420px] space-y-8 z-10">
 

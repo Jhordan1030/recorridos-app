@@ -280,13 +280,15 @@ const Recorridos = () => {
               variant="secondary"
               onClick={loadRecorridos}
               disabled={loading}
-              className="w-full md:w-auto"
+              size={isMobile ? 'sm' : 'lg'}
+              className="w-full md:w-auto !bg-white !border !border-slate-200 !text-slate-700 hover:!text-indigo-600 hover:!border-indigo-200 hover:!bg-indigo-50 transition-all shadow-sm"
             >
               Refrescar
             </Button>
             <Button
               variant="primary"
               onClick={handleOpenModal}
+              size={isMobile ? 'sm' : 'lg'}
               className="w-full md:w-auto shadow-2xl shadow-primary-500/20"
             >
               Nuevo Recorrido
