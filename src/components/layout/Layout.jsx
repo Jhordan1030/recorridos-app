@@ -91,7 +91,7 @@ const Layout = ({ children }) => {
 
             {/* Contenido de la página */}
             <main className="flex-1 overflow-x-hidden overflow-y-auto">
-              <div className="w-full max-w-[2000px] mx-auto px-4 lg:px-6 pb-8">
+              <div className="w-full max-w-[2000px] mx-auto px-2 lg:px-6 pb-8">
                 {children}
               </div>
             </main>
