@@ -734,7 +734,7 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="h-[250px] w-full min-w-0">
+              <div className="w-full h-[250px]" style={{ minHeight: '250px' }}>
                 {chartData && chartData.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
