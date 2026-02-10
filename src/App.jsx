@@ -8,6 +8,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { AlertProvider } from './context/AlertContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
+import IdleTimerHandler from './components/IdleTimerHandler';
 import './App.css';
 import { Suspense, lazy } from 'react';
 
@@ -50,9 +51,17 @@ function AppContent() {
     );
   }
 
+  // Disable console logs in production
+  if (import.meta.env.PROD) {
+    console.log = () => { };
+    console.debug = () => { };
+    console.info = () => { };
+  }
+
   return (
     <AppProvider>
       <Router>
+        <IdleTimerHandler />
         <Routes>
           {/* Login Route - Outside Layout */}
           <Route
