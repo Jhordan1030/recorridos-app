@@ -734,7 +734,8 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <div className="w-full h-[250px]" style={{ minHeight: '250px' }}>
+              {/* Contenedor con altura fija explícita para evitar error de Recharts */}
+              <div style={{ width: '100%', height: 250 }}>
                 {chartData && chartData.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -787,7 +788,6 @@ const Dashboard = () => {
                         activeDot={{ r: 6, stroke: '#fff', strokeWidth: 2 }}
                       />
                     </AreaChart>
-
                   </ResponsiveContainer>
                 ) : (
                   <div className="h-full w-full flex items-center justify-center text-slate-400 text-sm">
