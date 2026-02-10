@@ -49,6 +49,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Safe Area Utility for Mobile Notch */
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 20px);
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;

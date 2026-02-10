@@ -263,7 +263,7 @@ const Recorridos = () => {
   };
 
   return (
-    <div className="min-h-screen bg-transparent py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
+    <div className="min-h-screen bg-transparent py-8 px-0 sm:px-6 lg:px-8 transition-colors duration-300">
       <Alert />
 
       {/* --- Page Header --- */}

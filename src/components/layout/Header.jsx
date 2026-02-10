@@ -86,7 +86,7 @@ const Header = ({ isMobile }) => {
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-2xl border-b border-white/20 shadow-sm transition-all duration-300">
+    <header className="hidden md:block sticky top-0 z-50 bg-white/80 backdrop-blur-2xl border-b border-white/20 shadow-sm transition-all duration-300">
       <div className="max-w-[2000px] mx-auto px-4 h-16 flex items-center justify-between gap-4">
 
         {/* --- LEFT: Logo & Brand --- */}
@@ -134,12 +134,13 @@ const Header = ({ isMobile }) => {
           )}
 
           {/* Notifications Placeholder */}
-          <button className="w-10 h-10 rounded-full bg-slate-50/80 hover:bg-slate-100 flex items-center justify-center text-slate-600 transition-colors border border-transparent hover:border-slate-200">
+          <button className="hidden md:flex w-10 h-10 rounded-full bg-slate-50/80 hover:bg-slate-100 items-center justify-center text-slate-600 transition-colors border border-transparent hover:border-slate-200">
             <Bell size={20} />
           </button>
 
           {/* User Menu */}
-          <div className="relative" ref={userMenuRef}>
+          {/* User Menu - Hidden on Mobile (available in BottomNav) */}
+          <div className="relative hidden md:block" ref={userMenuRef}>
             <button
               onClick={() => setShowUserMenu(!showUserMenu)}
               className="flex items-center gap-2 p-1 pl-2 rounded-full hover:bg-slate-50 transition-all border border-transparent hover:border-slate-200 focus:outline-none"
