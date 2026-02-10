@@ -5,14 +5,31 @@ import { updateUser, getCurrentUser } from '../services/api';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
-import { User, Mail, Shield, Key, Camera, Save, ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom'; // ← Agregar para volver atrás
+import {
+  User,
+  Mail,
+  Shield,
+  Key,
+  Camera,
+  Save,
+  ArrowLeft,
+  ChevronRight,
+  Bell,
+  Smartphone,
+  HelpCircle,
+  LogOut,
+  Lock
+} from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useApp } from '../context/AppContext';
 
 const Profile = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { showAlert } = useAlert();
-  const navigate = useNavigate(); // ← Hook para navegación
+  const navigate = useNavigate();
+  const { isMobile } = useApp();
   const [loading, setLoading] = useState(false);
+  const [activeSection, setActiveSection] = useState('main'); // 'main', 'personal', 'security'
 
   // --- LÓGICA DE NOMBRE ---
   const extractName = (u) => {
@@ -31,6 +48,9 @@ const Profile = () => {
     confirmPassword: ''
   });
 
+  const [displayName, setDisplayName] = useState('');
+  const [initial, setInitial] = useState('');
+
   // Cargar datos del usuario al montar
   useEffect(() => {
     const fetchProfile = async () => {
@@ -38,21 +58,27 @@ const Profile = () => {
         setLoading(true);
         const response = await getCurrentUser();
         const userData = response.data.user || response.data;
+        const name = extractName(userData) || '';
 
         setFormData(prev => ({
           ...prev,
-          nombre: extractName(userData) || '',
+          nombre: name,
           email: userData.email || ''
         }));
+        setDisplayName(name);
+        setInitial(name ? name.charAt(0).toUpperCase() : 'U');
+
       } catch (error) {
         console.error('Error fetching profile:', error);
-        // Si falla, al menos usamos lo que tenemos en el context
         if (user) {
+          const name = extractName(user) || '';
           setFormData(prev => ({
             ...prev,
-            nombre: extractName(user) || '',
+            nombre: name,
             email: user.email || ''
           }));
+          setDisplayName(name);
+          setInitial(name ? name.charAt(0).toUpperCase() : 'U');
         }
       } finally {
         setLoading(false);
@@ -70,7 +96,6 @@ const Profile = () => {
     e.preventDefault();
     setLoading(true);
 
-    // Validación simple de contraseña
     if (formData.password && formData.password !== formData.confirmPassword) {
       showAlert('error', 'Las contraseñas no coinciden');
       setLoading(false);
@@ -78,7 +103,6 @@ const Profile = () => {
     }
 
     try {
-      // Preparamos los datos a enviar
       const dataToUpdate = {
         nombre: formData.nombre,
         email: formData.email
@@ -94,6 +118,8 @@ const Profile = () => {
       if (response.data.success) {
         showAlert('success', 'Perfil actualizado correctamente');
         setFormData(prev => ({ ...prev, password: '', confirmPassword: '' }));
+        setDisplayName(formData.nombre);
+        setActiveSection('main');
       }
     } catch (error) {
       showAlert('error', 'Error al actualizar perfil: ' + (error.response?.data?.error || error.message));
@@ -102,159 +128,216 @@ const Profile = () => {
     }
   };
 
-  // Obtener inicial para el avatar
-  const getInitial = () => {
-    return formData.nombre ? formData.nombre.charAt(0).toUpperCase() : 'U';
-  };
+  // --- RENDER HELPERS ---
 
-  return (
-    <div className="min-h-screen bg-transparent py-10 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
-
-      {/* --- Page Header --- */}
-      <div className="max-w-5xl mx-auto mb-10">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
-          <div className="flex items-center gap-6">
-            <button
-              onClick={() => navigate(-1)}
-              className="p-3 rounded-2xl bg-white border border-slate-200 hover:bg-slate-50 transition-all group shadow-sm"
-            >
-              <ArrowLeft size={20} className="text-slate-400 group-hover:text-slate-900 transition-colors" />
-            </button>
-            <div>
-              <h1 className="text-4xl font-black text-slate-900 sm:text-5xl tracking-tighter">Mi Perfil</h1>
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mt-3">Configuración de identidad y seguridad</p>
-            </div>
-          </div>
-
-          <div className="inline-flex items-center px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border border-slate-200 bg-white text-slate-700 shadow-sm">
-            <div className={`w-2 h-2 rounded-full mr-3 ${user?.rol === 'admin' ? 'bg-amber-500 shadow-[0_0_10px_rgba(251,191,36,0.5)]' : 'bg-emerald-500 shadow-[0_0_10px_rgba(52,211,153,0.5)]'}`} />
-            {user?.rol === 'admin' ? 'Nivel Administrador' : 'Usuario Activo'}
-          </div>
+  const renderHeader = () => (
+    <div className="flex flex-col items-center py-8 bg-slate-50 border-b border-slate-100">
+      <div className="relative group cursor-pointer mb-4">
+        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary-500 to-indigo-600 flex items-center justify-center text-white text-4xl font-bold shadow-lg ring-4 ring-white">
+          {initial}
+        </div>
+        <div className="absolute bottom-0 right-0 bg-slate-900 text-white p-2 rounded-full border-2 border-white shadow-sm">
+          <Camera size={16} />
         </div>
       </div>
+      <h2 className="text-xl font-bold text-slate-900">{displayName}</h2>
+      <p className="text-sm text-slate-500">{formData.email}</p>
+    </div>
+  );
 
-      <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10">
+  const renderListItem = ({ icon: Icon, label, sublabel, onClick, color = "text-primary-600", bg = "bg-primary-50", danger = false }) => (
+    <button
+      onClick={onClick}
+      className={`w-full flex items-center justify-between p-4 bg-white active:bg-slate-50 transition-colors border-b border-slate-50 last:border-0 ${danger ? 'text-red-600' : 'text-slate-900'}`}
+    >
+      <div className="flex items-center gap-4">
+        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${danger ? 'bg-red-50 text-red-500' : bg + ' ' + color}`}>
+          <Icon size={18} />
+        </div>
+        <div className="text-left">
+          <p className="font-medium text-[15px]">{label}</p>
+          {sublabel && <p className="text-xs text-slate-400 mt-0.5">{sublabel}</p>}
+        </div>
+      </div>
+      <ChevronRight size={18} className="text-slate-300" />
+    </button>
+  );
 
-        {/* --- Identity Summary --- */}
-        <div className="lg:col-span-4 space-y-6">
-          <Card className="bg-white border border-slate-200 rounded-[2.5rem] shadow-xl p-0 overflow-hidden">
-            <div className="p-10 flex flex-col items-center text-center">
-              <div className="relative mb-8 group">
-                <div className="w-36 h-36 rounded-[2.5rem] bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 text-6xl font-black shadow-inner">
-                  {getInitial()}
-                </div>
-                <button className="absolute -bottom-2 -right-2 bg-primary-500 text-white rounded-2xl p-3.5 shadow-2xl shadow-primary-500/30 border border-primary-400/20 hover:scale-110 transition-all duration-300">
-                  <Camera className="w-5 h-5" />
-                </button>
-              </div>
+  // --- VISTAS ---
 
-              <h2 className="text-2xl font-black text-slate-900 mb-2 tracking-tighter">
-                {formData.nombre || 'Jhordan Huera'}
-              </h2>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.1em] mb-10">
-                {user?.rol === 'admin' ? 'Administrador del Sistema' : 'Usuario del Sistema'}
-              </p>
-
-              <div className="w-full grid grid-cols-2 gap-4">
-                <div className="p-5 bg-slate-50 rounded-3xl border border-slate-100 flex flex-col items-center gap-1">
-                  <span className="text-emerald-500 text-lg font-black tracking-tighter">✓</span>
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Validado</span>
-                </div>
-                <div className="p-5 bg-slate-50 rounded-3xl border border-slate-100 flex flex-col items-center gap-1">
-                  <span className="text-slate-900 text-lg font-black tracking-tighter">{new Date().getFullYear()}</span>
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Periodo</span>
-                </div>
-              </div>
-            </div>
-          </Card>
+  if (activeSection === 'personal') {
+    return (
+      <div className="min-h-screen bg-slate-100 pb-24">
+        <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 py-3 flex items-center gap-3">
+          <button onClick={() => setActiveSection('main')} className="p-1 -ml-1 text-primary-600">
+            <ArrowLeft size={24} />
+          </button>
+          <h1 className="text-lg font-bold text-slate-900">Datos Personales</h1>
         </div>
 
-        {/* --- Sensitive Data Form --- */}
-        <div className="lg:col-span-8">
-          <Card className="bg-white border border-slate-200 rounded-[2.5rem] shadow-xl overflow-hidden p-0">
-            <div className="p-8 sm:p-10 lg:p-12">
-              <div className="mb-10 flex items-center gap-5">
-                <div className="h-12 w-12 rounded-2xl bg-primary-100 border border-primary-200 flex items-center justify-center">
-                  <User className="w-6 h-6 text-primary-600" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-black text-slate-900 tracking-tighter uppercase tracking-[0.05em]">Datos Maestros</h3>
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">Sincronización de credenciales principales</p>
-                </div>
+        <div className="p-4 max-w-md mx-auto">
+          <Card className="p-5 space-y-4 shadow-sm border-slate-200">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <Input
+                label="Nombre Completo"
+                name="nombre"
+                icon={User}
+                value={formData.nombre}
+                onChange={handleChange}
+              />
+              <Input
+                label="Correo Electrónico"
+                name="email"
+                type="email"
+                icon={Mail}
+                value={formData.email}
+                onChange={handleChange}
+              //   disabled // Email usually shouldn't change easily
+              />
+              <div className="pt-2">
+                <Button type="submit" isLoading={loading} className="w-full justify-center">
+                  Guardar Cambios
+                </Button>
               </div>
-
-              <form onSubmit={handleSubmit} className="space-y-10">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                  <Input
-                    label="Filiación Completa"
-                    type="text"
-                    name="nombre"
-                    value={formData.nombre}
-                    onChange={handleChange}
-                    placeholder="Escriba su nombre..."
-                  />
-                  <Input
-                    label="Canal de Notificación"
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="su@email.com"
-                  />
-                </div>
-
-                <div className="pt-10 border-t border-slate-100">
-                  <div className="mb-8 flex items-center gap-5">
-                    <div className="h-12 w-12 rounded-2xl bg-amber-100 border border-amber-200 flex items-center justify-center">
-                      <Shield className="w-6 h-6 text-amber-600" />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-black text-slate-900 tracking-tighter uppercase tracking-[0.05em]">Cifrado y Acceso</h3>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">Gestión de llaves criptográficas</p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                    <Input
-                      label="Nueva Contraseña"
-                      type="password"
-                      name="password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      placeholder="••••••••"
-                    />
-                    <Input
-                      label="Validar Secreto"
-                      type="password"
-                      name="confirmPassword"
-                      value={formData.confirmPassword}
-                      onChange={handleChange}
-                      placeholder="••••••••"
-                    />
-                  </div>
-                </div>
-
-                <div className="pt-10 flex flex-col-reverse sm:flex-row gap-6 border-t border-slate-100">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={() => navigate(-1)}
-                    className="w-full sm:w-auto"
-                  >
-                    Retroceder
-                  </Button>
-                  <Button
-                    type="submit"
-                    variant="primary"
-                    disabled={loading}
-                    className="w-full sm:w-auto shadow-2xl shadow-primary-500/20 px-10 ml-auto"
-                  >
-                    {loading ? 'Procesando...' : 'Fijar Atributos'}
-                  </Button>
-                </div>
-              </form>
-            </div>
+            </form>
           </Card>
+        </div>
+      </div>
+    );
+  }
+
+  if (activeSection === 'security') {
+    return (
+      <div className="min-h-screen bg-slate-100 pb-24">
+        <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 py-3 flex items-center gap-3">
+          <button onClick={() => setActiveSection('main')} className="p-1 -ml-1 text-primary-600">
+            <ArrowLeft size={24} />
+          </button>
+          <h1 className="text-lg font-bold text-slate-900">Seguridad</h1>
+        </div>
+
+        <div className="p-4 max-w-md mx-auto">
+          <Card className="p-5 space-y-4 shadow-sm border-slate-200">
+            <div className="mb-4 p-3 bg-amber-50 rounded-lg border border-amber-100 text-amber-800 text-xs">
+              <p className="font-bold flex items-center gap-1"><Lock size={12} /> Nota de Seguridad</p>
+              Asegúrate de usar una contraseña fuerte que no utilices en otros sitios.
+            </div>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <Input
+                label="Nueva Contraseña"
+                name="password"
+                type="password"
+                icon={Key}
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="••••••••"
+              />
+              <Input
+                label="Confirmar Contraseña"
+                name="confirmPassword"
+                type="password"
+                icon={Key}
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                placeholder="••••••••"
+              />
+              <div className="pt-2">
+                <Button type="submit" variant="primary" isLoading={loading} className="w-full justify-center">
+                  Actualizar Contraseña
+                </Button>
+              </div>
+            </form>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  // --- MAIN VIEW (WhatsApp Style) ---
+  return (
+    <div className="min-h-screen bg-slate-100 pb-24">
+      {/* Desktop Header Adaptation */}
+      <div className="hidden lg:block mb-6">
+        <h1 className="text-2xl font-bold text-slate-800">Perfil de Usuario</h1>
+        <p className="text-slate-500">Administra tu cuenta y preferencias.</p>
+      </div>
+
+      <div className="max-w-md mx-auto lg:max-w-2xl bg-white lg:rounded-2xl lg:shadow-xl overflow-hidden min-h-[calc(100vh-6rem)] lg:min-h-fit border-x border-slate-200 lg:border-y">
+
+        {/* Header */}
+        {renderHeader()}
+
+        {/* List Groups */}
+        <div className="bg-slate-100 pt-2 lg:bg-white lg:pt-0">
+
+          {/* Section 1 */}
+          <div className="bg-white mb-2 lg:mb-0 lg:border-t border-b border-slate-200 lg:border-0">
+            {renderListItem({
+              icon: User,
+              label: 'Información Personal',
+              sublabel: 'Nombre, correo electrónico',
+              bg: 'bg-blue-100',
+              color: 'text-blue-600',
+              onClick: () => setActiveSection('personal')
+            })}
+            {renderListItem({
+              icon: Key,
+              label: 'Seguridad',
+              sublabel: 'Cambiar contraseña, 2FA',
+              bg: 'bg-teal-100',
+              color: 'text-teal-600',
+              onClick: () => setActiveSection('security')
+            })}
+          </div>
+
+          {/* Section 2 */}
+          <div className="bg-white mb-2 lg:mb-0 border-y border-slate-200 lg:border-0 lg:mt-4">
+            {renderListItem({
+              icon: Bell,
+              label: 'Notificaciones',
+              bg: 'bg-rose-100',
+              color: 'text-rose-600',
+              onClick: () => showAlert('info', 'Próximamente: Configuración de notificaciones')
+            })}
+            {renderListItem({
+              icon: Shield,
+              label: 'Privacidad',
+              bg: 'bg-slate-100',
+              color: 'text-slate-600',
+              onClick: () => showAlert('info', 'Próximamente: Ajustes de privacidad')
+            })}
+            {renderListItem({
+              icon: Smartphone,
+              label: 'Apariencia',
+              sublabel: 'Tema claro/oscuro',
+              bg: 'bg-purple-100',
+              color: 'text-purple-600',
+              onClick: () => showAlert('info', 'El tema se ajusta al sistema automáticamente')
+            })}
+          </div>
+
+          {/* Section 3 */}
+          <div className="bg-white mb-8 border-y border-slate-200 lg:border-0 lg:mt-4">
+            {renderListItem({
+              icon: HelpCircle,
+              label: 'Ayuda',
+              bg: 'bg-emerald-100',
+              color: 'text-emerald-600',
+              onClick: () => showAlert('info', 'Contacta a soporte técnico')
+            })}
+            {renderListItem({
+              icon: LogOut,
+              label: 'Cerrar Sesión',
+              bg: 'bg-slate-50',
+              danger: true,
+              onClick: logout
+            })}
+          </div>
+
+          <div className="pb-8 text-center">
+            <p className="text-xs text-slate-400">Recorridos App v1.2.0</p>
+          </div>
+
         </div>
       </div>
     </div>
