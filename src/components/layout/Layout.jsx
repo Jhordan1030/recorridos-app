@@ -17,7 +17,8 @@ const Layout = ({ children }) => {
       )}
 
       {/* Main Content */}
-      <main className="flex-1 w-full max-w-[2000px] mx-auto px-0 sm:px-4 lg:px-6 pb-24 lg:pb-8">
+      {/* Main Content - Adapts to screen type */}
+      <main className="flex-1 w-full max-w-[2000px] mx-auto px-4 sm:px-4 lg:px-6 pb-24 lg:pb-8 pt-safe md:pt-6">
         {children}
       </main>
 

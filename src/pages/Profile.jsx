@@ -255,14 +255,14 @@ const Profile = () => {
 
   // --- MAIN VIEW (WhatsApp Style) ---
   return (
-    <div className="min-h-screen bg-slate-100 pb-24">
+    <div className="w-full">
       {/* Desktop Header Adaptation */}
       <div className="hidden lg:block mb-6">
         <h1 className="text-2xl font-bold text-slate-800">Perfil de Usuario</h1>
         <p className="text-slate-500">Administra tu cuenta y preferencias.</p>
       </div>
 
-      <div className="max-w-md mx-auto lg:max-w-2xl bg-white lg:rounded-2xl lg:shadow-xl overflow-hidden min-h-[calc(100vh-6rem)] lg:min-h-fit border-x border-slate-200 lg:border-y">
+      <div className="max-w-md mx-auto lg:max-w-2xl bg-white rounded-2xl shadow-sm lg:shadow-xl overflow-hidden border border-slate-200">
 
         {/* Header */}
         {renderHeader()}
