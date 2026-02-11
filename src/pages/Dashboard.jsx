@@ -2,8 +2,24 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useAlert } from '../context/AlertContext';
 import { useApp } from '../context/AppContext';
 import { getRecorridos, getNinos, getVehiculos, createRecorrido, updateRecorrido, deleteRecorrido } from '../services/api';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+// Imports dinámicos para optimización (jsPDF y autoTable)
+import {
+  Users,
+  Route,
+  Truck,
+  Calendar as CalendarIcon,
+  FileText,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  Trash2,
+
+  Plus,
+  TrendingUp,
+  ArrowUpRight,
+  ArrowDownRight
+} from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import Modal from '../components/ui/Modal';
 import ConfirmModal from '../components/ui/ConfirmModal';
 import Alert from '../components/ui/Alert';
@@ -25,6 +41,7 @@ const Dashboard = () => {
   const [ninosSeleccionados, setNinosSeleccionados] = useState([]);
   const [loadingForm, setLoadingForm] = useState(false);
   const [recorridosMensuales, setRecorridosMensuales] = useState({});
+  const [chartData, setChartData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mesActual, setMesActual] = useState(new Date().getMonth() + 1);
   const [añoActual, setAñoActual] = useState(new Date().getFullYear());
@@ -116,6 +133,60 @@ const Dashboard = () => {
       });
 
     setRecorridosMensuales(recorridosLimpios);
+
+    // --- LÓGICA DE GRÁFICO COMPARATIVO ---
+    const chartDataMap = {};
+    const diasDelMes = new Date(añoActual, mesActual, 0).getDate();
+
+
+
+    // Inicializar mapa con días
+    for (let i = 1; i <= diasDelMes; i++) {
+      chartDataMap[i] = { name: i.toString(), actual: 0, anterior: 0 };
+    }
+
+    if (Array.isArray(data)) {
+      data.forEach(r => {
+        if (!r?.fecha) return;
+
+        // Manejo robusto de fechas - ZONA HORARIA NEUTRA
+        let a, m, d;
+        if (typeof r.fecha === 'string') {
+          // Tomamos la fecha YYYY-MM-DD ignorando hora y zona
+          const fechaStr = r.fecha.includes('T') ? r.fecha.split('T')[0] : r.fecha;
+          const parts = fechaStr.split('-');
+
+          if (parts.length === 3) {
+            // Parseo directo de componentes
+            a = parseInt(parts[0], 10);
+            m = parseInt(parts[1], 10);
+            d = parseInt(parts[2], 10);
+          } else {
+            return;
+          }
+        } else {
+          return;
+        }
+
+        // Datos Mes Actual
+        if (m === mesActual && a === añoActual) {
+          if (chartDataMap[d]) chartDataMap[d].actual += 1;
+        }
+
+        // Datos Mes Anterior
+        const fechaMesAnterior = new Date(añoActual, mesActual - 1, 0); // Último día mes anterior
+        const mesAnterior = fechaMesAnterior.getMonth() + 1;
+        const anioAnterior = fechaMesAnterior.getFullYear();
+
+        if (m === mesAnterior && a === anioAnterior) {
+          if (chartDataMap[d]) chartDataMap[d].anterior += 1;
+        }
+      });
+    }
+
+
+
+    setChartData(Object.values(chartDataMap));
     setLoading(false);
   };
 
@@ -151,7 +222,47 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    loadRecorridosData();
+    const loadDashboardData = async () => {
+      setLoading(true);
+      try {
+        const [recorridosRes, ninosRes, vehiculosRes] = await Promise.all([
+          getRecorridos(),
+          getNinos(),
+          getVehiculos()
+        ]);
+
+        // Procesar Recorridos
+        let data = [];
+        if (recorridosRes?.data) {
+          if (recorridosRes.data.success && recorridosRes.data.data) {
+            data = recorridosRes.data.data;
+          } else if (Array.isArray(recorridosRes.data)) {
+            data = recorridosRes.data;
+          } else if (recorridosRes.data.recorridos) {
+            data = recorridosRes.data.recorridos;
+          } else {
+            Object.keys(recorridosRes.data).forEach(key => {
+              if (Array.isArray(recorridosRes.data[key])) {
+                data = recorridosRes.data[key];
+              }
+            });
+          }
+        }
+        procesarRecorridos(data || []);
+
+        // Setear Niños y Vehiculos para los Stats
+        if (ninosRes.data.success) setNinos(ninosRes.data.data);
+        if (vehiculosRes.data.success) setVehiculos(vehiculosRes.data.data);
+
+      } catch (error) {
+        console.error("Error loading dashboard data", error);
+        showAlert('error', 'Error al cargar datos del dashboard');
+        setRecorridosMensuales({});
+        setLoading(false);
+      }
+    };
+
+    loadDashboardData();
     // eslint-disable-next-line
   }, [mesActual, añoActual]);
 
@@ -210,25 +321,14 @@ const Dashboard = () => {
   const matrizCalendario = useMemo(() => generarCalendario(), [mesActual, añoActual, recorridosMensuales]);
 
   // FUNCIONES DEL FORMULARIO
-  const loadNinos = async () => {
+  // (Data loaded on mount now, but we keep these if needed for refresh)
+  const refreshCatalogs = async () => {
     try {
-      const response = await getNinos();
-      if (response.data.success) {
-        setNinos(response.data.data);
-      }
-    } catch (error) {
-      showAlert('error', 'Error al cargar niños');
-    }
-  };
-
-  const loadVehiculos = async () => {
-    try {
-      const response = await getVehiculos();
-      if (response.data.success) {
-        setVehiculos(response.data.data);
-      }
-    } catch (error) {
-      showAlert('error', 'Error al cargar vehículos');
+      const [nRes, vRes] = await Promise.all([getNinos(), getVehiculos()]);
+      if (nRes.data.success) setNinos(nRes.data.data);
+      if (vRes.data.success) setVehiculos(vRes.data.data);
+    } catch (e) {
+      console.error(e);
     }
   };
 
@@ -250,7 +350,8 @@ const Dashboard = () => {
     setLoadingForm(true);
     setIsModalOpen(true);
     try {
-      await Promise.all([loadNinos(), loadVehiculos()]);
+      // Refresh just in case
+      await refreshCatalogs();
     } catch (error) {
       showAlert('error', 'Error al cargar datos del formulario');
     } finally {
@@ -395,8 +496,11 @@ const Dashboard = () => {
   };
 
   // --- NUEVA FUNCIÓN EXPORTAR PDF (ESTILO MODERNO) ---
-  const exportarPDF = () => {
+  const exportarPDF = async () => {
     try {
+      const jsPDF = (await import('jspdf')).default;
+      const autoTable = (await import('jspdf-autotable')).default;
+
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.width;
 
@@ -523,273 +627,377 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-transparent py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
+    <div className="min-h-screen bg-transparent py-4 sm:py-8 px-0 sm:px-6 lg:px-8 transition-colors duration-300">
       <Alert />
 
-      {/* --- Page Header --- */}
-      <div className="max-w-7xl mx-auto mb-10">
-        <div className="md:flex md:items-center md:justify-between md:space-x-8">
-          <div className="flex items-start">
-            <div className="pt-1.5">
-              <h1 className="text-3xl font-black text-white sm:text-5xl tracking-tighter">Dashboard</h1>
-              <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mt-2">Panel central de operaciones</p>
-            </div>
+      {/* --- Header Section --- */}
+      <div className="mb-8">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Panel de Control</h1>
+            <p className="text-xs font-medium text-slate-500 mt-1 uppercase tracking-wider">Gestión centralizada de operaciones</p>
           </div>
-          <div className="mt-8 flex flex-col-reverse justify-stretch gap-4 md:mt-0 md:flex-row md:items-center">
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
             <Button
               variant="secondary"
+              size={isMobile ? 'sm' : 'lg'}
               onClick={exportarPDF}
               disabled={loading || totalRecorridosMes === 0}
-              className="w-full md:w-auto"
+              className="w-full sm:w-auto justify-center !bg-white !border !border-slate-200 !text-slate-700 hover:!text-indigo-600 hover:!border-indigo-200 hover:!bg-indigo-50 transition-all shadow-sm"
             >
-              Exportar Reporte
+              <div className="flex items-center gap-2">
+                <FileText size={isMobile ? 16 : 20} className="text-slate-400 group-hover:text-indigo-600" />
+                <span>Exportar Reporte</span>
+              </div>
             </Button>
             <Button
               variant="primary"
+              size={isMobile ? 'sm' : 'lg'}
               onClick={handleOpenModal}
-              className="w-full md:w-auto shadow-2xl shadow-primary-500/20"
+              icon={<Plus size={isMobile ? 14 : 20} />}
+              className="w-full sm:w-auto justify-center shadow-lg shadow-primary-500/20"
             >
-              Nuevo Registro
+              Nueva Ruta
             </Button>
           </div>
         </div>
       </div>
 
-      {/* --- Period Controls & Overview --- */}
-      <div className="max-w-7xl mx-auto mb-10 space-y-6">
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-          {/* Calendar Period Navigation */}
-          <div className="lg:col-span-4">
-            <div className="flex items-center bg-white/5 backdrop-blur-md rounded-3xl border border-white/10 overflow-hidden h-full">
-              <button
-                onClick={() => cambiarMes(-1)}
-                className="px-6 py-4 hover:bg-white/10 text-white/50 hover:text-white transition-all border-r border-white/5 focus:outline-none"
-              >
-                ‹
-              </button>
-              <div className="flex-1 px-4 py-4 text-center">
-                <h3 className="text-xs font-black text-primary-400 uppercase tracking-[0.2em]">
-                  {nombresMeses[mesActual - 1]}
-                </h3>
-                <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">{añoActual}</span>
+      {/* Stats Grid - Redesigned */}
+      {/* Stats Grid - Redesigned */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-8">
+        {loading ? (
+          Array(2).fill(0).map((_, i) => (
+            <Skeleton key={i} variant="card" className="h-32" />
+          ))
+        ) : (
+          <>
+            <Card variant="base" className="p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1">Est. Financiera</p>
+                  <h3 className="text-3xl font-black text-slate-900 tracking-tighter">${costoTotalMes.toFixed(2)}</h3>
+                </div>
+                <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600">
+                  <FileText size={20} strokeWidth={2.5} />
+                </div>
               </div>
-              <button
-                onClick={() => cambiarMes(1)}
-                className="px-6 py-4 hover:bg-white/10 text-white/50 hover:text-white transition-all border-l border-white/5 focus:outline-none"
-              >
-                ›
-              </button>
-            </div>
-          </div>
+              <div className="mt-4 flex items-center gap-2 text-[11px] font-bold text-slate-400">
+                <span className="text-slate-600">Acumulado</span>
+                <span>en {nombresMeses[mesActual - 1]}</span>
+              </div>
+            </Card>
 
-          <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <Card className="p-5 sm:p-8 border-white/5">
-              <dt className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">Presupuesto</dt>
-              <dd className="text-2xl sm:text-4xl font-black text-white tracking-tighter">
-                ${costoTotalMes.toFixed(2)}
-              </dd>
+            <Card variant="base" className="p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1">Rutas Activas</p>
+                  <h3 className="text-3xl font-black text-slate-900 tracking-tighter">{totalRecorridosMes}</h3>
+                </div>
+                <div className="p-2 bg-indigo-50 rounded-lg text-indigo-600">
+                  <Route size={20} strokeWidth={2.5} />
+                </div>
+              </div>
+              <div className="mt-4 flex items-center gap-2 text-[11px] font-bold text-slate-400">
+                <span className="text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">+{diasConRecorridos} días</span>
+                <span>de operación este mes</span>
+              </div>
             </Card>
-            <Card className="p-5 sm:p-8">
-              <dt className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">Operación</dt>
-              <dd className="text-2xl sm:text-4xl font-black text-white tracking-tighter">{totalRecorridosMes} <span className="text-xs text-white/20 ml-1">Rutas</span></dd>
-            </Card>
-            <Card className="p-5 sm:p-8 border-emerald-500/20">
-              <dt className="text-[10px] font-black text-emerald-400/50 uppercase tracking-[0.2em] mb-2">Consistencia</dt>
-              <dd className="text-2xl sm:text-4xl font-black text-emerald-400 tracking-tighter">
-                {diasConRecorridos} <span className="text-xs text-emerald-400/30 ml-1">Días</span>
-              </dd>
-            </Card>
-          </div>
-        </div>
+          </>
+        )}
       </div>
 
-      {loading ? (
-        <div className="max-w-7xl mx-auto mb-10 space-y-10">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Skeleton variant="stat" />
-            <Skeleton variant="stat" />
-            <Skeleton variant="stat" className="sm:col-span-2 lg:col-span-1" />
-          </div>
-          <Skeleton variant="card" className="h-[400px]" />
-          <div className="space-y-4">
-            <Skeleton variant="title" />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Skeleton variant="card" />
-              <Skeleton variant="card" />
-            </div>
-          </div>
-        </div>
-      ) : (
-        <>
-          {/* --- Main Calendar Interface --- */}
-          <div className="max-w-7xl mx-auto mb-10">
-            <Card className="p-0 overflow-hidden border-none bg-white/5 backdrop-blur-xl rounded-[2.5rem] border border-white/10 shadow-2xl">
-              {/* Day Headers */}
-              <div className="grid grid-cols-7 text-center font-black text-[9px] sm:text-[10px] text-white/20 bg-white/5 border-b border-white/5 uppercase tracking-widest sm:tracking-[0.2em]">
-                {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map((dia, index) => (
-                  <span key={index} className="py-3 sm:py-5 border-r border-white/5 last:border-r-0">
-                    <span className="hidden sm:inline">{dia}</span>
-                    <span className="sm:hidden">{dia.charAt(0)}</span>
-                  </span>
-                ))}
-              </div>
-
-              {/* Calendar Grid */}
-              <div className="bg-transparent">
-                {matrizCalendario.map((semana, idx) => (
-                  <div key={idx} className="grid grid-cols-7 border-b border-white/5 last:border-b-0">
-                    {semana.map((dia, dIdx) => {
-                      if (!dia) {
-                        return (
-                          <div key={dIdx} className="h-20 sm:h-32 border-r border-white/5 last:border-r-0 bg-white/[0.02]" />
-                        );
-                      }
-
-                      const tieneRecorridos = Array.isArray(recorridosMensuales[dia.numero]) && recorridosMensuales[dia.numero].length > 0;
-                      let dayClasses = "relative h-16 sm:h-32 border-r border-white/5 last:border-r-0 p-1 sm:p-3 transition-all duration-300 group hover:bg-white/10";
-
-                      if (dia.esHoy) dayClasses += " bg-white/5";
-                      if (dia.tieneRecorridos) dayClasses += " bg-primary-500/[0.03]";
-
-                      return (
-                        <div key={dIdx} className={dayClasses}>
-                          <div className="flex items-center justify-center sm:justify-end mb-1 sm:mb-2">
-                            <span className={`
-                          flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-black transition-all duration-300
-                          ${dia.esHoy
-                                ? 'bg-primary-500 text-white shadow-2xl shadow-primary-500/40 ring-4 ring-primary-500/10'
-                                : dia.tieneRecorridos
-                                  ? 'text-white font-black bg-white/10 border border-white/10'
-                                  : 'text-white/30 group-hover:text-white/60'}
-                        `}>
-                              {dia.numero}
-                            </span>
-                          </div>
-
-                          {dia.tieneRecorridos && (
-                            <div className="mt-auto flex flex-wrap gap-1 justify-center sm:justify-end opacity-60 group-hover:opacity-100 transition-opacity">
-                              {recorridosMensuales[dia.numero]?.length > 0 && (
-                                <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.7)]" />
-                              )}
-                              {recorridosMensuales[dia.numero]?.length > 1 && (
-                                <div className="h-1.5 w-1.5 rounded-full bg-emerald-500/40" />
-                              )}
-                              {recorridosMensuales[dia.numero]?.length > 2 && (
-                                <div className="h-1.5 w-1.5 rounded-full bg-emerald-500/20" />
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
+      {/* --- GRÁFICO COMPARATIVO --- */}
+      <div className="mb-8">
+        <Card variant="base" className="p-6 border border-slate-200 shadow-sm relative overflow-hidden">
+          {loading ? (
+            <Skeleton variant="rect" className="h-[250px] w-full" />
+          ) : (
+            <>
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
+                    <TrendingUp size={20} className="text-indigo-600" />
+                    Rendimiento Operativo
+                  </h3>
+                  <p className="text-xs font-medium text-slate-500 mt-1">Comparativa de rutas: {nombresMeses[mesActual - 1]} vs Mes Anterior</p>
+                </div>
+                <div className="flex items-center gap-4 text-xs font-bold">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-indigo-500"></div>
+                    <span className="text-slate-600">Actual</span>
                   </div>
-                ))}
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-slate-200"></div>
+                    <span className="text-slate-400">Anterior</span>
+                  </div>
+                </div>
               </div>
-            </Card>
-          </div>
 
-          {/* --- Detailed Activity List --- */}
-          <Card className="p-0 border-none bg-white/5 backdrop-blur-xl rounded-[2.5rem] border border-white/10 shadow-2xl overflow-hidden">
-            <div className="border-b border-white/5 p-6 sm:p-8 px-6 sm:px-10">
-              <h4 className="text-xl sm:text-2xl font-black text-white tracking-tighter uppercase tracking-[0.05em]">
-                Bitácora de Operaciones
-              </h4>
-              <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] mt-2">Detalle cronológico mensual</p>
+              {/* Contenedor con altura fija explícita para evitar error de Recharts */}
+              <div style={{ width: '100%', height: 250 }}>
+                {chartData && chartData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                      <XAxis
+                        dataKey="name"
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 'bold' }}
+                        dy={10}
+                      />
+                      <YAxis
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 'bold' }}
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: '#fff',
+                          borderRadius: '12px',
+                          border: '1px solid #e2e8f0',
+                          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                          fontSize: '12px',
+                          fontWeight: 'bold',
+                          color: '#1e293b'
+                        }}
+                        itemStyle={{ color: '#475569' }}
+                        cursor={{ stroke: '#6366f1', strokeWidth: 1, strokeDasharray: '4 4' }}
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="anterior"
+                        stroke="#cbd5e1"
+                        strokeWidth={2}
+                        fill="transparent"
+                        activeDot={{ r: 4, strokeWidth: 0 }}
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="actual"
+                        stroke="#6366f1"
+                        strokeWidth={3}
+                        fill="url(#colorActual)"
+                        activeDot={{ r: 6, stroke: '#fff', strokeWidth: 2 }}
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-full w-full flex items-center justify-center text-slate-400 text-sm">
+                    No hay datos para mostrar
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </Card>
+      </div >
+
+      {
+        loading ? (
+          <div className="space-y-6" >
+            <Skeleton variant="card" className="h-[400px]" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Skeleton variant="card" className="h-[300px]" />
+              <Skeleton variant="card" className="h-[300px]" />
             </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Lado Izquierdo: Calendario Estilo Enterprise */}
+            <div className="lg:col-span-12 xl:col-span-8">
+              <Card variant="base" padding="p-0" className="h-full overflow-hidden border border-slate-200 shadow-sm">
+                <div className="p-6 border-b border-slate-100 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <h3 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
+                      <CalendarIcon size={20} className="text-primary-600" />
+                      Cronograma Operativo
+                    </h3>
+                    <p className="text-xs font-medium text-slate-500 mt-1">Gestión visual de rutas y despachos</p>
+                  </div>
 
-            {Object.keys(recorridosMensuales).length === 0 ? (
-              <div className="py-24 text-center">
-                <div className="text-6xl mb-6 opacity-20">📂</div>
-                <h3 className="text-xl font-black text-white mb-2">Archivo vacío</h3>
-                <p className="text-white/20 text-[10px] font-black uppercase tracking-widest">No se detectaron movimientos en este periodo</p>
-              </div>
-            ) : (
-              <div className="p-6 sm:p-8 px-6 sm:px-10 space-y-10">
-                {Object.keys(recorridosMensuales)
-                  .filter(dia => !isNaN(parseInt(dia)))
-                  .sort((a, b) => parseInt(a) - parseInt(b))
-                  .map(dia => (
-                    <div key={dia} className="relative pl-8 sm:pl-12 border-l border-white/10 pb-4 last:pb-0">
-                      {/* Timeline Node */}
-                      <div className="absolute -left-2 sm:-left-[9px] top-0 bg-primary-500 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(14,165,233,0.5)] ring-4 ring-slate-950">
-                        {dia}
+                  <div className="flex items-center gap-1 bg-slate-50 p-1.5 rounded-xl border border-slate-200">
+                    <button onClick={() => cambiarMes(-1)} className="p-2 hover:bg-white hover:shadow-sm rounded-lg text-slate-500 transition-all"><ChevronLeft size={18} /></button>
+                    <span className="text-sm font-black text-slate-800 px-4 min-w-[140px] text-center uppercase tracking-widest leading-none">
+                      {nombresMeses[mesActual - 1]} <span className="text-slate-400 font-medium">{añoActual}</span>
+                    </span>
+                    <button onClick={() => cambiarMes(1)} className="p-2 hover:bg-white hover:shadow-sm rounded-lg text-slate-500 transition-all"><ChevronRight size={18} /></button>
+                  </div>
+                </div>
+
+                <div className="p-2 sm:p-6 bg-slate-50/50">
+                  <div className="pb-2">
+                    <div className="w-full">
+                      <div className="grid grid-cols-7 mb-4">
+                        {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map(d => (
+                          <div key={d} className="text-[9px] sm:text-[11px] font-black text-slate-400 uppercase text-center tracking-wider">{d}</div>
+                        ))}
                       </div>
+                      <div className="grid grid-cols-7 gap-1 sm:gap-3">
+                        {matrizCalendario.map((semana, idx) => (
+                          <React.Fragment key={idx}>
+                            {semana.map((dia, dIdx) => {
+                              if (!dia) return <div key={`empty-${dIdx}`} className="h-14 sm:h-32 bg-transparent" />;
 
-                      <div className="mb-6 flex items-center gap-4">
-                        <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">
-                          {dia} {nombresMeses[mesActual - 1]}
-                        </span>
-                        <div className="h-[1px] flex-1 bg-white/[0.03]" />
-                      </div>
+                              const recorridoDelDia = recorridosMensuales[dia.numero] || [];
+                              const tieneRecorridos = recorridoDelDia.length > 0;
+                              const esHoy = dia.esHoy;
 
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {(recorridosMensuales[dia] || []).map((recorrido, idx) => (
-                          <div
-                            key={idx}
-                            className="group relative bg-white/[0.03] hover:bg-white/[0.08] backdrop-blur-md border border-white/5 hover:border-white/10 rounded-3xl p-6 transition-all duration-500"
-                          >
-                            <div className="flex flex-col sm:flex-row sm:justify-between items-start gap-3 sm:gap-4 mb-4">
-                              <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
-                                <span className="flex-shrink-0 h-10 w-10 sm:h-11 sm:w-11 rounded-xl bg-white/10 text-white flex items-center justify-center text-[10px] sm:text-xs font-black border border-white/10 shadow-xl">
-                                  {formatearHora(recorrido.hora_inicio)}
-                                </span>
-                                <div className="min-w-0 flex-1">
-                                  <p className="text-sm font-black text-white uppercase tracking-tight truncate sm:whitespace-normal">
-                                    {recorrido.vehiculo_descripcion || 'Ruta sin asignar'}
-                                  </p>
-                                  <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.1em] mt-1">
-                                    {recorrido.tipo_recorrido}
-                                  </p>
-                                </div>
-                                {/* Mobile Price Container */}
-                                <div className="sm:hidden ml-auto">
-                                  <span className="text-base font-black text-emerald-400 tracking-tighter shrink-0">
-                                    ${parseFloat(recorrido.costo || 0).toFixed(2)}
+                              return (
+                                <div
+                                  key={dia.numero}
+                                  className={`
+                                  relative h-14 sm:h-32 p-1 sm:p-3 rounded-xl sm:rounded-2xl border transition-all duration-200 flex flex-col group
+                                  ${esHoy ? 'bg-white border-primary-500 ring-2 sm:ring-4 ring-primary-500/10 z-10' : 'bg-white border-slate-200 hover:border-slate-300 hover:shadow-md'}
+                                `}
+                                >
+                                  <span className={`
+                                   absolute top-1 right-1 sm:top-3 sm:right-3 w-5 h-5 sm:w-7 sm:h-7 flex items-center justify-center rounded-full text-[10px] sm:text-xs font-bold transition-colors
+                                   ${esHoy ? 'bg-primary-600 text-white' : 'text-slate-400 group-hover:text-slate-600 bg-slate-50'}
+                                 `}>
+                                    {dia.numero}
                                   </span>
-                                </div>
-                              </div>
-                              {/* Desktop Price Container */}
-                              <span className="hidden sm:block text-lg font-black text-emerald-400 tracking-tighter">
-                                ${parseFloat(recorrido.costo || 0).toFixed(2)}
-                              </span>
-                            </div>
 
-                            <div className="flex flex-wrap items-center justify-between pt-4 border-t border-white/5 gap-3">
-                              <div className="flex items-center gap-2 min-w-fit">
-                                <div className="h-1 w-1 rounded-full bg-primary-400 shadow-[0_0_8px_rgba(56,189,248,0.5)]" />
-                                <span className="text-[9px] font-black text-white/20 uppercase tracking-widest whitespace-nowrap">
-                                  {recorrido.ninos?.length || 0} Estudiantes
-                                </span>
-                              </div>
-                              <div className="flex gap-2 ml-auto">
-                                <button
-                                  onClick={() => handleEdit(recorrido)}
-                                  className={`bg-white/10 hover:bg-white/20 text-white/60 hover:text-white p-2 sm:p-2.5 rounded-xl transition-all border border-white/10 ${isMobile ? 'opacity-100' : 'lg:opacity-0 group-hover:opacity-100'}`}
-                                  title="Gestionar"
-                                >
-                                  <span className="sm:hidden text-sm">⚙️</span>
-                                  <span className="hidden sm:inline">⚙️</span>
-                                </button>
-                                <button
-                                  onClick={() => handleDelete(recorrido.id)}
-                                  className={`bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 p-2 sm:p-2.5 rounded-xl transition-all border border-red-500/10 ${isMobile ? 'opacity-100' : 'lg:opacity-0 group-hover:opacity-100'}`}
-                                  title="Eliminar"
-                                >
-                                  <span className="sm:hidden text-sm">🗑️</span>
-                                  <span className="hidden sm:inline">🗑️</span>
-                                </button>
-                              </div>
-                            </div>
-                          </div>
+                                  {/* Mobile Dots View */}
+                                  <div className="mt-6 sm:hidden flex flex-wrap gap-0.5 justify-center">
+                                    {recorridoDelDia.slice(0, 4).map((r, ri) => (
+                                      <div
+                                        key={ri}
+                                        className={`w-1.5 h-1.5 rounded-full ${r.tipo_recorrido === 'traer' ? 'bg-emerald-500' :
+                                          r.tipo_recorrido === 'llevar' ? 'bg-amber-500' : 'bg-blue-500'
+                                          }`}
+                                      />
+                                    ))}
+                                    {recorridoDelDia.length > 4 && (
+                                      <div className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+                                    )}
+                                  </div>
+
+                                  {/* Desktop List View */}
+                                  <div className="hidden sm:block mt-8 space-y-1.5 overflow-y-auto custom-scrollbar pr-1">
+                                    {recorridoDelDia.map((r, ri) => (
+                                      <div key={ri} className={`
+                                      flex items-center gap-2 px-2 py-1.5 rounded-lg border text-[10px] font-bold truncate transition-colors
+                                      ${r.tipo_recorrido === 'traer'
+                                          ? 'bg-emerald-50 text-emerald-700 border-emerald-100 hover:bg-emerald-100'
+                                          : r.tipo_recorrido === 'llevar'
+                                            ? 'bg-amber-50 text-amber-700 border-amber-100 hover:bg-amber-100'
+                                            : 'bg-blue-50 text-blue-700 border-blue-100 hover:bg-blue-100'
+                                        }
+                                    `}>
+                                        <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${r.tipo_recorrido === 'traer' ? 'bg-emerald-500' :
+                                          r.tipo_recorrido === 'llevar' ? 'bg-amber-500' : 'bg-blue-500'
+                                          }`} />
+                                        <span className="truncate">{r.vehiculo_descripcion || 'Sin Unidad'}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </React.Fragment>
                         ))}
                       </div>
                     </div>
-                  ))}
-              </div>
-            )}
-          </Card>
-        </>
-      )}
+                  </div>
+                </div>
+              </Card>
+            </div>
+
+            {/* --- Bitácora de Operaciones (Derecha) --- */}
+            <div className="lg:col-span-12 xl:col-span-4 h-full">
+              <Card variant="base" padding="p-0" className="h-[500px] lg:h-[650px] flex flex-col border border-slate-200 shadow-sm">
+                <div className="p-6 border-b border-slate-100 bg-white flex items-center justify-between">
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                      <Clock size={16} className="text-emerald-600" />
+                      Actividad Reciente
+                    </h3>
+                    <p className="text-[10px] font-medium text-slate-400 mt-0.5">Operaciones de {nombresMeses[mesActual - 1]}</p>
+                  </div>
+                  <div className="animate-pulse">
+                    <span className="text-[10px] font-black bg-emerald-100 text-emerald-700 px-2 py-1 rounded-md border border-emerald-200 tracking-wider">LIVE</span>
+                  </div>
+                </div>
+                <div className="flex-1 overflow-y-auto p-5 space-y-6 custom-scrollbar bg-slate-50/30">
+                  {Object.keys(recorridosMensuales).length > 0 ? (
+                    Object.keys(recorridosMensuales)
+                      .filter(dia => !isNaN(parseInt(dia)))
+                      .sort((a, b) => parseInt(b) - parseInt(a))
+                      .map(dia => (
+                        <div key={dia} className="relative pl-4 border-l-2 border-slate-200 space-y-4">
+                          <div className="absolute -left-[9px] top-0 w-4 h-4 bg-slate-200 rounded-full border-2 border-white"></div>
+                          <h4 className="text-xs font-black text-slate-500 uppercase tracking-widest leading-none mb-2">{dia} de {nombresMeses[mesActual - 1]}</h4>
+
+                          {recorridosMensuales[dia].map((recorrido, idx) => {
+                            // Calcular pasajeros aquí si no viene del backend
+                            const totalPasajeros = recorrido.total_ninos !== undefined ? recorrido.total_ninos : (recorrido.ninos?.length || 0);
+
+                            return (
+                              <div
+                                key={idx}
+                                className="group p-4 bg-white border border-slate-200 rounded-xl hover:border-primary-200 hover:shadow-md transition-all duration-200 relative overflow-hidden"
+                              >
+                                {/* Hover Accent */}
+                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+
+                                <div className="flex items-center justify-between mb-2">
+                                  <span className={`
+                                  text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider
+                                  ${recorrido.tipo_recorrido === 'traer' ? 'bg-emerald-50 text-emerald-600' :
+                                      recorrido.tipo_recorrido === 'llevar' ? 'bg-amber-50 text-amber-600' : 'bg-blue-50 text-blue-600'}
+                                `}>
+                                    {recorrido.tipo_recorrido?.toUpperCase() || 'GENERAL'}
+                                  </span>
+                                  <span className="text-[11px] font-bold text-slate-400 flex items-center gap-1">
+                                    <Clock size={12} />
+                                    {formatearHora(recorrido.hora_inicio)}
+                                  </span>
+                                </div>
+
+                                <h5 className="text-sm font-bold text-slate-800 mb-3 pr-6">{recorrido.vehiculo_descripcion}</h5>
+
+                                <div className="flex items-center justify-between pt-2 border-t border-slate-50">
+                                  <div className="flex items-center gap-2">
+                                    <div className="bg-slate-100 p-1.5 rounded-full text-slate-500">
+                                      <Users size={12} />
+                                    </div>
+                                    <span className="text-xs font-semibold text-slate-600">{totalPasajeros} Pasajeros</span>
+                                  </div>
+
+                                  <button
+                                    onClick={() => handleDelete(recorrido.id)}
+                                    className="text-slate-300 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-lg transition-all"
+                                    title="Eliminar registro"
+                                  >
+                                    <Trash2 size={14} />
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ))
+                  ) : (
+                    <div className="h-full flex flex-col items-center justify-center text-center opacity-40">
+                      <div className="bg-slate-100 p-4 rounded-full mb-4">
+                        <FileText size={32} className="text-slate-400" />
+                      </div>
+                      <p className="text-xs font-bold uppercase tracking-widest text-slate-500">No hay actividad registrada</p>
+                    </div>
+                  )}
+                </div>
+              </Card>
+            </div>
+          </div>
+        )}
 
       {/* --- Management Modal --- */}
       <Modal
@@ -800,9 +1008,33 @@ const Dashboard = () => {
       >
         <div className="p-0 bg-transparent">
           {loadingForm ? (
-            <div className="py-24 text-center">
-              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-500 mx-auto mb-6"></div>
-              <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">Preparando entorno...</p>
+            <div className="space-y-8 p-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Skeleton variant="title" className="w-1/3 h-4" />
+                  <Skeleton variant="text" className="h-10 w-full" />
+                </div>
+                <div className="space-y-2">
+                  <Skeleton variant="title" className="w-1/3 h-4" />
+                  <Skeleton variant="text" className="h-10 w-full" />
+                </div>
+                <div className="space-y-2">
+                  <Skeleton variant="title" className="w-2/3 h-4" />
+                  <Skeleton variant="text" className="h-10 w-full" />
+                </div>
+                <div className="space-y-2">
+                  <Skeleton variant="title" className="w-1/2 h-4" />
+                  <Skeleton variant="text" className="h-10 w-full" />
+                </div>
+                <div className="sm:col-span-2 space-y-2">
+                  <Skeleton variant="title" className="w-1/4 h-4" />
+                  <Skeleton variant="text" className="h-16 w-full" />
+                </div>
+              </div>
+              <div className="pt-8 border-t border-slate-100 flex justify-end gap-4">
+                <Skeleton variant="rect" className="w-24 h-10 rounded-xl" />
+                <Skeleton variant="rect" className="w-32 h-10 rounded-xl" />
+              </div>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-8">
@@ -824,26 +1056,26 @@ const Dashboard = () => {
                   required
                 />
                 <div>
-                  <label className="text-[10px] font-black text-white/40 uppercase tracking-widest block mb-2 pl-1">Selección de Unidad</label>
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2 pl-1">Selección de Unidad</label>
                   <select
                     name="vehiculo_id"
                     value={formData.vehiculo_id}
                     onChange={handleChange}
                     required
-                    className="px-4 py-3 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary-500/50 focus:border-white/20 block w-full transition-all duration-300 bg-white/5 text-white outline-none backdrop-blur-sm"
+                    className="px-4 py-3 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary-500/50 focus:border-slate-300 block w-full transition-all duration-300 bg-white text-slate-900 outline-none"
                   >
                     <option value="">Buscar unidad...</option>
                     {vehiculos.map(v => <option key={v.id} value={v.id}>{v.descripcion}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="text-[10px] font-black text-white/40 uppercase tracking-widest block mb-2 pl-1">Modalidad de Ruta</label>
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2 pl-1">Modalidad de Ruta</label>
                   <select
                     name="tipo_recorrido"
                     value={formData.tipo_recorrido}
                     onChange={handleChange}
                     required
-                    className="px-4 py-3 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary-500/50 focus:border-white/20 block w-full transition-all duration-300 bg-white/5 text-white outline-none backdrop-blur-sm"
+                    className="px-4 py-3 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary-500/50 focus:border-slate-300 block w-full transition-all duration-300 bg-white text-slate-900 outline-none"
                   >
                     <option value="traer">Recolección (Traer)</option>
                     <option value="llevar">Despacho (Llevar)</option>
@@ -862,16 +1094,16 @@ const Dashboard = () => {
               </div>
 
               {/* Passenger Management inside Modal */}
-              <div className="pt-8 border-t border-white/5">
+              <div className="pt-8 border-t border-slate-100">
                 <div className="flex justify-between items-center mb-6">
-                  <h4 className="text-[10px] font-black text-white/40 uppercase tracking-widest">Nómina de Pasajeros ({ninosSeleccionados.length})</h4>
+                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Nómina de Pasajeros ({ninosSeleccionados.length})</h4>
                 </div>
 
                 <div className="mb-6">
                   <select
                     onChange={agregarNino}
                     value=""
-                    className="px-4 py-3 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary-500/50 focus:border-white/20 block w-full transition-all duration-300 bg-white/5 text-white outline-none backdrop-blur-sm"
+                    className="px-4 py-3 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary-500/50 focus:border-slate-300 block w-full transition-all duration-300 bg-white text-slate-900 outline-none"
                   >
                     <option value="">+ Vincular estudiante a este trayecto...</option>
                     {(ninos || []).filter(n => !ninosSeleccionados.some(sel => sel.nino_id?.toString() === n.id?.toString())).map(n => (
@@ -882,26 +1114,26 @@ const Dashboard = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
                   {(ninosSeleccionados || []).map((n, idx) => (
-                    <div key={n.nino_id} className="group flex items-center justify-between bg-white/5 border border-white/5 hover:border-white/10 rounded-2xl p-3 transition-all">
+                    <div key={n.nino_id} className="group flex items-center justify-between bg-white border border-slate-200 hover:border-slate-300 rounded-2xl p-3 transition-all">
                       <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-lg bg-white/5 text-white flex items-center justify-center text-[10px] font-black border border-white/10">
+                        <div className="h-8 w-8 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center text-[10px] font-black border border-slate-200">
                           {n.nombre?.charAt(0) || '?'}
                         </div>
-                        <span className="text-xs font-black text-white/70 uppercase tracking-tight">{n.nombre} {n.apellidos}</span>
+                        <span className="text-xs font-black text-slate-700 uppercase tracking-tight">{n.nombre} {n.apellidos}</span>
                       </div>
-                      <button type="button" onClick={() => eliminarNino(idx)} className="text-white/20 hover:text-red-400 p-2 transition-colors">✕</button>
+                      <button type="button" onClick={() => eliminarNino(idx)} className="text-slate-400 hover:text-red-500 p-2 transition-colors">✕</button>
                     </div>
                   ))}
                   {ninosSeleccionados.length === 0 && (
-                    <div className="sm:col-span-2 py-8 text-center border-2 border-dashed border-white/5 rounded-3xl">
-                      <p className="text-[10px] font-black text-white/10 uppercase tracking-widest">Nómina vacía</p>
+                    <div className="sm:col-span-2 py-8 text-center border-2 border-dashed border-slate-200 rounded-3xl">
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Nómina vacía</p>
                     </div>
                   )}
                 </div>
               </div>
 
               {/* Botones Finales */}
-              <div className="flex flex-col-reverse sm:flex-row justify-end gap-4 pt-8 border-t border-white/5">
+              <div className="flex flex-col-reverse sm:flex-row justify-end gap-4 pt-8 border-t border-slate-100">
                 <Button
                   type="button"
                   variant="secondary"
@@ -933,7 +1165,7 @@ const Dashboard = () => {
         cancelText="Cancelar"
         type="danger"
       />
-    </div>
+    </div >
   );
 };
 

@@ -253,25 +253,26 @@ const Recorridos = () => {
   };
 
   // Helper UI para Tipo de Recorrido
+  // Helper UI para Tipo de Recorrido
   const getTipoBadge = (tipo) => {
     return tipo === 'traer'
-      ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20'
+      ? 'bg-indigo-50 text-indigo-600 border-indigo-200'
       : tipo === 'llevar'
-        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-        : 'bg-primary-500/10 text-primary-400 border-primary-500/20';
+        ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
+        : 'bg-primary-50 text-primary-600 border-primary-200';
   };
 
   return (
-    <div className="min-h-screen bg-transparent py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
+    <div className="min-h-screen bg-transparent py-8 px-0 sm:px-6 lg:px-8 transition-colors duration-300">
       <Alert />
 
       {/* --- Page Header --- */}
-      <div className="max-w-7xl mx-auto mb-10">
+      <div className="w-full mx-auto mb-10">
         <div className="md:flex md:items-center md:justify-between md:space-x-8">
           <div className="flex items-start">
             <div className="pt-1.5">
-              <h1 className="text-4xl font-black text-white sm:text-5xl tracking-tighter">Recorridos</h1>
-              <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mt-3">Gestión de rutas y logística escolar</p>
+              <h1 className="text-4xl font-black text-slate-900 sm:text-5xl tracking-tighter">Recorridos</h1>
+              <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mt-3">Gestión de rutas y logística escolar</p>
             </div>
           </div>
           <div className="mt-8 flex flex-col-reverse justify-stretch gap-4 md:mt-0 md:flex-row md:items-center">
@@ -279,13 +280,15 @@ const Recorridos = () => {
               variant="secondary"
               onClick={loadRecorridos}
               disabled={loading}
-              className="w-full md:w-auto"
+              size={isMobile ? 'sm' : 'lg'}
+              className="w-full md:w-auto !bg-white !border !border-slate-200 !text-slate-700 hover:!text-indigo-600 hover:!border-indigo-200 hover:!bg-indigo-50 transition-all shadow-sm"
             >
               Refrescar
             </Button>
             <Button
               variant="primary"
               onClick={handleOpenModal}
+              size={isMobile ? 'sm' : 'lg'}
               className="w-full md:w-auto shadow-2xl shadow-primary-500/20"
             >
               Nuevo Recorrido
@@ -295,28 +298,28 @@ const Recorridos = () => {
       </div>
 
       {/* --- Controls & Stats --- */}
-      <div className="max-w-7xl mx-auto mb-10 space-y-6">
+      <div className="w-full mx-auto mb-10 space-y-6">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
           {/* Navegación Mes */}
           <div className="lg:col-span-4">
-            <div className="flex items-center bg-white/5 backdrop-blur-md rounded-3xl border border-white/10 overflow-hidden h-full">
+            <div className="flex items-center bg-white rounded-3xl border border-slate-200 overflow-hidden h-full shadow-sm">
               <button
                 onClick={() => cambiarMes(-1)}
                 disabled={loading}
-                className="px-6 py-4 hover:bg-white/10 text-white/50 hover:text-white transition-all border-r border-white/5"
+                className="px-6 py-4 hover:bg-slate-50 text-slate-400 hover:text-slate-600 transition-all border-r border-slate-100"
               >
                 ‹
               </button>
               <div className="flex-1 px-8 py-4 text-center">
-                <h3 className="text-sm font-black text-primary-400 uppercase tracking-[0.2em]">
+                <h3 className="text-sm font-black text-primary-600 uppercase tracking-[0.2em]">
                   {nombresMeses[mesSeleccionado - 1]}
                 </h3>
-                <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">{añoSeleccionado}</span>
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{añoSeleccionado}</span>
               </div>
               <button
                 onClick={() => cambiarMes(1)}
                 disabled={loading}
-                className="px-6 py-4 hover:bg-white/10 text-white/50 hover:text-white transition-all border-l border-white/5"
+                className="px-6 py-4 hover:bg-slate-50 text-slate-400 hover:text-slate-600 transition-all border-l border-slate-100"
               >
                 ›
               </button>
@@ -325,26 +328,26 @@ const Recorridos = () => {
 
           {/* Stats Bar */}
           <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <Card className="p-8 border-emerald-500/20">
-              <dt className="text-[10px] font-black text-emerald-400/50 uppercase tracking-[0.2em] mb-2">Inversión Mes</dt>
-              <dd className="text-4xl font-black text-emerald-400 tracking-tighter">
+            <Card className="p-8 border-emerald-200 bg-emerald-50/50">
+              <dt className="text-[10px] font-black text-emerald-600/70 uppercase tracking-[0.2em] mb-2">Inversión Mes</dt>
+              <dd className="text-4xl font-black text-emerald-600 tracking-tighter">
                 ${estadisticas.totalMes.toFixed(2)}
               </dd>
             </Card>
             <Card className="p-8">
-              <dt className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">Trayectos</dt>
-              <dd className="text-4xl font-black text-white tracking-tighter">{estadisticas.totalRecorridos}</dd>
+              <dt className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Trayectos</dt>
+              <dd className="text-4xl font-black text-slate-900 tracking-tighter">{estadisticas.totalRecorridos}</dd>
             </Card>
             <Card className="p-8">
-              <dt className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">Flota Activa</dt>
-              <dd className="text-4xl font-black text-white tracking-tighter">{estadisticas.vehiculosUsados}</dd>
+              <dt className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Flota Activa</dt>
+              <dd className="text-4xl font-black text-slate-900 tracking-tighter">{estadisticas.vehiculosUsados}</dd>
             </Card>
           </div>
         </div>
       </div>
 
       {/* Recorridos Grid */}
-      <div className="max-w-7xl mx-auto">
+      <div className="w-full mx-auto">
         {loading ? (
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {[...Array(8)].map((_, i) => (
@@ -356,12 +359,12 @@ const Recorridos = () => {
             {recorridosFiltrados.map((recorrido) => (
               <div
                 key={recorrido.id}
-                className="group relative bg-white/5 backdrop-blur-md rounded-[2rem] border border-white/10 p-7 hover:bg-white/10 transition-all duration-500 hover:shadow-2xl flex flex-col"
+                className="group relative bg-white rounded-[2rem] border border-slate-100 p-7 hover:shadow-xl transition-all duration-500 flex flex-col"
               >
                 <div className="flex items-start justify-between mb-6">
                   <div className="flex flex-col">
-                    <span className="text-[10px] font-black text-white/20 uppercase tracking-widest mb-1">Fecha</span>
-                    <span className="text-lg font-black text-white tracking-tighter flex items-center gap-2">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Fecha</span>
+                    <span className="text-lg font-black text-slate-900 tracking-tighter flex items-center gap-2">
                       {recorrido.fecha.split('T')[0]}
                     </span>
                   </div>
@@ -372,17 +375,17 @@ const Recorridos = () => {
 
                 <div className="space-y-6 mb-8">
                   <div className="flex justify-between items-center">
-                    <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">Hora Salida</span>
-                    <span className="px-3 py-1 bg-white/5 rounded-lg text-[10px] font-black text-white tracking-widest border border-white/5 font-mono">
+                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Hora Salida</span>
+                    <span className="px-3 py-1 bg-slate-50 rounded-lg text-[10px] font-black text-slate-700 tracking-widest border border-slate-100 font-mono">
                       {formatearHora(recorrido.hora_inicio)}
                     </span>
                   </div>
 
                   <div>
-                    <p className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-2">Vehículo</p>
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">Vehículo</p>
                     <div className="flex items-center gap-3">
                       <span className="text-2xl opacity-50">🚗</span>
-                      <span className="text-sm font-black text-white truncate tracking-tight" title={recorrido.vehiculo_descripcion}>
+                      <span className="text-sm font-black text-slate-900 truncate tracking-tight" title={recorrido.vehiculo_descripcion}>
                         {recorrido.vehiculo_descripcion || 'Sin asignar'}
                       </span>
                     </div>
@@ -390,19 +393,19 @@ const Recorridos = () => {
 
                   {recorrido.ninos?.length > 0 && (
                     <div>
-                      <p className="text-[9px] font-black text-white/20 uppercase tracking-widest mb-3">Estudiantes ({recorrido.ninos.length})</p>
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">Estudiantes ({recorrido.ninos.length})</p>
                       <div className="flex -space-x-3 overflow-hidden">
                         {recorrido.ninos.slice(0, 4).map((n, i) => (
                           <div
                             key={i}
-                            className="inline-block h-8 w-8 rounded-xl bg-white/10 text-white flex items-center justify-center text-[11px] font-black shadow-2xl border border-white/20 ring-4 ring-slate-900/50"
+                            className="inline-block h-8 w-8 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center text-[11px] font-black shadow-sm border border-slate-50 ring-4 ring-white"
                             title={n.nombre}
                           >
                             {n.nombre?.charAt(0) || '?'}
                           </div>
                         ))}
                         {recorrido.ninos.length > 4 && (
-                          <div className="inline-block h-8 w-8 rounded-xl bg-white/5 text-white/40 flex items-center justify-center text-[10px] font-black border border-white/5">
+                          <div className="inline-block h-8 w-8 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center text-[10px] font-black border border-slate-100">
                             +{recorrido.ninos.length - 4}
                           </div>
                         )}
@@ -411,16 +414,16 @@ const Recorridos = () => {
                   )}
                 </div>
 
-                <div className="mt-auto pt-6 border-t border-white/5 flex justify-between items-center">
-                  <span className="text-[9px] font-black text-white/10 uppercase tracking-widest">Costo Incurrido</span>
-                  <span className="text-xl font-black text-emerald-400 tracking-tighter">
+                <div className="mt-auto pt-6 border-t border-slate-100 flex justify-between items-center">
+                  <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Costo Incurrido</span>
+                  <span className="text-xl font-black text-emerald-600 tracking-tighter">
                     ${parseFloat(recorrido.costo || 0).toFixed(2)}
                   </span>
                 </div>
 
                 {/* Card Actions Footer */}
                 <div className={`
-                  absolute inset-0 bg-slate-950/80 backdrop-blur-xl rounded-[2rem] flex items-center justify-center gap-3 transition-all duration-500
+                  absolute inset-0 bg-white/90 backdrop-blur-xl rounded-[2rem] flex items-center justify-center gap-3 transition-all duration-500
                   ${isMobile
                     ? 'opacity-0 scale-95 pointer-events-none'
                     : 'opacity-0 lg:group-hover:opacity-100 scale-95 lg:group-hover:scale-100 z-10 pointer-events-none lg:group-hover:pointer-events-auto'
@@ -431,7 +434,7 @@ const Recorridos = () => {
                 </div>
 
                 {/* Mobile Actions (Visible) */}
-                <div className="mt-auto pt-6 border-t border-white/5 flex gap-2 lg:hidden">
+                <div className="mt-auto pt-6 border-t border-slate-100 flex gap-2 lg:hidden">
                   <Button variant="secondary" size="sm" className="flex-1" onClick={() => handleEdit(recorrido)}>Editar</Button>
                   <Button variant="danger" size="sm" className="flex-1" onClick={() => handleDelete(recorrido.id)}>Eliminar</Button>
                 </div>
@@ -440,10 +443,10 @@ const Recorridos = () => {
           </div>
         ) : (
           !loading && (
-            <div className="text-center py-24 bg-white/5 rounded-[2.5rem] border border-white/5 border-dashed">
+            <div className="text-center py-24 bg-slate-50 rounded-[2.5rem] border border-slate-200 border-dashed">
               <div className="text-5xl mb-6 opacity-30">📍</div>
-              <h3 className="text-xl font-black text-white mb-2">Sin recorridos</h3>
-              <p className="text-white/20 text-[10px] font-black uppercase tracking-widest">No hay registros para el periodo seleccionado</p>
+              <h3 className="text-xl font-black text-slate-900 mb-2">Sin recorridos</h3>
+              <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest">No hay registros para el periodo seleccionado</p>
             </div>
           )
         )}
@@ -477,28 +480,28 @@ const Recorridos = () => {
                 disabled={loadingForm}
               />
               <div>
-                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest block mb-2 pl-1">Vehículo Asignado</label>
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2 pl-1">Vehículo Asignado</label>
                 <select
                   name="vehiculo_id"
                   value={formData.vehiculo_id}
                   onChange={handleChange}
                   required
                   disabled={loadingForm}
-                  className="px-4 py-3 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary-500/50 focus:border-white/20 block w-full transition-all duration-300 bg-white/5 text-white outline-none backdrop-blur-sm"
+                  className="px-4 py-3 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary-500/50 focus:border-slate-300 block w-full transition-all duration-300 bg-white text-slate-900 outline-none"
                 >
                   <option value="">Seleccionar transporte...</option>
                   {vehiculos.map(v => <option key={v.id} value={v.id}>{v.descripcion}</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest block mb-2 pl-1">Tipo de Servicio</label>
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2 pl-1">Tipo de Servicio</label>
                 <select
                   name="tipo_recorrido"
                   value={formData.tipo_recorrido}
                   onChange={handleChange}
                   required
                   disabled={loadingForm}
-                  className="px-4 py-3 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary-500/50 focus:border-white/20 block w-full transition-all duration-300 bg-white/5 text-white outline-none backdrop-blur-sm"
+                  className="px-4 py-3 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary-500/50 focus:border-slate-300 block w-full transition-all duration-300 bg-white text-slate-900 outline-none"
                 >
                   <option value="traer">🚌 Traer Estudiantes</option>
                   <option value="llevar">🏠 Llevar Estudiantes</option>
@@ -518,9 +521,9 @@ const Recorridos = () => {
             </div>
 
             {/* Sección Niños */}
-            <div className="pt-8 border-t border-white/5">
+            <div className="pt-8 border-t border-slate-200">
               <div className="flex justify-between items-center mb-6">
-                <h4 className="text-[10px] font-black text-white/40 uppercase tracking-widest">Estudiantes Asignados ({ninosSeleccionados.length})</h4>
+                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Estudiantes Asignados ({ninosSeleccionados.length})</h4>
               </div>
 
               <div className="mb-6">
@@ -528,7 +531,7 @@ const Recorridos = () => {
                   onChange={agregarNino}
                   value=""
                   disabled={loadingForm}
-                  className="px-4 py-3 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary-500/50 focus:border-white/20 block w-full transition-all duration-300 bg-white/5 text-white outline-none backdrop-blur-sm"
+                  className="px-4 py-3 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary-500/50 focus:border-slate-300 block w-full transition-all duration-300 bg-white text-slate-900 outline-none"
                 >
                   <option value="">+ Vincular estudiante a esta ruta</option>
                   {(ninos || []).filter(n => !ninosSeleccionados.some(sel => sel.nino_id?.toString() === n.id?.toString())).map(n => (
@@ -539,31 +542,31 @@ const Recorridos = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
                 {(ninosSeleccionados || []).map((n, idx) => (
-                  <div key={n.nino_id} className="group flex items-center justify-between bg-white/5 border border-white/5 hover:border-white/10 rounded-2xl p-3 transition-all">
+                  <div key={n.nino_id} className="group flex items-center justify-between bg-white border border-slate-200 hover:border-slate-300 rounded-2xl p-3 transition-all">
                     <div className="flex items-center gap-3">
-                      <div className="h-8 w-8 rounded-lg bg-white/5 text-white flex items-center justify-center text-[10px] font-black border border-white/10">
+                      <div className="h-8 w-8 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center text-[10px] font-black border border-slate-200">
                         {n.nombre?.charAt(0) || '?'}
                       </div>
-                      <span className="text-xs font-black text-white/70 uppercase tracking-tight">{n.nombre} {n.apellidos}</span>
+                      <span className="text-xs font-black text-slate-700 uppercase tracking-tight">{n.nombre} {n.apellidos}</span>
                     </div>
                     <button
                       type="button"
                       onClick={() => eliminarNino(idx)}
-                      className="text-white/20 hover:text-red-400 p-2 transition-colors"
+                      className="text-slate-400 hover:text-red-500 p-2 transition-colors"
                     >
                       ✕
                     </button>
                   </div>
                 ))}
                 {ninosSeleccionados.length === 0 && (
-                  <div className="col-span-2 py-8 text-center bg-white/5 rounded-2xl border border-white/5 border-dashed">
-                    <p className="text-[10px] font-black text-white/10 uppercase tracking-[0.2em]">Sin estudiantes vinculados</p>
+                  <div className="col-span-2 py-8 text-center bg-slate-50 rounded-2xl border border-slate-200 border-dashed">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Sin estudiantes vinculados</p>
                   </div>
                 )}
               </div>
             </div>
 
-            <div className="mt-10 pt-8 border-t border-white/5 flex flex-col-reverse sm:flex-row sm:justify-end gap-4">
+            <div className="mt-10 pt-8 border-t border-slate-200 flex flex-col-reverse sm:flex-row sm:justify-end gap-4">
               <Button type="button" onClick={handleCloseModal} variant="secondary" className="w-full sm:w-auto">Cancelar</Button>
               <Button
                 type="submit"

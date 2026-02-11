@@ -33,18 +33,18 @@ const Login = () => {
     <div className="flex min-h-screen w-full bg-transparent overflow-hidden">
 
       {/* --- LADO IZQUIERDO (FORMULARIO) --- */}
-      <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-6 md:p-12 relative bg-transparent transition-colors duration-300">
+      <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-6 md:p-12 relative bg-transparent transition-colors duration-300 px-4">
 
         <div className="w-full max-w-[420px] space-y-8 z-10">
 
           <div className="text-center md:text-left space-y-3">
-            <div className="md:hidden inline-flex mb-6 p-4 rounded-3xl bg-white/5 backdrop-blur-md border border-white/10 text-white shadow-2xl">
+            <div className="md:hidden inline-flex mb-6 p-4 rounded-3xl bg-white border border-slate-200 text-slate-900 shadow-xl">
               <span className="text-3xl">🚌</span>
             </div>
-            <h2 className="text-4xl font-black text-white tracking-tighter">
+            <h2 className="text-4xl font-black text-slate-900 tracking-tighter">
               Bienvenido
             </h2>
-            <p className="text-white/40 font-black uppercase tracking-widest text-[10px]">
+            <p className="text-slate-400 font-black uppercase tracking-widest text-[10px]">
               INGRESA TUS CREDENCIALES PARA CONTINUAR
             </p>
           </div>
@@ -60,19 +60,19 @@ const Login = () => {
 
             {/* Input Email con Icono */}
             <div className="space-y-3">
-              <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] ml-1">
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">
                 Correo Electrónico
               </label>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
-                  <Mail className="h-5 w-5 text-white/20 group-focus-within:text-white transition-colors" />
+                  <Mail className="h-5 w-5 text-slate-400 group-focus-within:text-slate-900 transition-colors" />
                 </div>
                 <Input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="pl-12 bg-white/5 border-white/10 text-white placeholder-white/20 focus:bg-white/10"
+                  className="pl-12 bg-white border-slate-200 text-slate-900 placeholder-slate-400 focus:bg-slate-50 focus:border-slate-300"
                   placeholder="ejemplo@empresa.com"
                 />
               </div>
@@ -81,23 +81,23 @@ const Login = () => {
             {/* Input Password con Icono */}
             <div className="space-y-3">
               <div className="flex justify-between items-center ml-1">
-                <label className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">
                   Contraseña
                 </label>
-                <a href="#" className="text-[10px] font-black text-blue-400 hover:text-white uppercase tracking-widest transition-colors">
+                <a href="#" className="text-[10px] font-black text-primary-600 hover:text-primary-700 uppercase tracking-widest transition-colors">
                   ¿Olvidaste tu clave?
                 </a>
               </div>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
-                  <Lock className="h-5 w-5 text-white/20 group-focus-within:text-white transition-colors" />
+                  <Lock className="h-5 w-5 text-slate-400 group-focus-within:text-slate-900 transition-colors" />
                 </div>
                 <Input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-12 bg-white/5 border-white/10 text-white placeholder-white/20 focus:bg-white/10"
+                  className="pl-12 bg-white border-slate-200 text-slate-900 placeholder-slate-400 focus:bg-slate-50 focus:border-slate-300"
                   placeholder="••••••••"
                 />
               </div>
@@ -119,7 +119,7 @@ const Login = () => {
 
           </form>
 
-          <p className="text-center text-white/20 text-[10px] font-black uppercase tracking-[0.3em] mt-12 pb-6">
+          <p className="text-center text-slate-400 text-[10px] font-black uppercase tracking-[0.3em] mt-12 pb-6">
             © 2026 Recorridos App Inc.
           </p>
         </div>

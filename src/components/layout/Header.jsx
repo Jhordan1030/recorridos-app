@@ -1,13 +1,24 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // Importamos useNavigate
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Menu, LogOut, User, X, ChevronDown, Settings } from 'lucide-react';
+import {
+  LogOut,
+  User,
+  ChevronDown,
+  Settings,
+  Home,
+  MapPin,
+  Users,
+  Car,
+  Bell
+} from 'lucide-react';
 
-const Header = ({ onToggleSidebar, isSidebarOpen, isMobile }) => {
+const Header = ({ isMobile }) => {
   const { user, isAdmin, logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const userMenuRef = useRef(null);
-  const navigate = useNavigate(); // Hook de navegación
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // --- LÓGICA INTELIGENTE DE NOMBRE (CACHE SEGURO) ---
   const extractName = (u) => {
@@ -62,139 +73,136 @@ const Header = ({ onToggleSidebar, isSidebarOpen, isMobile }) => {
     setShowUserMenu(false);
   };
 
-  // Función para navegar al perfil
   const goToProfile = () => {
     setShowUserMenu(false);
-    navigate('/perfil'); // Navega a la ruta del perfil
+    navigate('/perfil');
   };
 
+  const navItems = [
+    { icon: Home, path: '/dashboard', label: 'Inicio' },
+    { icon: MapPin, path: '/recorridos', label: 'Rutas' },
+    { icon: Users, path: '/ninos', label: 'Niños' },
+    { icon: Car, path: '/vehiculos', label: 'Vehículos' },
+  ];
+
   return (
-    <header className="glass-navbar sticky top-2 sm:top-4 z-40 mx-2 sm:mx-4 mt-2 sm:mt-4 lg:ml-auto lg:w-fit rounded-2xl sm:rounded-[2rem] border border-white/10">
-      <div className="flex items-center justify-between h-14 sm:h-16 px-4 sm:px-8 lg:px-10 space-x-4 sm:space-x-8">
+    <header className="hidden md:block sticky top-0 z-50 bg-white/80 backdrop-blur-2xl border-b border-white/20 shadow-sm transition-all duration-300">
+      <div className="max-w-[2000px] mx-auto px-4 h-16 flex items-center justify-between gap-4">
 
-        {/* Lado Izquierdo */}
-        <div className="flex items-center">
-          <button
-            onClick={onToggleSidebar}
-            data-sidebar-toggle="true"
-            className={`p-2.5 text-white/70 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-300 ease-out focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:ring-offset-2 ${isMobile ? 'lg:hidden' : 'hidden'}`}
-            aria-label="Toggle Sidebar"
-          >
-            {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
-
-          <div className={`flex items-center space-x-2 sm:space-x-3 ${isMobile ? 'lg:hidden' : 'hidden'}`}>
-            <div className="w-8 h-8 sm:w-9 sm:h-9 bg-gradient-to-br from-primary-600 to-primary-700 rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/25 ring-1 sm:ring-2 ring-white">
-              <span className="text-white font-bold text-xs sm:text-sm">🚌</span>
+        {/* --- LEFT: Logo & Brand --- */}
+        <div className="flex items-center gap-3 shrink-0">
+          <Link to="/dashboard" className="flex items-center gap-2 group">
+            <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-indigo-700 rounded-2xl flex items-center justify-center shadow-lg shadow-primary-600/20 transition-transform group-hover:scale-105">
+              <span className="text-white font-black text-xl tracking-tighter">R</span>
             </div>
-            <div className="flex flex-col">
-              <h1 className="text-lg sm:text-xl font-black text-white tracking-tighter">Recorridos</h1>
-              <p className="text-[8px] sm:text-[10px] text-white/30 font-black uppercase tracking-widest leading-none">Panel</p>
-            </div>
-          </div>
+            <span className={`text-xl font-bold text-slate-900 tracking-tight hidden sm:block ${isMobile ? 'hidden' : ''}`}>Recorridos</span>
+          </Link>
         </div>
 
-        {/* Lado Derecho */}
-        <div className="flex items-center space-x-4">
+        {/* --- CENTER: Desktop Navigation (Facebook Style - iOS Glass) --- */}
+        <div className="hidden lg:flex items-center justify-center flex-1 max-w-2xl px-4">
+          <nav className="flex items-center justify-between w-full bg-slate-100/50 p-1 rounded-2xl border border-white/50 backdrop-blur-sm">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = location.pathname === item.path || (item.path === '/dashboard' && location.pathname === '/');
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`
+                          relative group flex items-center justify-center w-full h-10 rounded-xl transition-all duration-300
+                          ${isActive
+                      ? 'text-primary-600 bg-white shadow-sm ring-1 ring-black/5'
+                      : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'
+                    }
+                       `}
+                  title={item.label}
+                >
+                  <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
+                </Link>
+              )
+            })}
+          </nav>
+        </div>
+
+        {/* --- RIGHT: User Profile & Actions --- */}
+        <div className="flex items-center gap-3 shrink-0 justify-end">
           {isAdmin && (
-            <div className="hidden sm:flex items-center space-x-2.5 bg-amber-400/20 border border-amber-400/30 px-3.5 py-1.5 rounded-full shadow-lg ring-1 ring-amber-400/20">
-              <div className="w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(251,191,36,0.8)]"></div>
-              <span className="text-amber-400 text-[10px] font-black uppercase tracking-widest">Administrador</span>
+            <div className="hidden md:flex items-center px-3 py-1 bg-amber-500/10 border border-amber-500/20 rounded-full">
+              <span className="text-amber-600 text-[10px] font-bold uppercase tracking-wider">Admin</span>
             </div>
           )}
 
-          {/* Menú Usuario */}
-          <div className="relative" ref={userMenuRef}>
+          {/* Notifications Placeholder */}
+          <button className="hidden md:flex w-10 h-10 rounded-full bg-slate-50/80 hover:bg-slate-100 items-center justify-center text-slate-600 transition-colors border border-transparent hover:border-slate-200">
+            <Bell size={20} />
+          </button>
+
+          {/* User Menu */}
+          {/* User Menu - Hidden on Mobile (available in BottomNav) */}
+          <div className="relative hidden md:block" ref={userMenuRef}>
             <button
               onClick={() => setShowUserMenu(!showUserMenu)}
-              className="group flex items-center space-x-3 p-2 rounded-2xl hover:bg-white/5 transition-all duration-300 ease-out border border-transparent hover:border-gray-200/50 focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:ring-offset-2"
+              className="flex items-center gap-2 p-1 pl-2 rounded-full hover:bg-slate-50 transition-all border border-transparent hover:border-slate-200 focus:outline-none"
             >
-              <div className="hidden sm:block text-right">
-                <p className="text-sm font-black text-white tracking-tighter">
-                  {displayName}
-                </p>
-                <p className="text-[10px] font-black text-white/30 uppercase tracking-widest truncate">
-                  {isAdmin ? 'Administrador' : 'Usuario'}
-                </p>
+              <div className="text-right hidden xl:block">
+                <p className="text-sm font-bold text-slate-700 leading-none">{displayName}</p>
               </div>
-
-              <div className="flex items-center space-x-2.5">
-                <div className="relative">
-                  <div className="w-10 h-10 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center text-white font-black text-sm shadow-xl border border-white/20 transition-all duration-300 group-hover:bg-white/20">
-                    {initial}
-                  </div>
-                  <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-500 border-2 border-[#020617] rounded-full shadow-lg"></div>
-                </div>
-                <ChevronDown size={14} className={`text-white/40 transition-all duration-300 ease-out ${showUserMenu ? 'rotate-180 text-white' : 'group-hover:text-white'}`} />
+              <div className="w-9 h-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md ring-2 ring-white">
+                {initial}
+              </div>
+              <div className="w-6 h-6 bg-slate-200 rounded-full flex items-center justify-center lg:hidden">
+                <ChevronDown size={14} className="text-slate-500" />
               </div>
             </button>
 
             {/* Dropdown */}
             {showUserMenu && (
-              <div className="absolute right-0 top-full mt-3 w-72 bg-white/5 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/10 py-0 z-50 overflow-hidden ring-1 ring-white/10">
-                <div className="px-6 py-6 border-b border-white/10">
-                  <div className="flex items-center space-x-4">
-                    <div className="relative">
-                      <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-xl border border-white/20">
-                        {initial}
-                      </div>
-                      <div className="absolute -bottom-1 -right-1 bg-emerald-500 w-4 h-4 rounded-full border-4 border-[#020617]"></div>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-base font-black text-white truncate tracking-tighter">
-                        {displayName}
-                      </p>
-                      <p className="text-[10px] font-black text-white/30 truncate mt-0.5 uppercase tracking-widest">
-                        {user?.rol === 'admin' ? 'Administrador del Sistema' : 'Nivel de Usuario'}
-                      </p>
-                      <div className="mt-3">
-                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${isAdmin ? 'bg-amber-400/20 text-amber-400 border-amber-400/20' : 'bg-primary-400/20 text-primary-400 border-primary-400/20'}`}>
-                          {isAdmin ? 'Administrador' : 'Usuario'}
-                        </span>
-                      </div>
-                    </div>
+              <div className="absolute right-0 top-full mt-3 w-72 bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/20 p-2 z-50 animate-in fade-in zoom-in-95 duration-200 origin-top-right ring-1 ring-black/5">
+
+                {/* User Info Header inside Dropdown */}
+                <div className="mx-2 mt-2 p-3 bg-slate-50/80 rounded-xl mb-2 flex items-center gap-3">
+                  <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-primary-600 font-bold text-lg shadow-sm">
+                    {initial}
+                  </div>
+                  <div className="overflow-hidden">
+                    <p className="text-sm font-bold text-slate-900 truncate">{displayName}</p>
+                    <p className="text-xs text-slate-500 truncate">{user?.email}</p>
                   </div>
                 </div>
 
-                <div className="py-2">
+                <div className="space-y-1">
                   <button
                     onClick={goToProfile}
-                    className="flex items-center space-x-4 w-full px-6 py-4 text-sm text-white/70 hover:bg-white/5 transition-all duration-200 group"
+                    className="flex items-center gap-3 w-full px-3 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-white rounded-xl transition-all"
                   >
-                    <User size={18} className="text-white/30 group-hover:text-white transition-colors" />
-                    <span className="font-black uppercase tracking-widest text-[10px]">Mi perfil</span>
+                    <User size={18} className="text-slate-400" />
+                    <span>Mi Perfil</span>
                   </button>
 
                   <button
                     onClick={() => setShowUserMenu(false)}
-                    className="flex items-center space-x-4 w-full px-6 py-4 text-sm text-white/70 hover:bg-white/5 transition-all duration-200 group"
+                    className="flex items-center gap-3 w-full px-3 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-white rounded-xl transition-all"
                   >
-                    <Settings size={18} className="text-white/30 group-hover:text-white transition-colors" />
-                    <span className="font-black uppercase tracking-widest text-[10px]">Configuración</span>
+                    <Settings size={18} className="text-slate-400" />
+                    <span>Configuración</span>
                   </button>
 
-                  <div className="mx-6 my-2 h-px bg-white/5"></div>
+                  <div className="my-1 border-t border-slate-100/50 mx-2" />
 
                   <button
                     onClick={handleLogout}
-                    className="flex items-center space-x-4 w-full px-6 py-4 text-sm text-red-400 hover:bg-red-400/10 transition-all duration-200 group"
+                    className="flex items-center gap-3 w-full px-3 py-2.5 text-sm font-medium text-red-500 hover:text-red-700 hover:bg-red-50 rounded-xl transition-all"
                   >
-                    <LogOut size={18} className="text-red-400/50 group-hover:text-red-400 transition-colors" />
-                    <span className="font-black uppercase tracking-widest text-[10px]">Cerrar sesión</span>
+                    <LogOut size={18} className="text-red-400 group-hover:text-red-500" />
+                    <span>Cerrar Sesión</span>
                   </button>
-                </div>
-
-                <div className="px-6 py-4 bg-white/5 border-t border-white/5">
-                  <div className="text-[10px] text-white/20 text-center font-black uppercase tracking-[0.2em]">
-                    Recorridos App v3.1.4
-                  </div>
                 </div>
               </div>
             )}
           </div>
         </div>
       </div>
-      <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
     </header>
   );
 };

@@ -12,17 +12,28 @@ const ConfirmModal = ({
   type = "warning"
 }) => {
 
-  // Bloquear scroll cuando está abierto
+  // Manejo de ESC y bloqueo de scroll
   useEffect(() => {
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') onClose();
+    };
+
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      document.addEventListener('keydown', handleEscape);
     } else {
       document.body.style.overflow = 'unset';
+      document.removeEventListener('keydown', handleEscape);
     }
     return () => {
       document.body.style.overflow = 'unset';
+      document.removeEventListener('keydown', handleEscape);
     };
-  }, [isOpen]);
+  }, [isOpen, onClose]);
+
+  const handleBackdropClick = (event) => {
+    if (event.target === event.currentTarget) onClose();
+  };
 
   if (!isOpen) return null;
 
@@ -56,17 +67,22 @@ const ConfirmModal = ({
     <div className="fixed inset-0 z-[60] overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
 
       {/* Contenedor de centrado */}
-      <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+      <div
+        className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0"
+        onClick={handleBackdropClick}
+      >
 
         {/* Backdrop con Blur */}
         <div
-          className="fixed inset-0 bg-gray-900/75 backdrop-blur-3xl transition-opacity"
+          className="fixed inset-0 bg-gray-900/75 backdrop-blur-3xl transition-opacity pointer-events-none"
           aria-hidden="true"
-          onClick={onClose}
         />
 
         {/* Panel del Modal */}
-        <div className="relative transform overflow-hidden rounded-[2.5rem] bg-slate-950/90 backdrop-blur-3xl text-left shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] transition-all sm:my-8 sm:w-full sm:max-w-lg border border-white/10">
+        <div
+          className="relative transform overflow-hidden rounded-[2.5rem] bg-slate-950/90 backdrop-blur-3xl text-left shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] transition-all sm:my-8 sm:w-full sm:max-w-lg border border-white/10"
+          onClick={(e) => e.stopPropagation()}
+        >
 
           <div className="bg-transparent px-8 pb-4 pt-8 sm:p-10 sm:pb-6">
             <div className="sm:flex sm:items-start">

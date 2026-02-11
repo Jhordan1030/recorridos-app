@@ -20,25 +20,32 @@ export default defineConfig({
         orientation: 'portrait',
         icons: [
           {
-            src: '/pwa-192x192.png',
+            src: '/pwa-192x192.webp',
             sizes: '192x192',
-            type: 'image/png'
+            type: 'image/webp'
           },
           {
-            src: '/pwa-512x512.png',
+            src: '/pwa-512x512.webp',
             sizes: '512x512',
-            type: 'image/png'
+            type: 'image/webp'
           },
           {
-            src: '/pwa-512x512.png',
+            src: '/pwa-512x512.webp',
             sizes: '512x512',
-            type: 'image/png',
+            type: 'image/webp',
             purpose: 'any maskable'
           }
         ]
       },
       devOptions: {
-        enabled: true
+        enabled: true,
+        type: 'module',
+        navigateFallback: 'index.html',
+        suppressWarnings: true,
+      },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}'],
+        navigateFallback: null,
       }
     })
   ],
@@ -57,6 +64,14 @@ export default defineConfig({
     chunkSizeWarningLimit: 1000
   },
   server: {
-    port: 3000
+    port: 3000,
+    warmup: {
+      clientFiles: [
+        './src/main.jsx',
+        './src/App.jsx',
+        './src/index.css',
+        './src/components/layout/Layout.jsx'
+      ]
+    }
   }
 })

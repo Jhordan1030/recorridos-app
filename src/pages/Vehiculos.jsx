@@ -9,6 +9,7 @@ import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import Card from '../components/ui/Card';
 import Skeleton from '../components/ui/Skeleton';
+import { Settings, Trash2, Plus, Search, Truck, Zap } from 'lucide-react';
 
 const Vehiculos = () => {
   const { vehiculos, setVehiculos, isMobile } = useApp();
@@ -28,6 +29,7 @@ const Vehiculos = () => {
   const [editMode, setEditMode] = useState(false);
   const [editId, setEditId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     loadVehiculos();
@@ -156,146 +158,186 @@ const Vehiculos = () => {
     const config = {
       propio: {
         icon: '🚗',
-        color: 'bg-blue-500/20 text-blue-400 border-blue-500/20'
+        color: 'bg-blue-50 text-blue-600 border-blue-200'
       },
       empresa: {
         icon: '🏢',
-        color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/20'
+        color: 'bg-emerald-50 text-emerald-600 border-emerald-200'
       },
       alquilado: {
         icon: '📋',
-        color: 'bg-violet-500/20 text-violet-400 border-violet-500/20'
+        color: 'bg-violet-50 text-violet-600 border-violet-200'
       },
       taxi: {
         icon: '🚕',
-        color: 'bg-amber-500/20 text-amber-400 border-amber-500/20'
+        color: 'bg-amber-50 text-amber-600 border-amber-200'
       },
       default: {
         icon: '🚗',
-        color: 'bg-white/10 text-white/70 border-white/10'
+        color: 'bg-slate-50 text-slate-600 border-slate-200'
       }
     };
     return config[tipo] || config.default;
   };
 
+  const filteredVehiculos = (vehiculos || []).filter(v =>
+    v.descripcion.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (v.placa && v.placa.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+
   return (
-    <div className="min-h-screen bg-transparent py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
+    <div className="min-h-screen bg-transparent py-4 sm:py-8 px-0 sm:px-6 lg:px-8 transition-colors duration-300">
       <Alert />
 
       {/* --- Page Header --- */}
-      <div className="max-w-7xl mx-auto mb-10">
-        <div className="md:flex md:items-center md:justify-between md:space-x-8">
-          <div className="flex items-start">
-            <div className="pt-1.5">
-              <h1 className="text-4xl font-black text-white sm:text-5xl tracking-tighter">Vehículos</h1>
-              <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mt-3">Gestión de flota y costos operativos</p>
-            </div>
+      <div className="mb-8">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Vehículos</h1>
+            <p className="text-xs font-medium text-slate-500 mt-1 uppercase tracking-wider">Control de flota y asignaciones</p>
           </div>
-          <div className="mt-8 flex flex-col-reverse justify-stretch gap-4 md:mt-0 md:flex-row md:items-center">
-            <Button
-              variant="secondary"
-              onClick={loadVehiculos}
-              disabled={loading}
-              className="w-full md:w-auto"
-            >
-              Refrescar
-            </Button>
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+            <div className="relative w-full sm:w-64">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search className="h-4 w-4 text-slate-400" />
+              </div>
+              <input
+                type="text"
+                placeholder="Buscar vehículo..."
+                className="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-xl leading-5 bg-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 sm:text-sm transition-all shadow-sm"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
             <Button
               variant="primary"
               onClick={handleOpenCreateModal}
-              className="w-full md:w-auto shadow-2xl shadow-primary-500/20"
+              size={isMobile ? 'sm' : 'lg'}
+              className="w-full sm:w-auto shadow-sm"
             >
-              Nuevo Vehículo
+              <div className="flex items-center gap-2">
+                <Plus size={18} />
+                <span>Nuevo Vehículo</span>
+              </div>
             </Button>
           </div>
         </div>
       </div>
 
       {/* --- Content Section --- */}
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-10">
-          <Card className="p-8">
-            <dt className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">Total Flota</dt>
-            <dd className="text-4xl font-black text-white tracking-tighter">{vehiculos.length}</dd>
+      <div className="w-full mx-auto">
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-2 mb-8">
+          <Card variant="base" className="p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1">Total Flota</p>
+                <h3 className="text-3xl font-black text-slate-900 tracking-tighter">{vehiculos.length}</h3>
+              </div>
+              <div className="p-2 bg-amber-50 rounded-lg text-amber-600">
+                <Truck size={20} strokeWidth={2.5} />
+              </div>
+            </div>
+            <div className="mt-4 flex items-center gap-2 text-[11px] font-bold text-slate-400">
+              <span className="text-slate-600">Unidades</span>
+              <span>disponibles</span>
+            </div>
           </Card>
-          <Card className="p-8 border-blue-500/20">
-            <dt className="text-[10px] font-black text-blue-400/50 uppercase tracking-[0.2em] mb-2">Vehículos Propios</dt>
-            <dd className="text-4xl font-black text-blue-400 tracking-tighter">
-              {vehiculos.filter(v => v.tipo === 'propio').length}
-            </dd>
+
+          <Card variant="base" className="p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1">Operatividad</p>
+                <h3 className="text-3xl font-black text-emerald-600 tracking-tighter uppercase">100%</h3>
+              </div>
+              <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600">
+                <Zap size={20} strokeWidth={2.5} />
+              </div>
+            </div>
+            <div className="mt-4 flex items-center gap-2 text-[11px] font-bold text-slate-400">
+              <span className="text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">En servicio</span>
+            </div>
           </Card>
         </div>
 
+
         {loading ? (
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {[...Array(8)].map((_, i) => (
-              <Skeleton key={i} variant="card" className="h-[280px]" />
+              <Skeleton key={i} variant="card" className="h-[200px]" />
             ))}
           </div>
-        ) : vehiculos.length === 0 ? (
-          <div className="text-center py-24 bg-white/5 rounded-[2.5rem] border border-white/5 border-dashed">
-            <div className="text-5xl mb-6 opacity-30">🚗</div>
-            <h3 className="text-xl font-black text-white mb-2">Sin vehículos</h3>
-            <p className="text-white/20 text-[10px] font-black uppercase tracking-widest">Registra tu primer transporte para comenzar</p>
+        ) : filteredVehiculos.length === 0 ? (
+          <div className="text-center py-20 bg-white rounded-3xl border border-slate-200 border-dashed">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-50 mb-4">
+              <Truck size={32} className="text-slate-300" />
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 mb-1">Sin vehículos</h3>
+            <p className="text-slate-500 text-sm">Registra tu primer transporte para comenzar.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {(vehiculos || []).map((vehiculo) => {
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {filteredVehiculos.map((vehiculo) => {
               const styleInfo = getTipoInfo(vehiculo.tipo);
               return (
-                <div
+                <Card
                   key={vehiculo.id}
-                  className="group relative bg-white/5 backdrop-blur-md rounded-[2rem] border border-white/10 p-7 hover:bg-white/10 transition-all duration-500 hover:shadow-2xl flex flex-col"
+                  variant="base"
+                  padding="p-0"
+                  className="group relative overflow-visible hover:shadow-lg transition-all duration-300 border-slate-200 flex flex-col"
                 >
-                  <div className="flex items-start justify-between mb-6">
-                    <span className="text-3xl filter drop-shadow-2xl">{styleInfo.icon}</span>
-                    <span className={`inline-flex items-center px-3 py-1 text-[10px] font-black uppercase tracking-widest border rounded-full ${styleInfo.color}`}>
-                      {vehiculo.tipo}
-                    </span>
-                  </div>
+                  <div className="p-6 flex-1">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center text-xl shadow-sm border border-slate-100">
+                        {styleInfo.icon}
+                      </div>
+                      <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${styleInfo.color}`}>
+                        {vehiculo.tipo}
+                      </span>
+                    </div>
 
-                  <div className="mb-8">
-                    <h3 className="text-xl font-black text-white truncate tracking-tighter" title={vehiculo.descripcion}>
+                    <h3 className="text-lg font-bold text-slate-900 tracking-tight truncate line-clamp-1 mb-1" title={vehiculo.descripcion}>
                       {vehiculo.descripcion}
                     </h3>
-                    <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mt-1">
+                    <p className="text-xs font-medium text-slate-400 uppercase tracking-widest mb-4">
                       {vehiculo.placa || 'SIN PLACA'}
                     </p>
-                  </div>
 
-                  <div className="space-y-4 py-6 border-t border-white/5">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">Capacidad</span>
-                      <span className="text-[10px] font-black text-white/70 uppercase tracking-widest">
-                        {vehiculo.capacidad ? `${vehiculo.capacidad} Pas.` : '--'}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">Costo/Recorrido</span>
-                      <span className="text-xl font-black text-emerald-400 tracking-tighter">
-                        ${parseFloat(vehiculo.costo_por_recorrido || 0).toFixed(2)}
-                      </span>
+                    <div className="pt-4 border-t border-slate-50 grid grid-cols-2 gap-2">
+                      <div>
+                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Capacidad</p>
+                        <p className="text-sm font-bold text-slate-700">{vehiculo.capacidad || '0'} Pas.</p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Costo</p>
+                        <p className="text-sm font-bold text-emerald-600">${parseFloat(vehiculo.costo_por_recorrido || 0).toFixed(2)}</p>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Card Actions Footer */}
-                  <div className={`
-                    absolute inset-0 bg-slate-950/80 backdrop-blur-xl rounded-[2rem] flex items-center justify-center gap-3 transition-all duration-500
-                    ${isMobile
-                      ? 'opacity-0 scale-95 pointer-events-none'
-                      : 'opacity-0 lg:group-hover:opacity-100 scale-95 lg:group-hover:scale-100 z-10 pointer-events-none lg:group-hover:pointer-events-auto'
-                    }
-                  `}>
-                    <Button variant="secondary" size="sm" onClick={() => handleEdit(vehiculo)}>✏️</Button>
-                    <Button variant="danger" size="sm" onClick={() => handleDeleteClick(vehiculo.id)}>🗑️</Button>
+                  <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-3">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="flex-1 text-xs justify-center gap-2 hover:bg-white hover:border-indigo-200 hover:text-indigo-600 shadow-sm"
+                      onClick={() => handleEdit(vehiculo)}
+                    >
+                      <div className="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" /></svg>
+                        <span>Editar</span>
+                      </div>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-slate-400 hover:text-red-600 hover:bg-red-50 hover:border-red-100 border border-transparent px-3"
+                      onClick={() => handleDeleteClick(vehiculo.id)}
+                    >
+                      <span className="sr-only">Eliminar</span>
+                      <Trash2 size={16} />
+                    </Button>
                   </div>
-
-                  {/* Mobile Actions (Visible) */}
-                  <div className="mt-auto pt-6 border-t border-white/5 flex gap-2 lg:hidden">
-                    <Button variant="secondary" size="sm" className="flex-1" onClick={() => handleEdit(vehiculo)}>Editar</Button>
-                    <Button variant="danger" size="sm" className="flex-1" onClick={() => handleDeleteClick(vehiculo.id)}>Eliminar</Button>
-                  </div>
-                </div>
+                </Card>
               );
             })}
           </div>
@@ -324,13 +366,13 @@ const Vehiculos = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-2 gap-6">
               <div>
-                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest block mb-2 pl-1">Tipo de Vehículo</label>
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2 pl-1">Tipo de Vehículo</label>
                 <select
                   name="tipo"
                   value={formData.tipo}
                   onChange={handleChange}
                   required
-                  className="px-4 py-3 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary-500/50 focus:border-white/20 block w-full transition-all duration-300 bg-white/5 text-white outline-none backdrop-blur-sm"
+                  className="px-4 py-3 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary-500/50 focus:border-slate-300 block w-full transition-all duration-300 bg-white text-slate-900 outline-none"
                   disabled={loading}
                 >
                   <option value="propio">🚗 Propio</option>
@@ -385,7 +427,7 @@ const Vehiculos = () => {
               />
             </div>
 
-            <div className="mt-10 pt-8 border-t border-white/5 flex flex-col-reverse sm:flex-row sm:justify-end gap-4">
+            <div className="mt-10 pt-8 border-t border-slate-200 flex flex-col-reverse sm:flex-row sm:justify-end gap-4">
               <Button type="button" onClick={handleCloseModal} variant="secondary" className="w-full sm:w-auto">Cancelar</Button>
               <Button type="submit" variant="primary" loading={loading} className="w-full sm:w-auto">
                 {editMode ? 'Guardar Cambios' : 'Registrar Vehículo'}

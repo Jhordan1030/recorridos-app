@@ -10,6 +10,7 @@ import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import Card from '../components/ui/Card';
 import Skeleton from '../components/ui/Skeleton';
+import { Plus } from 'lucide-react';
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -228,12 +229,12 @@ const Users = () => {
       <Alert />
 
       {/* --- Page Header --- */}
-      <div className="max-w-7xl mx-auto mb-10">
+      <div className="w-full mx-auto mb-10">
         <div className="md:flex md:items-center md:justify-between md:space-x-8">
           <div className="flex items-start">
             <div className="pt-1.5">
-              <h1 className="text-4xl font-black text-white sm:text-5xl tracking-tighter">Usuarios</h1>
-              <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mt-3">Administración de accesos y roles</p>
+              <h1 className="text-4xl font-black text-slate-900 sm:text-5xl tracking-tighter">Usuarios</h1>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-3">Administración de accesos y roles</p>
             </div>
           </div>
           <div className="mt-8 flex flex-col-reverse justify-stretch gap-4 md:mt-0 md:flex-row md:items-center">
@@ -241,13 +242,15 @@ const Users = () => {
               variant="secondary"
               onClick={loadUsers}
               disabled={loading}
-              className="w-full md:w-auto"
+              size={isMobile ? 'sm' : 'lg'}
+              className="w-full md:w-auto !bg-white !border !border-slate-200 !text-slate-700 hover:!text-indigo-600 hover:!border-indigo-200 hover:!bg-indigo-50 transition-all shadow-sm"
             >
               Refrescar
             </Button>
             <Button
               variant="primary"
               onClick={() => setShowCreateForm(true)}
+              size={isMobile ? 'sm' : 'lg'}
               className="w-full md:w-auto shadow-2xl shadow-primary-500/20"
             >
               Nuevo Usuario
@@ -257,15 +260,15 @@ const Users = () => {
       </div>
 
       {/* --- Main Content --- */}
-      <div className="max-w-7xl mx-auto">
+      <div className="w-full mx-auto">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 mb-10">
           <Card className="p-8">
-            <dt className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">Total Usuarios</dt>
-            <dd className="text-4xl font-black text-white tracking-tighter">{usersArray.length}</dd>
+            <dt className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Total Usuarios</dt>
+            <dd className="text-4xl font-black text-slate-900 tracking-tighter">{usersArray.length}</dd>
           </Card>
-          <Card className="p-8 border-purple-500/20">
-            <dt className="text-[10px] font-black text-purple-400/50 uppercase tracking-[0.2em] mb-2">Administradores</dt>
-            <dd className="text-4xl font-black text-purple-400 tracking-tighter">
+          <Card className="p-8 border-purple-200 bg-purple-50/50">
+            <dt className="text-[10px] font-black text-purple-600/70 uppercase tracking-[0.2em] mb-2">Administradores</dt>
+            <dd className="text-4xl font-black text-purple-600 tracking-tighter">
               {usersArray.filter(u => u.rol === 'admin').length}
             </dd>
           </Card>
@@ -278,21 +281,21 @@ const Users = () => {
             ))}
           </div>
         ) : usersArray.length === 0 ? (
-          <div className="text-center py-24 bg-white/5 rounded-[2.5rem] border border-white/5 border-dashed">
+          <div className="text-center py-24 bg-slate-50 rounded-[2.5rem] border border-slate-200 border-dashed">
             <div className="text-5xl mb-6 opacity-30">👥</div>
-            <h3 className="text-xl font-black text-white mb-2">Sin usuarios</h3>
-            <p className="text-white/20 text-[10px] font-black uppercase tracking-widest">Registra nuevos miembros para comenzar</p>
+            <h3 className="text-xl font-black text-slate-900 mb-2">Sin usuarios</h3>
+            <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest">Registra nuevos miembros para comenzar</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {usersArray.map((user) => (
               <div
                 key={user.id}
-                className="group relative bg-white/5 backdrop-blur-md rounded-[2rem] border border-white/10 p-7 hover:bg-white/10 transition-all duration-500 hover:shadow-2xl flex flex-col"
+                className="group relative bg-white rounded-[2rem] border border-slate-100 p-7 hover:shadow-xl transition-all duration-500 flex flex-col"
               >
                 <div className="flex items-start justify-between mb-6">
                   {/* Avatar */}
-                  <div className="h-14 w-14 rounded-2xl bg-white/10 text-white flex items-center justify-center font-black text-xs shadow-2xl border border-white/20 ring-4 ring-white/5">
+                  <div className="h-14 w-14 rounded-2xl bg-slate-50 text-slate-600 flex items-center justify-center font-black text-xs shadow-sm border border-slate-100 ring-4 ring-slate-50">
                     {getInitials(user.nombre)}
                   </div>
                   {/* Role Badge */}
@@ -300,16 +303,16 @@ const Users = () => {
                 </div>
 
                 <div className="mb-8">
-                  <h3 className="text-xl font-black text-white truncate tracking-tighter" title={user.nombre}>
+                  <h3 className="text-xl font-black text-slate-900 truncate tracking-tighter" title={user.nombre}>
                     {user.nombre}
                   </h3>
-                  <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mt-1 truncate" title={user.email}>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1 truncate" title={user.email}>
                     {user.email}
                   </p>
                 </div>
 
-                <div className="flex items-center justify-between pt-6 border-t border-white/5">
-                  <span className="text-[9px] font-black text-white/10 uppercase tracking-widest">ID: {user.id}</span>
+                <div className="flex items-center justify-between pt-6 border-t border-slate-50">
+                  <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest">ID: {user.id}</span>
                   <div className="flex items-center gap-1.5">
                     <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full shadow-[0_0_8px_rgba(52,211,153,0.5)]"></div>
                     <span className="text-[9px] font-black text-emerald-400/70 uppercase tracking-widest">En línea</span>
@@ -318,7 +321,7 @@ const Users = () => {
 
                 {/* Card Actions Footer */}
                 <div className={`
-                  absolute inset-0 bg-slate-950/80 backdrop-blur-xl rounded-[2rem] flex items-center justify-center gap-3 transition-all duration-500
+                  absolute inset-0 bg-white/90 backdrop-blur-xl rounded-[2rem] flex items-center justify-center gap-3 transition-all duration-500
                   ${isMobile
                     ? 'opacity-0 scale-95 pointer-events-none'
                     : 'opacity-0 lg:group-hover:opacity-100 scale-95 lg:group-hover:scale-100 z-10 pointer-events-none lg:group-hover:pointer-events-auto'
@@ -330,7 +333,7 @@ const Users = () => {
                 </div>
 
                 {/* Mobile Actions (Visible) */}
-                <div className="mt-auto pt-6 border-t border-white/5 flex gap-2 lg:hidden">
+                <div className="mt-auto pt-6 border-t border-slate-100 flex gap-2 lg:hidden">
                   <Button variant="secondary" size="sm" className="flex-1" onClick={() => openEditForm(user)}>Editar</Button>
                   <Button variant="warning" size="sm" className="px-3" onClick={() => openPasswordModal(user)}>🔑</Button>
                   <Button variant="danger" size="sm" className="flex-1" onClick={() => handleDeleteUser(user.id)} disabled={user.rol === 'admin' || user.id === currentUser?.userId}>Eliminar</Button>
@@ -389,9 +392,9 @@ const Users = () => {
                 required
               />
               <div>
-                <label className="text-[10px] font-black text-white/40 uppercase tracking-widest block mb-2 pl-1">Rol</label>
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2 pl-1">Rol</label>
                 <select
-                  className="px-4 py-3 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary-500/50 focus:border-white/20 block w-full transition-all duration-300 bg-white/5 text-white outline-none backdrop-blur-sm"
+                  className="px-4 py-3 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary-500/50 focus:border-slate-300 block w-full transition-all duration-300 bg-white text-slate-900 outline-none"
                   value={createFormData.rol}
                   onChange={e => setCreateFormData({ ...createFormData, rol: e.target.value })}
                 >
@@ -400,7 +403,7 @@ const Users = () => {
                 </select>
               </div>
             </div>
-            <div className="mt-10 pt-8 border-t border-white/5 flex flex-col-reverse sm:flex-row sm:justify-end gap-4">
+            <div className="mt-10 pt-8 border-t border-slate-100 flex flex-col-reverse sm:flex-row sm:justify-end gap-4">
               <Button type="button" onClick={() => setShowCreateForm(false)} variant="secondary" className="w-full sm:w-auto">Cancelar</Button>
               <Button type="submit" variant="primary" loading={creating} className="w-full sm:w-auto">Crear Usuario</Button>
             </div>
@@ -430,9 +433,9 @@ const Users = () => {
               required
             />
             <div>
-              <label className="text-[10px] font-black text-white/40 uppercase tracking-widest block mb-2 pl-1">Rol</label>
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2 pl-1">Rol</label>
               <select
-                className="px-4 py-3 border border-white/10 rounded-2xl focus:ring-2 focus:ring-primary-500/50 focus:border-white/20 block w-full transition-all duration-300 bg-white/5 text-white outline-none backdrop-blur-sm"
+                className="px-4 py-3 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary-500/50 focus:border-slate-300 block w-full transition-all duration-300 bg-white text-slate-900 outline-none"
                 value={editFormData.rol}
                 onChange={e => setEditFormData({ ...editFormData, rol: e.target.value })}
               >
@@ -440,7 +443,7 @@ const Users = () => {
                 <option value="admin">Administrador</option>
               </select>
             </div>
-            <div className="mt-10 pt-8 border-t border-white/5 flex flex-col-reverse sm:flex-row sm:justify-end gap-4">
+            <div className="mt-10 pt-8 border-t border-slate-100 flex flex-col-reverse sm:flex-row sm:justify-end gap-4">
               <Button type="button" onClick={() => setShowEditForm(false)} variant="secondary" className="w-full sm:w-auto">Cancelar</Button>
               <Button type="submit" variant="primary" loading={editing} className="w-full sm:w-auto">Guardar Cambios</Button>
             </div>
