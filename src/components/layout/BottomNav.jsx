@@ -1,17 +1,23 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, MapPin, Users, Car, User } from 'lucide-react';
+import { Home, MapPin, Users, Car, User, Shield } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 const BottomNav = () => {
     const location = useLocation();
+    const { isAdmin } = useAuth();
 
-    const navItems = [
+    const baseNavItems = [
         { icon: Home, label: 'Inicio', path: '/dashboard' },
         { icon: MapPin, label: 'Rutas', path: '/recorridos' },
         { icon: Users, label: 'Niños', path: '/ninos' },
         { icon: Car, label: 'Vehículos', path: '/vehiculos' },
-        { icon: User, label: 'Perfil', path: '/perfil' },
     ];
+
+    // Agregar enlace de Usuarios solo para admins, antes de Perfil
+    const navItems = isAdmin
+        ? [...baseNavItems, { icon: Shield, label: 'Usuarios', path: '/users' }, { icon: User, label: 'Perfil', path: '/perfil' }]
+        : [...baseNavItems, { icon: User, label: 'Perfil', path: '/perfil' }];
 
     return (
         <div className="fixed bottom-6 left-4 right-4 z-50 lg:hidden safe-area-bottom pointer-events-none">
