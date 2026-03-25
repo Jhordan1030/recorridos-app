@@ -10,7 +10,8 @@ import {
   MapPin,
   Users,
   Car,
-  Bell
+  Bell,
+  Shield
 } from 'lucide-react';
 
 const Header = ({ isMobile }) => {
@@ -78,12 +79,17 @@ const Header = ({ isMobile }) => {
     navigate('/perfil');
   };
 
-  const navItems = [
+  const baseNavItems = [
     { icon: Home, path: '/dashboard', label: 'Inicio' },
     { icon: MapPin, path: '/recorridos', label: 'Rutas' },
     { icon: Users, path: '/ninos', label: 'Niños' },
     { icon: Car, path: '/vehiculos', label: 'Vehículos' },
   ];
+
+  // Agregar enlace de Usuarios solo para admins
+  const navItems = isAdmin
+    ? [...baseNavItems, { icon: Shield, path: '/users', label: 'Usuarios' }]
+    : baseNavItems;
 
   return (
     <header className="hidden md:block sticky top-0 z-50 bg-white/80 backdrop-blur-2xl border-b border-white/20 shadow-sm transition-all duration-300">
